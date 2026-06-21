@@ -6,7 +6,8 @@
 | ファイル | 中身 |
 |---|---|
 | [`docs/01_fujiwara-book-summary.md`](docs/01_fujiwara-book-summary.md) | 本の全章まとめ（章ごとのルール＋藤原氏の投資先候補） |
-| [`docs/02_investment-plan.md`](docs/02_investment-plan.md) | **イオンの実行計画**（超余裕資金・毎月いくら・投資の順番・配分） |
+| [`docs/02_investment-plan.md`](docs/02_investment-plan.md) | 実行計画の全体版（枠の整理・判定フロー・フェーズ・配分） |
+| [`docs/05_ion-plan-confirmed.md`](docs/05_ion-plan-confirmed.md) | **★イオン専用 確定プラン**（月5万→7万・20年で1800万・毎月の配り方） |
 | [`docs/03_candidate-stocks.md`](docs/03_candidate-stocks.md) | 候補銘柄リスト＋**10年配当データに基づく評価** |
 | [`docs/04_software-vision.md`](docs/04_software-vision.md) | 一括管理ソフトの構想・ロードマップ |
 | [`data/candidates.json`](data/candidates.json) | 候補銘柄の構造化データ（将来のソフトの種） |
