@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="414" height="494" viewBox="0 0 414 494">
+<rect width="414" height="494" fill="#f4f6f8"/>
+<rect x="12" y="12" width="390" height="470" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+<rect x="28" y="28" width="358" height="188" rx="10" fill="#fdecea" stroke="#c0392b" stroke-width="2"/>
+<text x="44" y="58" font-size="15" fill="#c0392b" font-weight="800" text-anchor="start" font-family="Hiragino Sans, Noto Sans JP, sans-serif">🚨 今すぐ救急車(119)または</text>
+<text x="44" y="78" font-size="15" fill="#c0392b" font-weight="800" text-anchor="start" font-family="Hiragino Sans, Noto Sans JP, sans-serif">    救急外来へ</text>
+<text x="44" y="100" font-size="10.5" fill="#c0392b" font-weight="400" text-anchor="start" font-family="Hiragino Sans, Noto Sans JP, sans-serif">緊急性が高い可能性のある症状が選択されました</text>
+<text x="44" y="120" font-size="11" fill="#c0392b" font-weight="400" text-anchor="start" font-family="Hiragino Sans, Noto Sans JP, sans-serif">・胸の痛み・締めつけ</text>
+<text x="44" y="136" font-size="11" fill="#c0392b" font-weight="400" text-anchor="start" font-family="Hiragino Sans, Noto Sans JP, sans-serif">・片側手足のまひ</text>
+<rect x="28" y="150" width="173.0" height="38" rx="9" fill="#c0392b"/>
+<text x="114.5" y="174" font-size="13" fill="#fff" font-weight="800" text-anchor="middle" font-family="Hiragino Sans, Noto Sans JP, sans-serif">119 に電話</text>
+<rect x="213.0" y="150" width="173.0" height="38" rx="9" fill="#fff" stroke="#c0392b" stroke-width="2"/>
+<text x="299.5" y="174" font-size="12.5" fill="#c0392b" font-weight="800" text-anchor="middle" font-family="Hiragino Sans, Noto Sans JP, sans-serif">#7119 に相談</text>
+<text x="44" y="206" font-size="9.5" fill="#c0392b" font-weight="400" text-anchor="start" font-family="Hiragino Sans, Noto Sans JP, sans-serif">迷う場合も診療科案内より救急を優先してください</text>
+<rect x="28" y="228" width="358" height="44" rx="10" fill="#fff8e1" stroke="#f0d98c" stroke-width="1"/>
+<text x="40" y="247" font-size="11" fill="#1f2933" font-weight="700" text-anchor="start" font-family="Hiragino Sans, Noto Sans JP, sans-serif">⚠ これは診断ではありません。</text>
+<text x="40" y="263" font-size="10.5" fill="#1f2933" font-weight="400" text-anchor="start" font-family="Hiragino Sans, Noto Sans JP, sans-serif">以下はあくまで受診先の目安です。</text>
+<text x="28" y="290" font-size="14" fill="#1f2933" font-weight="700" text-anchor="start" font-family="Hiragino Sans, Noto Sans JP, sans-serif">受診先の目安</text>
+<rect x="28" y="302" width="150" height="36" rx="9" fill="#1d6fb8"/>
+<text x="103" y="326" font-size="16" fill="#fff" font-weight="800" text-anchor="middle" font-family="Hiragino Sans, Noto Sans JP, sans-serif">脳神経外科</text>
+<text x="28" y="360" font-size="11" fill="#6b7280" font-weight="400" text-anchor="start" font-family="Hiragino Sans, Noto Sans JP, sans-serif">関連候補：神経内科 / 救急科</text>
+</svg>

@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>受診先ナビ — 徒歩圏内の病院さがし（試作版）</title>
+  <style>
+:root {
+  --bg: #f4f6f8;
+  --card: #ffffff;
+  --text: #1f2933;
+  --muted: #6b7280;
+  --primary: #1d6fb8;
+  --primary-dark: #155a96;
+  --emergency: #c0392b;
+  --emergency-bg: #fdecea;
+  --border: #e2e8f0;
+  --radius: 12px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans",
+    "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+}
+
+.site-header {
+  text-align: center;
+  padding: 28px 16px 8px;
+}
+.site-header h1 {
+  margin: 0;
+  font-size: 1.7rem;
+}
+.beta {
+  font-size: 0.7rem;
+  background: var(--primary);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+.lead {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 16px 40px;
+}
+
+/* 免責 */
+.disclaimer {
+  max-width: 720px;
+  margin: 16px auto;
+  padding: 14px 16px;
+  background: #fff8e1;
+  border: 1px solid #f0d98c;
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+}
+.disclaimer a { color: var(--primary-dark); font-weight: 700; }
+.result-disclaimer { margin: 12px 0 20px; }
+
+/* カード */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-top: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.card h2 { margin-top: 0; }
+
+.hidden { display: none !important; }
+
+/* 症状グリッド */
+.emergency-hint {
+  font-size: 0.85rem;
+  color: var(--emergency);
+  margin-bottom: 10px;
+}
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 18px;
+}
+legend {
+  font-weight: 700;
+  margin-bottom: 8px;
+  padding: 0;
+}
+.symptom-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+.symptom-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  font-size: 0.95rem;
+}
+.symptom-item:hover { border-color: var(--primary); }
+.symptom-item input { width: 18px; height: 18px; flex: none; }
+.symptom-item.is-emergency {
+  border-color: #f1b0a8;
+  background: var(--emergency-bg);
+}
+.symptom-item.is-emergency span { color: var(--emergency); font-weight: 600; }
+
+/* プロフィール */
+.profile {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.profile label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  gap: 4px;
+}
+.profile select {
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+/* ボタン */
+.actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+button {
+  font-size: 1rem;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+}
+button.primary { background: var(--primary); color: #fff; }
+button.primary:hover { background: var(--primary-dark); }
+button.secondary {
+  background: #fff;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+button.secondary:hover { background: #f1f5f9; }
+
+/* 緊急バナー */
+.emergency-banner {
+  background: var(--emergency-bg);
+  border: 2px solid var(--emergency);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 20px;
+}
+.emergency-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--emergency);
+}
+.emergency-symptoms {
+  margin: 8px 0;
+  color: var(--emergency);
+}
+.emergency-note { font-weight: 600; }
+.emergency-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 14px 0 6px;
+}
+.call-btn {
+  flex: 1 1 200px;
+  text-align: center;
+  text-decoration: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+.call-119 { background: var(--emergency); color: #fff; }
+.call-7119 { background: #fff; color: var(--emergency); border: 2px solid var(--emergency); }
+.emergency-foot { font-size: 0.85rem; color: var(--emergency); margin-bottom: 0; }
+
+/* 診療科 */
+#recommended-departments h3,
+#hospital-results h3 { margin-bottom: 6px; }
+.dept-lead { margin: 0 0 8px; color: var(--muted); }
+.dept-primary {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 800;
+  padding: 8px 22px;
+  border-radius: 10px;
+}
+.dept-others { margin-top: 12px; font-size: 0.92rem; color: var(--muted); }
+.dept-chip {
+  display: inline-block;
+  background: #eef2f7;
+  color: var(--text);
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin: 2px;
+}
+
+/* 病院リスト */
+.dummy-tag {
+  font-size: 0.7rem;
+  background: #6b7280;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+.hospital-note { font-size: 0.83rem; color: var(--muted); margin: 4px 0 12px; }
+.hospital-list { list-style: none; padding: 0; margin: 0; }
+.hospital-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.hospital-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.hospital-name { font-weight: 700; font-size: 1.05rem; }
+.hospital-open {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.hospital-open.open { background: #e3f4e8; color: #1d7a3e; }
+.hospital-open.closed { background: #f1f1f1; color: #888; }
+.hospital-meta { color: var(--primary-dark); font-weight: 600; margin: 4px 0; }
+.hospital-depts, .hospital-hours { font-size: 0.9rem; color: var(--muted); }
+
+/* フッター */
+.site-footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.82rem;
+  padding: 24px 16px 40px;
+}
+
+@media (max-width: 480px) {
+  .site-header h1 { font-size: 1.4rem; }
+  .actions { flex-direction: column; }
+  button { width: 100%; }
+}
+
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <h1>受診先ナビ <span class="beta">試作版</span></h1>
+    <p class="lead">症状から「何科を受診すればいいか」の目安と、徒歩圏内の病院候補を案内します。</p>
+  </header>
+
+  <!-- 免責（トップ画面） -->
+  <div class="disclaimer" role="note">
+    <strong>⚠ これは医師の診断に代わるものではありません。</strong>
+    症状が重い場合や迷う場合は、迷わず医療機関や救急
+    （<a href="tel:7119">#7119</a> / <a href="tel:119">119</a>）に相談してください。
+    本アプリは受診先の「目安」を案内するもので、病名の診断や薬の推奨は行いません。
+  </div>
+
+  <main>
+    <!-- 症状選択フォーム -->
+    <section id="form-section" class="card">
+      <h2>1. 当てはまる症状を選んでください</h2>
+
+      <div class="emergency-hint">
+        <strong>赤色の症状</strong>は緊急性が高い可能性があります。
+      </div>
+
+      <form id="symptom-form">
+        <fieldset>
+          <legend>症状（複数選択可）</legend>
+          <div id="symptom-list" class="symptom-grid"></div>
+        </fieldset>
+
+        <fieldset class="profile">
+          <legend>あなたについて（任意）</legend>
+          <label>
+            年齢層
+            <select id="age-group" name="ageGroup">
+              <option value="">選択しない</option>
+              <option value="child">0〜15歳（こども）</option>
+              <option value="adult">16〜64歳</option>
+              <option value="senior">65歳以上</option>
+            </select>
+          </label>
+          <label>
+            性別
+            <select id="sex" name="sex">
+              <option value="">選択しない</option>
+              <option value="female">女性</option>
+              <option value="male">男性</option>
+              <option value="other">その他</option>
+            </select>
+          </label>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit" class="primary">受診先の目安を見る</button>
+          <button type="button" id="reset-btn" class="secondary">リセット</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- 結果画面 -->
+    <section id="result-section" class="card hidden" aria-live="polite">
+      <!-- 緊急警告（最優先で挿入される） -->
+      <div id="emergency-banner" class="hidden"></div>
+
+      <h2>2. 結果</h2>
+
+      <!-- 結果画面の免責 -->
+      <div class="disclaimer result-disclaimer" role="note">
+        <strong>⚠ これは診断ではありません。</strong>
+        以下はあくまで受診先の目安です。症状が重い・急に悪化した・判断に迷う場合は、
+        <a href="tel:7119">#7119</a>（救急相談）や <a href="tel:119">119</a>（救急車）に相談してください。
+      </div>
+
+      <div id="recommended-departments"></div>
+      <div id="hospital-results"></div>
+
+      <div class="actions">
+        <button type="button" id="back-btn" class="secondary">症状選択にもどる</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>受診先ナビ（試作版） — 病院データはダミーです。実際の位置情報・地図連携は今後追加予定。</p>
+  </footer>
+
+  <script>
+/*
+ * data.js — 受診先ナビのデータ定義
+ *
+ * ここに「症状」「診療科」「ダミー病院」のデータをまとめている。
+ * ルールはすべて固定（ルールベース）。後で精緻化しやすいよう、
+ * ロジック(app.js)とデータ(このファイル)を分離している。
+ *
+ * ⚠ 安全のための設計方針:
+ *  - 病名の診断・薬の推奨は一切しない。診療科の案内まで。
+ *  - emergency:true の症状が1つでも選ばれたら、診療科案内より先に
+ *    救急(119)を最優先で案内する（app.js側で処理）。
+ */
+
+/*
+ * 症状マスタ
+ *  id          : 内部ID
+ *  label       : 画面表示名
+ *  emergency   : 緊急性が高い症状か（true なら救急を最優先案内）
+ *  emergencyNote : 緊急時に表示する補足
+ *  departments : この症状に対応する診療科ID（優先度順）
+ */
+const SYMPTOMS = [
+  // --- 緊急性が高い症状 ---
+  {
+    id: 'chest_pain',
+    label: '胸の痛み・締めつけ',
+    emergency: true,
+    emergencyNote: '心臓や血管の重い病気の可能性があります。',
+    departments: ['cardiology', 'internal'],
+  },
+  {
+    id: 'breathing',
+    label: '激しい息苦しさ・呼吸困難',
+    emergency: true,
+    emergencyNote: '呼吸や心臓の緊急事態の可能性があります。',
+    departments: ['internal', 'cardiology'],
+  },
+  {
+    id: 'unconscious',
+    label: '意識がもうろう・意識を失った',
+    emergency: true,
+    emergencyNote: '命に関わる可能性があります。ためらわず119へ。',
+    departments: ['emergency'],
+  },
+  {
+    id: 'paralysis',
+    label: '片側の手足のまひ・ろれつが回らない',
+    emergency: true,
+    emergencyNote: '脳卒中の可能性があります。発症時刻が治療に重要です。',
+    departments: ['neurosurgery', 'neurology'],
+  },
+  {
+    id: 'bleeding',
+    label: '止まらない大量の出血',
+    emergency: true,
+    emergencyNote: '止血が必要です。圧迫しながら救急へ。',
+    departments: ['surgery', 'emergency'],
+  },
+  {
+    id: 'seizure',
+    label: 'けいれん・ひきつけ',
+    emergency: true,
+    emergencyNote: '繰り返す・長く続く場合は特に危険です。',
+    departments: ['neurology', 'emergency'],
+  },
+
+  // --- 一般的な症状 ---
+  { id: 'fever',     label: '発熱',           emergency: false, departments: ['internal'] },
+  { id: 'cough',     label: '咳・のどの痛み', emergency: false, departments: ['internal', 'otolaryngology'] },
+  { id: 'stomach',   label: '腹痛',           emergency: false, departments: ['internal', 'gastroenterology'] },
+  { id: 'headache',  label: '頭痛',           emergency: false, departments: ['internal', 'neurology'] },
+  { id: 'dizziness', label: 'めまい',         emergency: false, departments: ['otolaryngology', 'internal'] },
+  { id: 'injury',    label: 'けが・打撲・ねんざ', emergency: false, departments: ['orthopedics', 'surgery'] },
+  { id: 'jointpain', label: '関節・腰・首の痛み', emergency: false, departments: ['orthopedics'] },
+  { id: 'skin',      label: '皮膚の異常（発疹・かゆみ）', emergency: false, departments: ['dermatology'] },
+  { id: 'eye',       label: '目の痛み・見えにくさ', emergency: false, departments: ['ophthalmology'] },
+  { id: 'ear',       label: '耳の痛み・聞こえにくさ', emergency: false, departments: ['otolaryngology'] },
+  { id: 'tooth',     label: '歯の痛み',       emergency: false, departments: ['dentistry'] },
+];
+
+/*
+ * 診療科マスタ
+ */
+const DEPARTMENTS = {
+  emergency:        { id: 'emergency',        name: '救急科' },
+  internal:         { id: 'internal',         name: '内科' },
+  surgery:          { id: 'surgery',          name: '外科' },
+  orthopedics:      { id: 'orthopedics',      name: '整形外科' },
+  cardiology:       { id: 'cardiology',       name: '循環器内科' },
+  gastroenterology: { id: 'gastroenterology', name: '消化器内科' },
+  neurology:        { id: 'neurology',        name: '神経内科' },
+  neurosurgery:     { id: 'neurosurgery',     name: '脳神経外科' },
+  otolaryngology:   { id: 'otolaryngology',   name: '耳鼻咽喉科' },
+  dermatology:      { id: 'dermatology',      name: '皮膚科' },
+  ophthalmology:    { id: 'ophthalmology',    name: '眼科' },
+  dentistry:        { id: 'dentistry',        name: '歯科' },
+  pediatrics:       { id: 'pediatrics',       name: '小児科' },
+};
+
+/*
+ * ダミー病院データ
+ *  実際の位置情報/地図APIは未連携。距離は仮の固定値。
+ *  departments には扱う診療科IDを並べる。
+ *  walkMinutes : 徒歩での所要時間（分・ダミー）
+ */
+const DUMMY_HOSPITALS = [
+  {
+    name: 'みなと総合クリニック',
+    departments: ['internal', 'cardiology', 'gastroenterology'],
+    distanceMeters: 220,
+    walkMinutes: 3,
+    hours: '平日 9:00–18:00 / 土 9:00–13:00',
+    open: true,
+  },
+  {
+    name: 'さくら整形外科・外科',
+    departments: ['orthopedics', 'surgery'],
+    distanceMeters: 480,
+    walkMinutes: 6,
+    hours: '平日 9:00–12:30, 15:00–18:30 / 土 9:00–12:30',
+    open: true,
+  },
+  {
+    name: 'あおぞら皮膚科クリニック',
+    departments: ['dermatology'],
+    distanceMeters: 350,
+    walkMinutes: 5,
+    hours: '平日 10:00–13:00, 14:30–19:00',
+    open: true,
+  },
+  {
+    name: 'なかまち耳鼻咽喉科',
+    departments: ['otolaryngology'],
+    distanceMeters: 600,
+    walkMinutes: 8,
+    hours: '平日 9:00–12:00, 15:00–18:00 / 木・日 休診',
+    open: false,
+  },
+  {
+    name: 'ひかり眼科',
+    departments: ['ophthalmology'],
+    distanceMeters: 540,
+    walkMinutes: 7,
+    hours: '平日 9:30–13:00, 14:30–18:00',
+    open: true,
+  },
+  {
+    name: 'けやき脳神経クリニック',
+    departments: ['neurology', 'neurosurgery', 'internal'],
+    distanceMeters: 750,
+    walkMinutes: 10,
+    hours: '平日 9:00–17:00',
+    open: true,
+  },
+  {
+    name: '市民中央病院（救急対応）',
+    departments: ['emergency', 'internal', 'surgery', 'cardiology', 'neurosurgery', 'orthopedics'],
+    distanceMeters: 900,
+    walkMinutes: 12,
+    hours: '24時間・救急受付あり',
+    open: true,
+  },
+  {
+    name: 'こもれび歯科',
+    departments: ['dentistry'],
+    distanceMeters: 280,
+    walkMinutes: 4,
+    hours: '平日 9:00–18:00 / 土 9:00–13:00',
+    open: true,
+  },
+];
+
+// app.js から参照できるよう公開
+window.HospitalNaviData = { SYMPTOMS, DEPARTMENTS, DUMMY_HOSPITALS };
+
+</script>
+  <script>
+/*
+ * app.js — 受診先ナビのロジック
+ *
+ * 処理の流れ:
+ *  1. 症状フォームを描画
+ *  2. 送信時、選択症状から
+ *     a) 緊急症状があれば救急警告を最優先で表示
+ *     b) 該当診療科を集計して提示（ルールベース）
+ *     c) その診療科を扱う徒歩圏内のダミー病院を表示
+ *
+ * ⚠ 病名診断・薬の推奨は行わない。診療科の案内まで。
+ */
+
+(function () {
+  'use strict';
+
+  const { SYMPTOMS, DEPARTMENTS, DUMMY_HOSPITALS } = window.HospitalNaviData;
+
+  const form = document.getElementById('symptom-form');
+  const symptomList = document.getElementById('symptom-list');
+  const formSection = document.getElementById('form-section');
+  const resultSection = document.getElementById('result-section');
+  const emergencyBanner = document.getElementById('emergency-banner');
+  const deptContainer = document.getElementById('recommended-departments');
+  const hospitalContainer = document.getElementById('hospital-results');
+
+  /* ---------- 1. 症状フォームの描画 ---------- */
+  function renderSymptoms() {
+    symptomList.innerHTML = '';
+    SYMPTOMS.forEach((s) => {
+      const id = `sym-${s.id}`;
+      const wrapper = document.createElement('label');
+      wrapper.className = 'symptom-item' + (s.emergency ? ' is-emergency' : '');
+      wrapper.htmlFor = id;
+      wrapper.innerHTML = `
+        <input type="checkbox" id="${id}" name="symptom" value="${s.id}" />
+        <span>${s.label}</span>
+      `;
+      symptomList.appendChild(wrapper);
+    });
+  }
+
+  /* ---------- 2. 結果の計算 ---------- */
+  function getSelectedSymptoms() {
+    const checked = [...form.querySelectorAll('input[name="symptom"]:checked')];
+    const ids = checked.map((c) => c.value);
+    return SYMPTOMS.filter((s) => ids.includes(s.id));
+  }
+
+  // 緊急症状だけ抽出
+  function getEmergencySymptoms(selected) {
+    return selected.filter((s) => s.emergency);
+  }
+
+  // 選択症状 → 推奨診療科（重複は出現回数でスコア化し優先度順に）
+  function rankDepartments(selected) {
+    const score = {};
+    selected.forEach((s) => {
+      s.departments.forEach((deptId, idx) => {
+        // 先頭の診療科ほど高スコア（idxが小さいほど加点）
+        score[deptId] = (score[deptId] || 0) + (s.departments.length - idx);
+      });
+    });
+    return Object.keys(score)
+      .map((id) => ({ dept: DEPARTMENTS[id], score: score[id] }))
+      .sort((a, b) => b.score - a.score);
+  }
+
+  // 年齢層が「こども」なら小児科を先頭に補足提案
+  function applyProfileAdjustments(ranked, ageGroup) {
+    if (ageGroup === 'child' && !ranked.some((r) => r.dept.id === 'pediatrics')) {
+      return [{ dept: DEPARTMENTS.pediatrics, score: Infinity }, ...ranked];
+    }
+    return ranked;
+  }
+
+  // 推奨診療科に該当する徒歩圏内のダミー病院（距離が近い順）
+  function findHospitals(deptIds) {
+    return DUMMY_HOSPITALS
+      .filter((h) => h.departments.some((d) => deptIds.includes(d)))
+      .sort((a, b) => a.distanceMeters - b.distanceMeters);
+  }
+
+  /* ---------- 3. 結果の描画 ---------- */
+  function renderEmergency(emergencySymptoms) {
+    if (emergencySymptoms.length === 0) {
+      emergencyBanner.className = 'hidden';
+      emergencyBanner.innerHTML = '';
+      return;
+    }
+    const notes = [...new Set(emergencySymptoms.map((s) => s.emergencyNote).filter(Boolean))];
+    emergencyBanner.className = 'emergency-banner';
+    emergencyBanner.innerHTML = `
+      <div class="emergency-title">🚨 今すぐ救急車（119）または救急外来へ</div>
+      <p>選択された症状に、緊急性が高い可能性のあるものが含まれています。</p>
+      <ul class="emergency-symptoms">
+        ${emergencySymptoms.map((s) => `<li>${s.label}</li>`).join('')}
+      </ul>
+      ${notes.length ? `<p class="emergency-note">${notes.join(' ')}</p>` : ''}
+      <div class="emergency-actions">
+        <a class="call-btn call-119" href="tel:119">119 に電話（救急車）</a>
+        <a class="call-btn call-7119" href="tel:7119">#7119 に相談（救急相談）</a>
+      </div>
+      <p class="emergency-foot">迷う場合も、下の診療科案内より救急への相談を優先してください。</p>
+    `;
+  }
+
+  function renderDepartments(ranked) {
+    if (ranked.length === 0) {
+      deptContainer.innerHTML = `
+        <h3>受診先の目安</h3>
+        <p>選択された症状からは診療科を特定できませんでした。
+        まずは <strong>内科</strong> で相談するか、判断に迷う場合は
+        <a href="tel:7119">#7119</a> に相談してください。</p>`;
+      return;
+    }
+    const primary = ranked[0].dept;
+    const others = ranked.slice(1);
+    deptContainer.innerHTML = `
+      <h3>受診先の目安</h3>
+      <p class="dept-lead">まずは次の診療科の受診を検討してください。</p>
+      <div class="dept-primary">${primary.name}</div>
+      ${
+        others.length
+          ? `<p class="dept-others">関連して候補になりうる科：
+             ${others.map((o) => `<span class="dept-chip">${o.dept.name}</span>`).join(' ')}</p>`
+          : ''
+      }
+    `;
+  }
+
+  function renderHospitals(hospitals) {
+    if (hospitals.length === 0) {
+      hospitalContainer.innerHTML = `
+        <h3>徒歩圏内の病院候補</h3>
+        <p>該当する診療科の病院候補（ダミー）が見つかりませんでした。</p>`;
+      return;
+    }
+    hospitalContainer.innerHTML = `
+      <h3>徒歩圏内の病院候補 <span class="dummy-tag">ダミーデータ</span></h3>
+      <p class="hospital-note">※ 位置情報・地図連携は未実装です。距離や営業時間は仮の値です。</p>
+      <ul class="hospital-list">
+        ${hospitals
+          .map((h) => {
+            const depts = h.departments
+              .map((d) => DEPARTMENTS[d] && DEPARTMENTS[d].name)
+              .filter(Boolean)
+              .join('・');
+            return `
+            <li class="hospital-card">
+              <div class="hospital-head">
+                <span class="hospital-name">${h.name}</span>
+                <span class="hospital-open ${h.open ? 'open' : 'closed'}">
+                  ${h.open ? '診療中の可能性' : '時間外の可能性'}
+                </span>
+              </div>
+              <div class="hospital-meta">
+                <span>🚶 約${h.walkMinutes}分（${h.distanceMeters}m）</span>
+              </div>
+              <div class="hospital-depts">診療科：${depts}</div>
+              <div class="hospital-hours">🕒 ${h.hours}</div>
+            </li>`;
+          })
+          .join('')}
+      </ul>
+    `;
+  }
+
+  /* ---------- 4. 送信ハンドラ ---------- */
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const selected = getSelectedSymptoms();
+
+    if (selected.length === 0) {
+      alert('症状を1つ以上選んでください。');
+      return;
+    }
+
+    const ageGroup = document.getElementById('age-group').value;
+    const emergencySymptoms = getEmergencySymptoms(selected);
+
+    // a) 緊急警告を最優先で
+    renderEmergency(emergencySymptoms);
+
+    // b) 推奨診療科
+    let ranked = rankDepartments(selected);
+    ranked = applyProfileAdjustments(ranked, ageGroup);
+    renderDepartments(ranked);
+
+    // c) 病院候補
+    const deptIds = ranked.map((r) => r.dept.id);
+    renderHospitals(findHospitals(deptIds));
+
+    // 画面切り替え
+    formSection.classList.add('hidden');
+    resultSection.classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  /* ---------- 5. ナビゲーション ---------- */
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    form.reset();
+  });
+
+  document.getElementById('back-btn').addEventListener('click', () => {
+    resultSection.classList.add('hidden');
+    formSection.classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  /* ---------- 初期化 ---------- */
+  renderSymptoms();
+})();
+
+</script>
+</body>
+</html>
