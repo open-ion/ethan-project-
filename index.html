@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>受診先ナビ — 徒歩圏内の病院さがし（試作版）</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>受診先ナビ <span class="beta">試作版</span></h1>
+    <p class="lead">症状から「何科を受診すればいいか」の目安と、徒歩圏内の病院候補を案内します。</p>
+  </header>
+
+  <!-- 免責（トップ画面） -->
+  <div class="disclaimer" role="note">
+    <strong>⚠ これは医師の診断に代わるものではありません。</strong>
+    症状が重い場合や迷う場合は、迷わず医療機関や救急
+    （<a href="tel:7119">#7119</a> / <a href="tel:119">119</a>）に相談してください。
+    本アプリは受診先の「目安」を案内するもので、病名の診断や薬の推奨は行いません。
+  </div>
+
+  <main>
+    <!-- 症状選択フォーム -->
+    <section id="form-section" class="card">
+      <h2>1. 当てはまる症状を選んでください</h2>
+
+      <div class="emergency-hint">
+        <strong>赤色の症状</strong>は緊急性が高い可能性があります。
+      </div>
+
+      <form id="symptom-form">
+        <fieldset>
+          <legend>症状（複数選択可）</legend>
+          <div id="symptom-list" class="symptom-grid"></div>
+        </fieldset>
+
+        <fieldset class="profile">
+          <legend>あなたについて（任意）</legend>
+          <label>
+            年齢層
+            <select id="age-group" name="ageGroup">
+              <option value="">選択しない</option>
+              <option value="child">0〜15歳（こども）</option>
+              <option value="adult">16〜64歳</option>
+              <option value="senior">65歳以上</option>
+            </select>
+          </label>
+          <label>
+            性別
+            <select id="sex" name="sex">
+              <option value="">選択しない</option>
+              <option value="female">女性</option>
+              <option value="male">男性</option>
+              <option value="other">その他</option>
+            </select>
+          </label>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit" class="primary">受診先の目安を見る</button>
+          <button type="button" id="reset-btn" class="secondary">リセット</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- 結果画面 -->
+    <section id="result-section" class="card hidden" aria-live="polite">
+      <!-- 緊急警告（最優先で挿入される） -->
+      <div id="emergency-banner" class="hidden"></div>
+
+      <h2>2. 結果</h2>
+
+      <!-- 結果画面の免責 -->
+      <div class="disclaimer result-disclaimer" role="note">
+        <strong>⚠ これは診断ではありません。</strong>
+        以下はあくまで受診先の目安です。症状が重い・急に悪化した・判断に迷う場合は、
+        <a href="tel:7119">#7119</a>（救急相談）や <a href="tel:119">119</a>（救急車）に相談してください。
+      </div>
+
+      <div id="recommended-departments"></div>
+      <div id="hospital-results"></div>
+
+      <div class="actions">
+        <button type="button" id="back-btn" class="secondary">症状選択にもどる</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>受診先ナビ（試作版） — 病院データはダミーです。実際の位置情報・地図連携は今後追加予定。</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
