@@ -9,8 +9,17 @@
 | [`docs/02_investment-plan.md`](docs/02_investment-plan.md) | 実行計画の全体版（枠の整理・判定フロー・フェーズ・配分） |
 | [`docs/05_ion-plan-confirmed.md`](docs/05_ion-plan-confirmed.md) | **★イオン専用 確定プラン**（月5万→7万・20年で1800万・毎月の配り方） |
 | [`docs/03_candidate-stocks.md`](docs/03_candidate-stocks.md) | 候補銘柄リスト＋**10年配当データに基づく評価** |
+| [`docs/06_tax-filing-prep.md`](docs/06_tax-filing-prep.md) | 副業の確定申告・税金・「バレない」住民税対策 |
 | [`docs/04_software-vision.md`](docs/04_software-vision.md) | 一括管理ソフトの構想・ロードマップ |
-| [`data/candidates.json`](data/candidates.json) | 候補銘柄の構造化データ（将来のソフトの種） |
+| [`tools/dashboard.py`](tools/dashboard.py) | **★管理ソフト v0**：家計・防衛資金・NISA枠・確定申告を一画面に |
+| [`data/`](data/) | 構造化データ（profile / portfolio / candidates） |
+
+## 管理ソフトを動かす
+```bash
+python3 tools/dashboard.py
+```
+月1回これを開けば、今のフェーズ・防衛資金の進捗・次の一手・確定申告の残り日数が出る。
+保有や防衛資金額が変わったら `data/profile.json` `data/portfolio.json` を更新するだけ。
 
 ## 3行サマリー
 - **オルカン（eMAXIS Slim 全世界株式）からスタート**は藤原氏の推奨と完全一致。まずこれを軸に。

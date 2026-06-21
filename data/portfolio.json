@@ -1,0 +1,19 @@
+{
+  "_meta": {
+    "description": "イオンの実保有。売買のたびに更新する。ダッシュボードが集計する。",
+    "updated": "2026-06-21"
+  },
+  "nisa_tsumitate": [
+    {
+      "name": "eMAXIS Slim 全世界株式(オルカン)",
+      "type": "投信",
+      "monthly_jpy": 35000,
+      "started": "2026-07",
+      "invested_jpy": 0,
+      "note": "フェーズAのコア。まだ開始前(7月から)"
+    }
+  ],
+  "nisa_growth": [],
+  "tokutei": [],
+  "crowdfunding": []
+}
