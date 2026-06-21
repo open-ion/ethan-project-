@@ -79,6 +79,26 @@
       </div>
 
       <div id="recommended-departments"></div>
+
+      <div id="location-controls" class="location-box">
+        <h3>現在地から実際の病院を探す <span class="real-tag">実データ(OpenStreetMap)</span></h3>
+        <p class="loc-note">
+          位置情報はこの検索のためにその場で使うだけで、保存も外部送信もしません。
+          診療科や診療時間はデータが古い場合があるため、受診前に必ず電話でご確認ください。
+        </p>
+        <div class="loc-actions">
+          <button type="button" id="use-gps" class="primary">📍 現在地から探す</button>
+        </div>
+        <div class="loc-manual">
+          <label for="addr-input">うまくいかない時は、地名や住所で検索：</label>
+          <div class="loc-manual-row">
+            <input type="text" id="addr-input" placeholder="例：渋谷駅、横浜市中区 など" />
+            <button type="button" id="use-addr" class="secondary">この場所で探す</button>
+          </div>
+        </div>
+        <div id="loc-status" class="loc-status" aria-live="polite"></div>
+      </div>
+
       <div id="hospital-results"></div>
 
       <div class="actions">
@@ -92,6 +112,7 @@
   </footer>
 
   <script src="data.js"></script>
+  <script src="geo.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

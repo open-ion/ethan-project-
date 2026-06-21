@@ -170,5 +170,28 @@ const DUMMY_HOSPITALS = [
   },
 ];
 
+/*
+ * OpenStreetMap の診療科タグ(healthcare:speciality 等)を、本アプリの診療科IDに対応づける。
+ * 値は部分一致で判定する（例: "cardiology" は "cardio" を含む）。
+ * OSMは英語表記なので、想定される綴りの一部をキーにしている。
+ */
+const OSM_SPECIALITY_TO_DEPT = {
+  general: 'internal',
+  internal: 'internal',
+  cardio: 'cardiology',
+  gastro: 'gastroenterology',
+  neurosurg: 'neurosurgery',
+  neurolog: 'neurology',
+  orthop: 'orthopedics',
+  surgery: 'surgery',
+  dermatolog: 'dermatology',
+  ophthalmolog: 'ophthalmology',
+  otolaryngolog: 'otolaryngology',
+  paediatr: 'pediatrics',
+  pediatr: 'pediatrics',
+  dent: 'dentistry',
+  emergency: 'emergency',
+};
+
 // app.js から参照できるよう公開
-window.HospitalNaviData = { SYMPTOMS, DEPARTMENTS, DUMMY_HOSPITALS };
+window.HospitalNaviData = { SYMPTOMS, DEPARTMENTS, DUMMY_HOSPITALS, OSM_SPECIALITY_TO_DEPT };

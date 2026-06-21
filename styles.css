@@ -246,7 +246,47 @@ button.secondary:hover { background: #f1f5f9; }
 .hospital-open.open { background: #e3f4e8; color: #1d7a3e; }
 .hospital-open.closed { background: #f1f1f1; color: #888; }
 .hospital-meta { color: var(--primary-dark); font-weight: 600; margin: 4px 0; }
-.hospital-depts, .hospital-hours { font-size: 0.9rem; color: var(--muted); }
+.hospital-depts, .hospital-hours, .hospital-phone { font-size: 0.9rem; color: var(--muted); }
+.hospital-phone a { color: var(--primary-dark); font-weight: 700; }
+.hospital-map { margin-top: 6px; font-size: 0.88rem; }
+.hospital-map a { color: var(--primary); font-weight: 600; text-decoration: none; }
+
+/* 位置情報パネル */
+.location-box {
+  background: #f0f6fb;
+  border: 1px solid #cfe2f1;
+  border-radius: var(--radius);
+  padding: 16px;
+  margin: 18px 0;
+}
+.location-box h3 { margin: 0 0 8px; }
+.real-tag {
+  font-size: 0.7rem;
+  background: #1d7a3e;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+.loc-note { font-size: 0.82rem; color: var(--muted); margin: 0 0 12px; }
+.loc-actions { margin-bottom: 10px; }
+.loc-manual label { font-size: 0.85rem; display: block; margin-bottom: 6px; }
+.loc-manual-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.loc-manual-row input {
+  flex: 1 1 180px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+.loc-status { font-size: 0.9rem; margin-top: 10px; min-height: 1.2em; }
+.loc-status.loading { color: var(--primary-dark); }
+.loc-status.error { color: var(--emergency); }
+.real-section {
+  font-weight: 700;
+  margin: 16px 0 6px;
+  font-size: 0.95rem;
+}
 
 /* フッター */
 .site-footer {

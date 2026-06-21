@@ -253,7 +253,47 @@ button.secondary:hover { background: #f1f5f9; }
 .hospital-open.open { background: #e3f4e8; color: #1d7a3e; }
 .hospital-open.closed { background: #f1f1f1; color: #888; }
 .hospital-meta { color: var(--primary-dark); font-weight: 600; margin: 4px 0; }
-.hospital-depts, .hospital-hours { font-size: 0.9rem; color: var(--muted); }
+.hospital-depts, .hospital-hours, .hospital-phone { font-size: 0.9rem; color: var(--muted); }
+.hospital-phone a { color: var(--primary-dark); font-weight: 700; }
+.hospital-map { margin-top: 6px; font-size: 0.88rem; }
+.hospital-map a { color: var(--primary); font-weight: 600; text-decoration: none; }
+
+/* 位置情報パネル */
+.location-box {
+  background: #f0f6fb;
+  border: 1px solid #cfe2f1;
+  border-radius: var(--radius);
+  padding: 16px;
+  margin: 18px 0;
+}
+.location-box h3 { margin: 0 0 8px; }
+.real-tag {
+  font-size: 0.7rem;
+  background: #1d7a3e;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+.loc-note { font-size: 0.82rem; color: var(--muted); margin: 0 0 12px; }
+.loc-actions { margin-bottom: 10px; }
+.loc-manual label { font-size: 0.85rem; display: block; margin-bottom: 6px; }
+.loc-manual-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.loc-manual-row input {
+  flex: 1 1 180px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+.loc-status { font-size: 0.9rem; margin-top: 10px; min-height: 1.2em; }
+.loc-status.loading { color: var(--primary-dark); }
+.loc-status.error { color: var(--emergency); }
+.real-section {
+  font-weight: 700;
+  margin: 16px 0 6px;
+  font-size: 0.95rem;
+}
 
 /* フッター */
 .site-footer {
@@ -344,6 +384,26 @@ button.secondary:hover { background: #f1f5f9; }
       </div>
 
       <div id="recommended-departments"></div>
+
+      <div id="location-controls" class="location-box">
+        <h3>現在地から実際の病院を探す <span class="real-tag">実データ(OpenStreetMap)</span></h3>
+        <p class="loc-note">
+          位置情報はこの検索のためにその場で使うだけで、保存も外部送信もしません。
+          診療科や診療時間はデータが古い場合があるため、受診前に必ず電話でご確認ください。
+        </p>
+        <div class="loc-actions">
+          <button type="button" id="use-gps" class="primary">📍 現在地から探す</button>
+        </div>
+        <div class="loc-manual">
+          <label for="addr-input">うまくいかない時は、地名や住所で検索：</label>
+          <div class="loc-manual-row">
+            <input type="text" id="addr-input" placeholder="例：渋谷駅、横浜市中区 など" />
+            <button type="button" id="use-addr" class="secondary">この場所で探す</button>
+          </div>
+        </div>
+        <div id="loc-status" class="loc-status" aria-live="polite"></div>
+      </div>
+
       <div id="hospital-results"></div>
 
       <div class="actions">
@@ -529,8 +589,172 @@ const DUMMY_HOSPITALS = [
   },
 ];
 
+/*
+ * OpenStreetMap の診療科タグ(healthcare:speciality 等)を、本アプリの診療科IDに対応づける。
+ * 値は部分一致で判定する（例: "cardiology" は "cardio" を含む）。
+ * OSMは英語表記なので、想定される綴りの一部をキーにしている。
+ */
+const OSM_SPECIALITY_TO_DEPT = {
+  general: 'internal',
+  internal: 'internal',
+  cardio: 'cardiology',
+  gastro: 'gastroenterology',
+  neurosurg: 'neurosurgery',
+  neurolog: 'neurology',
+  orthop: 'orthopedics',
+  surgery: 'surgery',
+  dermatolog: 'dermatology',
+  ophthalmolog: 'ophthalmology',
+  otolaryngolog: 'otolaryngology',
+  paediatr: 'pediatrics',
+  pediatr: 'pediatrics',
+  dent: 'dentistry',
+  emergency: 'emergency',
+};
+
 // app.js から参照できるよう公開
-window.HospitalNaviData = { SYMPTOMS, DEPARTMENTS, DUMMY_HOSPITALS };
+window.HospitalNaviData = { SYMPTOMS, DEPARTMENTS, DUMMY_HOSPITALS, OSM_SPECIALITY_TO_DEPT };
+
+</script>
+  <script>
+/*
+ * geo.js — 位置情報の取得と、OpenStreetMapからの実病院検索
+ *
+ * 機能:
+ *  - getCurrentLocation() : ブラウザの位置情報API(navigator.geolocation)で現在地を取得
+ *  - geocodeAddress()     : 地名・住所を緯度経度に変換（Nominatim / OpenStreetMap）
+ *  - searchHospitalsOSM() : 現在地周辺の医療機関を検索（Overpass API / OpenStreetMap）
+ *
+ * ⚠ 設計方針:
+ *  - 位置情報はこの検索のためにその場で使うだけ。保存も外部送信もしない。
+ *  - ここでも病名の診断・薬の推奨はしない。診療科の案内・医療機関の候補提示まで。
+ *  - OSMのデータは更新が遅れることがあるため、診療科・診療時間は要確認である旨を
+ *    呼び出し側(app.js)で必ず表示する。
+ *  - 位置情報APIは HTTPS（安全なコンテキスト）でのみ動く。公開URL(GitHub Pages)はHTTPS。
+ */
+
+(function () {
+  'use strict';
+
+  const OVERPASS = 'https://overpass-api.de/api/interpreter';
+  const NOMINATIM = 'https://nominatim.openstreetmap.org/search';
+
+  // 2点間の直線距離（メートル）。Haversineの公式。
+  function haversine(aLat, aLng, bLat, bLng) {
+    const R = 6371000;
+    const toRad = (d) => (d * Math.PI) / 180;
+    const dLat = toRad(bLat - aLat);
+    const dLng = toRad(bLng - aLng);
+    const s =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(aLat)) * Math.cos(toRad(bLat)) * Math.sin(dLng / 2) ** 2;
+    return Math.round(2 * R * Math.asin(Math.sqrt(s)));
+  }
+
+  // 徒歩の所要時間（分）。徒歩を約80m/分として概算。
+  const walkMinutes = (m) => Math.max(1, Math.round(m / 80));
+
+  // ブラウザの位置情報APIで現在地を取得
+  function getCurrentLocation() {
+    return new Promise((resolve, reject) => {
+      if (!('geolocation' in navigator)) {
+        reject(new Error('この端末・ブラウザでは位置情報が使えません。'));
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (p) => resolve({ lat: p.coords.latitude, lng: p.coords.longitude }),
+        (err) => {
+          const msg =
+            err.code === 1
+              ? '位置情報の利用が許可されませんでした。ブラウザの設定をご確認ください。'
+              : err.code === 3
+              ? '位置情報の取得がタイムアウトしました。'
+              : '位置情報を取得できませんでした。';
+          reject(new Error(msg));
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      );
+    });
+  }
+
+  // 地名・住所 → 緯度経度（OpenStreetMapのジオコーディング）
+  async function geocodeAddress(query) {
+    const url =
+      `${NOMINATIM}?format=json&limit=1&countrycodes=jp&accept-language=ja` +
+      `&q=${encodeURIComponent(query)}`;
+    const res = await fetch(url, { headers: { Accept: 'application/json' } });
+    if (!res.ok) throw new Error('住所の検索に失敗しました。時間をおいてお試しください。');
+    const data = await res.json();
+    if (!data.length) {
+      throw new Error('その地名・住所が見つかりませんでした。別の書き方でお試しください。');
+    }
+    return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), label: data[0].display_name };
+  }
+
+  // OSMの診療科タグを、本アプリの診療科IDに対応づける（部分一致）
+  function mapSpecialities(tags) {
+    const map = window.HospitalNaviData.OSM_SPECIALITY_TO_DEPT;
+    const out = new Set();
+    const raw = `${tags['healthcare:speciality'] || ''};${tags.speciality || ''}`;
+    raw
+      .split(/[;,]/)
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean)
+      .forEach((s) => {
+        Object.keys(map).forEach((k) => {
+          if (s.includes(k)) out.add(map[k]);
+        });
+      });
+    return [...out];
+  }
+
+  // 現在地周辺の医療機関を検索（Overpass API）
+  async function searchHospitalsOSM(lat, lng, radius = 1500) {
+    const q =
+      `[out:json][timeout:25];(` +
+      `node["amenity"~"clinic|hospital|doctors"](around:${radius},${lat},${lng});` +
+      `way["amenity"~"clinic|hospital|doctors"](around:${radius},${lat},${lng});` +
+      `);out center tags 80;`;
+    const res = await fetch(OVERPASS, {
+      method: 'POST',
+      body: 'data=' + encodeURIComponent(q),
+    });
+    if (!res.ok) {
+      throw new Error('病院データの取得に失敗しました。時間をおいてお試しください。');
+    }
+    const data = await res.json();
+    const seen = new Set();
+    return (data.elements || [])
+      .map((el) => {
+        const t = el.tags || {};
+        const plat = el.lat != null ? el.lat : el.center && el.center.lat;
+        const plng = el.lon != null ? el.lon : el.center && el.center.lon;
+        if (plat == null || plng == null) return null;
+        const dist = haversine(lat, lng, plat, plng);
+        return {
+          name: t.name || t['name:ja'] || '(名称不明の医療機関)',
+          lat: plat,
+          lng: plng,
+          amenity: t.amenity,
+          distanceMeters: dist,
+          walkMinutes: walkMinutes(dist),
+          departments: mapSpecialities(t),
+          hours: t.opening_hours || '',
+          phone: t.phone || t['contact:phone'] || '',
+        };
+      })
+      .filter(Boolean)
+      .filter((h) => {
+        const key = `${h.name}@${h.lat.toFixed(4)},${h.lng.toFixed(4)}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .sort((a, b) => a.distanceMeters - b.distanceMeters);
+  }
+
+  window.HospitalNaviGeo = { getCurrentLocation, geocodeAddress, searchHospitalsOSM, haversine, walkMinutes };
+})();
 
 </script>
   <script>
@@ -551,6 +775,10 @@ window.HospitalNaviData = { SYMPTOMS, DEPARTMENTS, DUMMY_HOSPITALS };
   'use strict';
 
   const { SYMPTOMS, DEPARTMENTS, DUMMY_HOSPITALS } = window.HospitalNaviData;
+  const Geo = window.HospitalNaviGeo;
+
+  // 直近の推奨診療科ID（位置情報検索が参照する）
+  const state = { deptIds: [] };
 
   const form = document.getElementById('symptom-form');
   const symptomList = document.getElementById('symptom-list');
@@ -673,8 +901,8 @@ window.HospitalNaviData = { SYMPTOMS, DEPARTMENTS, DUMMY_HOSPITALS };
       return;
     }
     hospitalContainer.innerHTML = `
-      <h3>徒歩圏内の病院候補 <span class="dummy-tag">ダミーデータ</span></h3>
-      <p class="hospital-note">※ 位置情報・地図連携は未実装です。距離や営業時間は仮の値です。</p>
+      <h3>徒歩圏内の病院候補（サンプル） <span class="dummy-tag">ダミーデータ</span></h3>
+      <p class="hospital-note">※ これは表示イメージのサンプルです。上の「現在地から探す」で実際の医療機関を検索できます。距離・営業時間は仮の値です。</p>
       <ul class="hospital-list">
         ${hospitals
           .map((h) => {
@@ -702,6 +930,117 @@ window.HospitalNaviData = { SYMPTOMS, DEPARTMENTS, DUMMY_HOSPITALS };
     `;
   }
 
+  /* ---------- 3b. 位置情報からの実病院検索（OpenStreetMap） ---------- */
+  const locStatus = () => document.getElementById('loc-status');
+
+  // 結果を出すたびに位置情報UIを初期状態へ戻す
+  function resetLocationUI() {
+    const s = locStatus();
+    if (s) { s.className = 'loc-status'; s.textContent = ''; }
+    const addr = document.getElementById('addr-input');
+    if (addr) addr.value = '';
+  }
+
+  // 座標取得 → 周辺医療機関の検索 → 描画（GPS・住所入力で共通利用）
+  async function runLocationSearch(getCoords) {
+    const s = locStatus();
+    if (!Geo) {
+      if (s) { s.className = 'loc-status error'; s.textContent = '位置情報機能を読み込めませんでした。'; }
+      return;
+    }
+    s.className = 'loc-status loading';
+    s.textContent = '場所を確認しています…';
+    try {
+      const coords = await getCoords();
+      s.textContent = '近くの医療機関を検索しています…（数秒かかることがあります）';
+      const list = await Geo.searchHospitalsOSM(coords.lat, coords.lng, 1500);
+      renderRealHospitals(list, state.deptIds);
+      s.className = 'loc-status';
+      s.textContent = '';
+      hospitalContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (e) {
+      s.className = 'loc-status error';
+      s.textContent = (e && e.message ? e.message : '検索に失敗しました。') + '（下の住所検索もお試しください）';
+    }
+  }
+
+  // 位置情報ボタンの初期配線（DOMには最初から存在する）
+  function wireLocationControls() {
+    const gps = document.getElementById('use-gps');
+    const addrBtn = document.getElementById('use-addr');
+    if (gps) gps.addEventListener('click', () => runLocationSearch(() => Geo.getCurrentLocation()));
+    if (addrBtn)
+      addrBtn.addEventListener('click', () => {
+        const q = (document.getElementById('addr-input').value || '').trim();
+        if (!q) {
+          const s = locStatus();
+          s.className = 'loc-status error';
+          s.textContent = '地名や住所を入力してください。';
+          return;
+        }
+        runLocationSearch(() => Geo.geocodeAddress(q));
+      });
+  }
+
+  function realHospitalCard(h, matched) {
+    const deptNames = h.departments
+      .map((d) => DEPARTMENTS[d] && DEPARTMENTS[d].name)
+      .filter(Boolean)
+      .join('・');
+    const mapUrl = `https://www.openstreetmap.org/?mlat=${h.lat}&mlon=${h.lng}#map=18/${h.lat}/${h.lng}`;
+    return `
+      <li class="hospital-card">
+        <div class="hospital-head">
+          <span class="hospital-name">${escapeHtml(h.name)}</span>
+          ${matched ? '<span class="hospital-open open">推奨科に該当の可能性</span>' : ''}
+        </div>
+        <div class="hospital-meta"><span>🚶 約${h.walkMinutes}分（${h.distanceMeters}m）</span></div>
+        <div class="hospital-depts">診療科：${deptNames ? escapeHtml(deptNames) : '情報なし（受診前に要確認）'}</div>
+        ${h.hours ? `<div class="hospital-hours">🕒 ${escapeHtml(h.hours)}（登録情報・要確認）</div>` : ''}
+        ${h.phone ? `<div class="hospital-phone">☎ <a href="tel:${escapeHtml(h.phone)}">${escapeHtml(h.phone)}</a></div>` : ''}
+        <div class="hospital-map"><a href="${mapUrl}" target="_blank" rel="noopener">地図で見る ↗</a></div>
+      </li>`;
+  }
+
+  // 推奨診療科に該当しそうな医療機関を優先しつつ、近い順に描画
+  function renderRealHospitals(list, deptIds) {
+    if (!list.length) {
+      hospitalContainer.innerHTML = `
+        <h3>近くの医療機関</h3>
+        <p>この付近（半径約1.5km）では医療機関が見つかりませんでした。
+        場所を変えて試すか、下のサンプル表示を参考にしてください。</p>`;
+      return;
+    }
+    const scored = list
+      .map((h) => ({ h, match: h.departments.some((d) => deptIds.includes(d)) }))
+      .sort((a, b) => b.match - a.match || a.h.distanceMeters - b.h.distanceMeters)
+      .slice(0, 15);
+    const matched = scored.filter((x) => x.match);
+    const others = scored.filter((x) => !x.match);
+    hospitalContainer.innerHTML = `
+      <h3>近くの医療機関 <span class="real-tag">実データ(OpenStreetMap)</span></h3>
+      <p class="hospital-note">現在地から近い順。診療科・診療時間はデータが古い場合があるため、受診前に電話でご確認ください。</p>
+      ${
+        matched.length
+          ? `<p class="real-section">推奨診療科に該当しそうな医療機関</p>
+             <ul class="hospital-list">${matched.map((x) => realHospitalCard(x.h, true)).join('')}</ul>`
+          : ''
+      }
+      ${
+        others.length
+          ? `<p class="real-section">そのほか近くの医療機関（診療科は要確認）</p>
+             <ul class="hospital-list">${others.map((x) => realHospitalCard(x.h, false)).join('')}</ul>`
+          : ''
+      }
+    `;
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
+    );
+  }
+
   /* ---------- 4. 送信ハンドラ ---------- */
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -723,9 +1062,11 @@ window.HospitalNaviData = { SYMPTOMS, DEPARTMENTS, DUMMY_HOSPITALS };
     ranked = applyProfileAdjustments(ranked, ageGroup);
     renderDepartments(ranked);
 
-    // c) 病院候補
+    // c) 病院候補（まずはサンプル表示。下のボタンで実際の現在地から検索可能）
     const deptIds = ranked.map((r) => r.dept.id);
+    state.deptIds = deptIds;
     renderHospitals(findHospitals(deptIds));
+    resetLocationUI();
 
     // 画面切り替え
     formSection.classList.add('hidden');
@@ -746,6 +1087,7 @@ window.HospitalNaviData = { SYMPTOMS, DEPARTMENTS, DUMMY_HOSPITALS };
 
   /* ---------- 初期化 ---------- */
   renderSymptoms();
+  wireLocationControls();
 })();
 
 </script>
