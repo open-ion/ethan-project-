@@ -1,6 +1,6 @@
 name: Deploy マネークリップ to Pages
 
-# app/ を更新して push するたびに、GitHub Pages に自動デプロイする。
+# app/ を更新して push するたびに、gh-pages ブランチを更新してスマホに反映。
 # 改良 → push → スマホに即反映、のループ。
 
 on:
@@ -12,34 +12,19 @@ on:
   workflow_dispatch: {}
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
+  contents: write
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
+      - name: Deploy app/ to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          enablement: true
-
-      - name: Upload app/ as Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./app
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./app
+          force_orphan: true
+          commit_message: "マネークリップ を更新"
