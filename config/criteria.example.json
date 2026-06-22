@@ -1,0 +1,15 @@
+{
+  "label": "千葉県旭市周辺・1LDK以上・駐車場付き・通勤30分以内",
+  "hard": {
+    "max_rent": 70000,
+    "min_layout": "1LDK",
+    "parking": true,
+    "commute": { "to": "旭駅", "max_minutes": 30 }
+  },
+  "soft": [
+    { "key": "total_rent", "weight": 3, "lower_is_better": true },
+    { "key": "commute_minutes", "weight": 3, "lower_is_better": true },
+    { "key": "area_sqm", "weight": 2, "lower_is_better": false },
+    { "key": "building_age", "weight": 1, "lower_is_better": true }
+  ]
+}
