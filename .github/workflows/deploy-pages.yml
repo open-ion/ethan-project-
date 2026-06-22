@@ -1,0 +1,45 @@
+name: Deploy マネークリップ to Pages
+
+# app/ を更新して push するたびに、GitHub Pages に自動デプロイする。
+# 改良 → push → スマホに即反映、のループ。
+
+on:
+  push:
+    branches: ["claude/investment-portfolio-plan-ycuf60"]
+    paths:
+      - "app/**"
+      - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload app/ as Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./app
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
