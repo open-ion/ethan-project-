@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0e7c66">
+<title>マネークリップ</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">📎 マネークリップ</div>
+    <div class="brand-sub" id="phaseChip">—</div>
+  </header>
+
+  <main id="view"><!-- 画面はJSで描画 --></main>
+
+  <nav class="tabbar">
+    <button class="tab is-active" data-tab="home"><span>🏠</span>ホーム</button>
+    <button class="tab" data-tab="income"><span>💴</span>収入</button>
+    <button class="tab" data-tab="invest"><span>📈</span>投資</button>
+    <button class="tab" data-tab="tax"><span>📑</span>税金</button>
+  </nav>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
