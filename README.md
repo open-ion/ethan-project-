@@ -14,11 +14,26 @@
 | [`tools/dashboard.py`](tools/dashboard.py) | **★管理ソフト v0**：家計・防衛資金・NISA枠・確定申告を一画面に |
 | [`data/`](data/) | 構造化データ（profile / portfolio / candidates） |
 
-## 📎 マネークリップ（アプリ）
+## 📦 アプリ置き場（apps/）と公開ルール
+
+**原本は必ず `apps/<アプリ名>/` に持つ。試作は原本をコピーして新フォルダで。既存アプリは絶対に上書きしない。**
+
+| 場所 | 役割 |
+|---|---|
+| `apps/<名前>/` | **原本**。git管理＝履歴つきで永久保存。ここが正。 |
+| `gh-pages` ブランチ | 原本の**鏡**（自動生成・使い捨て）。`apps/` をまるごと反映。 |
+| 公開URL `/<名前>/` | アプリごとに別URL。互いに上書きされない。 |
+
+- トップ一覧：`https://open-ion.github.io/ethan-project-/`
+- マネークリップ：`https://open-ion.github.io/ethan-project-/moneyclip/`
+
+**新しいアプリの作り方**：`apps/` に新フォルダを作る（既存をコピーするなら `cp -r apps/moneyclip apps/新名`）→ `apps/index.html` に1行リンクを足す → main にpush。既存アプリは別フォルダ＝別URLなので無傷。
+
+### 📎 マネークリップ
 副業×確定申告×ほったらかし投資の「お金見える化」アプリ。スマホのホーム画面に入れて使うPWA。
 
 ```bash
-cd app && python3 -m http.server 8000
+cd apps/moneyclip && python3 -m http.server 8000
 # → スマホ/PCのブラウザで http://<このPCのIP>:8000 を開く
 # iPhone Safari/Androidなら「ホーム画面に追加」でアプリとして常駐
 ```
@@ -29,7 +44,7 @@ cd app && python3 -m http.server 8000
 - **投資** … NISA枠の消化・保有管理・候補リスト（藤原3基準つき）
 - **税金** … 普通徴収・青色申告の解説・確定申告カウントダウン・準備チェックリスト
 
-データは端末内（localStorage）に保存。バックエンドなし。`app/` 配下で完結。
+データは端末内（localStorage）に保存。バックエンドなし。`apps/moneyclip/` 配下で完結。
 
 ### CLI版ダッシュボード（おまけ）
 ```bash

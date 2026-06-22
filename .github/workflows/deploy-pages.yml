@@ -1,13 +1,18 @@
-name: Deploy マネークリップ to Pages
+name: Deploy apps to Pages
 
-# app/ を更新して push するたびに、gh-pages ブランチを更新してスマホに反映。
+# apps/ 配下を gh-pages ブランチにまるごと公開する。
+# 各アプリは apps/<名前>/ → 公開URL /<名前>/ に1対1で対応。
+#
+# ★安全設計：原本は git の apps/（履歴つきで永久保存）。gh-pages はその「鏡」。
+#   apps/ には全アプリが入っているので、毎回まるごと反映しても1個も失われない。
+#   新アプリ＝apps/ に新フォルダを足すだけ。既存アプリは別フォルダ＝別URLなので無傷。
 # 改良 → push → スマホに即反映、のループ。
 
 on:
   push:
     branches: ["main"]
     paths:
-      - "app/**"
+      - "apps/**"
       - ".github/workflows/deploy-pages.yml"
   workflow_dispatch: {}
 
@@ -21,10 +26,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy app/ to gh-pages branch
+      - name: Deploy apps/ to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./app
-          force_orphan: true
-          commit_message: "マネークリップ を更新"
+          publish_dir: ./apps
+          force_orphan: true        # gh-pages を apps/ の正確な鏡にする（apps/が全アプリの原本）
+          commit_message: "apps を更新"
