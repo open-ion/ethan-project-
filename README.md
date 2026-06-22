@@ -10,6 +10,7 @@
 | [`docs/05_ion-plan-confirmed.md`](docs/05_ion-plan-confirmed.md) | **★イオン専用 確定プラン**（月5万→7万・20年で1800万・毎月の配り方） |
 | [`docs/03_candidate-stocks.md`](docs/03_candidate-stocks.md) | 候補銘柄リスト＋**10年配当データに基づく評価** |
 | [`docs/06_tax-filing-prep.md`](docs/06_tax-filing-prep.md) | 副業の確定申告・税金・「バレない」住民税対策 |
+| [`docs/07_investment-principles.md`](docs/07_investment-principles.md) | **★長期運用の原則**（各資産の収益性×リスク×乱高下／暴落時の行動規範＝お守り） |
 | [`docs/04_software-vision.md`](docs/04_software-vision.md) | 一括管理ソフトの構想・ロードマップ |
 | [`tools/dashboard.py`](tools/dashboard.py) | **★管理ソフト v0**：家計・防衛資金・NISA枠・確定申告を一画面に |
 | [`data/`](data/) | 構造化データ（profile / portfolio / candidates） |
