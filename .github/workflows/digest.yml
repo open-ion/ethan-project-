@@ -1,0 +1,56 @@
+name: ニュースダイジェスト（毎朝自動更新）
+
+# 毎朝 6:00 JST（前日 21:00 UTC）に自動生成して GitHub Pages へ公開。
+# 手動実行（workflow_dispatch）でもいつでも更新できる。
+on:
+  schedule:
+    - cron: "0 21 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同時実行を1つに絞る（連続トリガー時の競合を防ぐ）
+concurrency:
+  group: news-digest
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: チェックアウト
+        uses: actions/checkout@v4
+
+      - name: Python セットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 依存インストール
+        run: pip install -r requirements.txt
+
+      - name: ダイジェスト生成
+        env:
+          # 設定すると Claude による要約が有効になる（任意）。
+          # リポジトリの Settings > Secrets に ANTHROPIC_API_KEY を登録。
+          # 未設定でも RSS 概要にフォールバックして必ず生成される。
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python digest.py
+
+      - name: Pages 設定
+        uses: actions/configure-pages@v5
+
+      - name: 成果物アップロード
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Pages へデプロイ
+        id: deploy
+        uses: actions/deploy-pages@v4

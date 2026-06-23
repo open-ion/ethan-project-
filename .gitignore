@@ -1,0 +1,6 @@
+# 生成物（GitHub Actions が毎回生成するのでコミット不要）
+site/
+*.pyc
+__pycache__/
+.venv/
+venv/

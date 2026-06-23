@@ -1,0 +1,113 @@
+"""設定読み込みとダイジェスト生成のオーケストレーション。"""
+
+from __future__ import annotations
+
+import datetime as dt
+import json
+import os
+from pathlib import Path
+
+from . import render
+from .sources import DEFAULT_GENRE_ORDER, GENRES, Article, collect_genre
+from .summarize import summarize
+
+DEFAULT_CONFIG = {
+    "genres": DEFAULT_GENRE_ORDER,
+    "max_items_per_genre": 5,
+    "summarize": {
+        "enabled": True,
+        # 安価・高速な Haiku を既定に。多数記事の日次要約に最適。
+        # 高精度が欲しければ "claude-opus-4-8" に変更可。
+        "model": "claude-haiku-4-5",
+        "max_items_to_summarize": 5,
+    },
+    "output": {
+        "dir": "site",
+        "title": "5分ニュースダイジェスト",
+        "timezone": "Asia/Tokyo",
+    },
+}
+
+
+def load_config(path: str | os.PathLike | None) -> dict:
+    """config.json を読み込む。無ければ既定値。部分指定もマージ。"""
+    config = json.loads(json.dumps(DEFAULT_CONFIG))  # deep copy
+    if path and Path(path).exists():
+        user = json.loads(Path(path).read_text(encoding="utf-8"))
+        config = _deep_merge(config, user)
+    return config
+
+
+def _deep_merge(base: dict, override: dict) -> dict:
+    for key, value in override.items():
+        if isinstance(value, dict) and isinstance(base.get(key), dict):
+            base[key] = _deep_merge(base[key], value)
+        else:
+            base[key] = value
+    return base
+
+
+def _now(config: dict) -> dt.datetime:
+    tzname = config.get("output", {}).get("timezone", "Asia/Tokyo")
+    try:
+        from zoneinfo import ZoneInfo
+        return dt.datetime.now(ZoneInfo(tzname))
+    except Exception:
+        return dt.datetime.now(dt.timezone.utc)
+
+
+def build_digest(config: dict, *, fetcher=None) -> dict:
+    """設定に従って各ジャンルを取得・要約し、出力に必要なデータを返す。"""
+    selected = [g for g in (config.get("genres") or DEFAULT_GENRE_ORDER)
+                if g in GENRES]
+    max_items = int(config.get("max_items_per_genre", 5))
+
+    genres_articles: dict[str, list[Article]] = {}
+    for gkey in selected:
+        print(f"- 取得中: {GENRES[gkey].label}")
+        kwargs = {"max_items": max_items}
+        if fetcher is not None:
+            kwargs["fetcher"] = fetcher
+        genres_articles[gkey] = collect_genre(GENRES[gkey], **kwargs)
+
+    total = sum(len(v) for v in genres_articles.values())
+    print(f"- 記事 {total} 件。要約します…")
+    result = summarize(genres_articles, config)
+
+    generated_at = _now(config)
+    return {
+        "genres_articles": genres_articles,
+        "summary": result,
+        "generated_at": generated_at,
+        "total": total,
+    }
+
+
+def write_outputs(config: dict, digest: dict) -> list[Path]:
+    """HTML（index + 日付アーカイブ）と Markdown を書き出す。"""
+    out_dir = Path(config.get("output", {}).get("dir", "site"))
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    ga = digest["generated_at"]
+    html_doc = render.render_html(
+        digest["genres_articles"], digest["summary"], config, generated_at=ga
+    )
+    md_doc = render.render_markdown(
+        digest["genres_articles"], digest["summary"], config, generated_at=ga
+    )
+
+    written: list[Path] = []
+    index = out_dir / "index.html"
+    index.write_text(html_doc, encoding="utf-8")
+    written.append(index)
+
+    datestr = ga.strftime("%Y-%m-%d")
+    archive = out_dir / f"digest-{datestr}.html"
+    archive.write_text(html_doc, encoding="utf-8")
+    written.append(archive)
+
+    md_path = out_dir / f"digest-{datestr}.md"
+    md_path.write_text(md_doc, encoding="utf-8")
+    written.append(md_path)
+
+    return written

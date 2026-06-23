@@ -1,0 +1,14 @@
+{
+  "genres": ["trend", "politics", "economy", "prices", "medical", "sports", "world"],
+  "max_items_per_genre": 5,
+  "summarize": {
+    "enabled": true,
+    "model": "claude-haiku-4-5",
+    "max_items_to_summarize": 5
+  },
+  "output": {
+    "dir": "site",
+    "title": "5分ニュースダイジェスト",
+    "timezone": "Asia/Tokyo"
+  }
+}
