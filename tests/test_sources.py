@@ -92,13 +92,26 @@ class RenderTest(unittest.TestCase):
         self.assertIn("[消費者物価指数", md)
 
     def test_empty_genre_renders(self):
-        # 記事ゼロでも落ちない
+        # 記事ゼロでも落ちない（空タブは出さず、トップに空状態を表示）
         result = SummaryResult(overall="", by_id={}, used_llm=False)
         html_doc = render.render_html(
             {"sports": []}, result, {"genres": ["sports"]},
             generated_at=dt.datetime(2026, 6, 23, 9, 0),
         )
-        self.assertIn("新着なし", html_doc)
+        self.assertIn("取得できませんでした", html_doc)
+
+    def test_tab_ui_present(self):
+        # タブUI（トップ + カテゴリタブ）が生成される
+        data = self._sample()
+        result = summarize(data, {"summarize": {"enabled": False}})
+        html_doc = render.render_html(
+            data, result, {"genres": ["economy"]},
+            generated_at=dt.datetime(2026, 6, 23, 9, 0),
+        )
+        self.assertIn("nav class='tabs'", html_doc)
+        self.assertIn("data-tab='top'", html_doc)
+        self.assertIn("data-tab='economy'", html_doc)
+        self.assertIn("主要トピック", html_doc)
 
 
 if __name__ == "__main__":
