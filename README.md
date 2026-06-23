@@ -46,6 +46,33 @@ open site/index.html        # mac
 これで毎朝6時(JST)に自動生成され、`https://<ユーザー名>.github.io/<リポジトリ名>/` で読める。
 `Actions` タブの「Run workflow」で即時更新もできる。
 
+## 毎朝LINEに届くようにする（任意）
+
+要点（今日のまとめ＋各カテゴリのトップ見出し＋全文ページへのリンク）を毎朝LINEに push する。
+※ LINE Notify は2025年3月で終了したため、現行の **LINE Messaging API** を使う。
+
+1. **LINE公式アカウントを作る**: [LINE Developers](https://developers.line.biz/) で
+   プロバイダー → **Messaging API チャネル**を作成。
+2. **チャネルアクセストークンを発行**: チャネル設定の「Messaging API」タブで
+   長期のチャネルアクセストークンを発行 → `LINE_CHANNEL_ACCESS_TOKEN`。
+3. **送信先IDを取得**: 自分のLINEで作成した公式アカウントを友だち追加し、
+   「Messaging API」タブの **Your user ID**（`U` で始まる文字列）を控える → `LINE_TO`。
+   （グループに送るならグループID）
+4. **Secretsに登録**: `Settings > Secrets and variables > Actions` に
+   `LINE_CHANNEL_ACCESS_TOKEN` と `LINE_TO` を登録。
+
+これで毎朝、Pages公開のあとに自動でLINEに届く。未登録なら配信はスキップされる（他は通常どおり動く）。
+
+ローカルから手動でテスト送信:
+
+```bash
+python digest.py                         # 先に site/digest.json を生成
+export LINE_CHANNEL_ACCESS_TOKEN=...      # トークン
+export LINE_TO=Uxxxxxxxx                  # 送信先ID
+export SITE_URL=https://<ユーザー名>.github.io/<リポジトリ名>/
+python notify_line.py
+```
+
 ## 設定（`config.json`）
 
 ```json
@@ -57,7 +84,8 @@ open site/index.html        # mac
     "model": "claude-haiku-4-5",
     "max_items_to_summarize": 5
   },
-  "output": { "dir": "site", "title": "5分ニュースダイジェスト", "timezone": "Asia/Tokyo" }
+  "deliver": { "line": { "enabled": true, "max_headlines_per_genre": 1 } },
+  "output": { "dir": "site", "title": "5分ニュースダイジェスト", "timezone": "Asia/Tokyo", "site_url": "" }
 }
 ```
 
@@ -68,6 +96,8 @@ open site/index.html        # mac
 - **summarize.model**: 要約モデル。既定は安価で速い `claude-haiku-4-5`。
   精度重視なら `claude-opus-4-8` に変更可。
 - **summarize.enabled**: `false` で要約OFF（RSS概要のみ）。
+- **deliver.line.max_headlines_per_genre**: LINEに載せるカテゴリごとの見出し数。
+- **deliver.line.enabled**: `false` でLINE配信OFF。
 
 ## 仕組み
 
@@ -76,9 +106,11 @@ config.json ──▶ newsdigest.core
                   │
                   ├─ sources.py   NHK RSS をジャンル別に取得・パース（標準ライブラリ）
                   ├─ summarize.py Claude で平易要約（APIキー無ければ自動フォールバック）
-                  └─ render.py    HTML / Markdown を出力
+                  ├─ render.py    HTML / Markdown を出力
+                  └─ notify.py    LINE Messaging API へ push（標準ライブラリ）
                   ▼
                 site/index.html  ──▶ GitHub Pages（毎朝 cron で自動更新）
+                site/digest.json ──▶ notify_line.py ──▶ 毎朝 LINE に届く
 ```
 
 - 物価(`prices`)は経済・暮らしフィードから物価関連キーワードで絞り込んで作っている。
@@ -96,7 +128,7 @@ python -m unittest discover -s tests
 
 - ニュース元の追加: `newsdigest/sources.py` の `GENRES` にフィードURLを足すだけ。
 - メール配信: `render_markdown()` の出力をSMTPで送る処理を足せば「毎朝メールで届く」も可能。
-- LINE / Slack 通知: 同じく Markdown を Webhook に流せばいい。
+- Slack等への通知: `newsdigest/notify.py` を参考に、Webhookへ送る処理を足せばよい。
 
 ---
 記事の著作権は各報道機関に帰属します。本ツールは見出しと概要の集約・要約のみを行います。

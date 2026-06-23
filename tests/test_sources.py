@@ -21,6 +21,7 @@ from newsdigest.sources import (  # noqa: E402
     parse_feed,
 )
 from newsdigest.summarize import SummaryResult, summarize  # noqa: E402
+from newsdigest.notify import build_line_text  # noqa: E402
 
 FIXTURE = (Path(__file__).parent / "fixtures" / "sample_nhk.xml").read_bytes()
 
@@ -112,6 +113,50 @@ class RenderTest(unittest.TestCase):
         self.assertIn("data-tab='top'", html_doc)
         self.assertIn("data-tab='economy'", html_doc)
         self.assertIn("主要トピック", html_doc)
+
+
+class LineMessageTest(unittest.TestCase):
+    def _data(self):
+        return {
+            "title": "5分ニュースダイジェスト",
+            "date_label": "2026-06-24",
+            "overall": "きょうは物価と金利が話題。",
+            "used_llm": True,
+            "genres": [
+                {"key": "economy", "label": "経済", "emoji": "💹", "items": [
+                    {"title": "消費者物価2.8%上昇", "link": "https://x/1",
+                     "summary": "物価が上がった。", "time": "06/24 08:30"},
+                    {"title": "日銀が利上げ議論", "link": "https://x/2",
+                     "summary": "金利の話。", "time": "06/24 07:15"},
+                ]},
+                {"key": "sports", "label": "スポーツ", "emoji": "⚽", "items": [
+                    {"title": "代表が勝利", "link": "https://x/3",
+                     "summary": "勝った。", "time": "06/24 06:00"},
+                ]},
+            ],
+        }
+
+    def test_build_text_basic(self):
+        text = build_line_text(
+            self._data(), site_url="https://example.github.io/news/",
+            max_headlines_per_genre=1,
+        )
+        self.assertIn("📰 5分ニュースダイジェスト", text)
+        self.assertIn("6月24日", text)
+        self.assertIn("今日のまとめ", text)
+        self.assertIn("消費者物価2.8%上昇", text)
+        self.assertIn("代表が勝利", text)
+        self.assertIn("https://example.github.io/news/", text)
+        # 1見出し設定なので2件目は含めない
+        self.assertNotIn("日銀が利上げ議論", text)
+
+    def test_build_text_two_headlines(self):
+        text = build_line_text(self._data(), max_headlines_per_genre=2)
+        self.assertIn("日銀が利上げ議論", text)
+
+    def test_text_within_limit(self):
+        text = build_line_text(self._data())
+        self.assertLessEqual(len(text), 5000)
 
 
 if __name__ == "__main__":

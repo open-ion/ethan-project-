@@ -110,4 +110,47 @@ def write_outputs(config: dict, digest: dict) -> list[Path]:
     md_path.write_text(md_doc, encoding="utf-8")
     written.append(md_path)
 
+    # 配信（LINE等）用の構造化データ
+    json_path = out_dir / "digest.json"
+    json_path.write_text(
+        json.dumps(_digest_to_dict(config, digest), ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    written.append(json_path)
+
     return written
+
+
+def _digest_to_dict(config: dict, digest: dict) -> dict:
+    """配信用にダイジェストをJSONシリアライズ可能な辞書へ変換。"""
+    ga = digest["generated_at"]
+    result = digest["summary"]
+    genres_out = []
+    for gkey in (g for g in (config.get("genres") or DEFAULT_GENRE_ORDER)
+                 if g in GENRES):
+        articles = digest["genres_articles"].get(gkey, [])
+        if not articles:
+            continue
+        items = []
+        for i, art in enumerate(articles):
+            items.append({
+                "title": art.title,
+                "link": art.link,
+                "summary": result.by_id.get(f"{gkey}-{i}", art.description),
+                "time": art.published_label,
+            })
+        genres_out.append({
+            "key": gkey,
+            "label": GENRES[gkey].label,
+            "emoji": GENRES[gkey].emoji,
+            "items": items,
+        })
+    return {
+        "title": config.get("output", {}).get("title", "5分ニュースダイジェスト"),
+        "generated_at": ga.isoformat(),
+        "date_label": ga.strftime("%Y-%m-%d"),
+        "overall": result.overall,
+        "used_llm": result.used_llm,
+        "genres": genres_out,
+    }
+

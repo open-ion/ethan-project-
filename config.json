@@ -6,9 +6,16 @@
     "model": "claude-haiku-4-5",
     "max_items_to_summarize": 5
   },
+  "deliver": {
+    "line": {
+      "enabled": true,
+      "max_headlines_per_genre": 1
+    }
+  },
   "output": {
     "dir": "site",
     "title": "5分ニュースダイジェスト",
-    "timezone": "Asia/Tokyo"
+    "timezone": "Asia/Tokyo",
+    "site_url": ""
   }
 }
