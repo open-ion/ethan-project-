@@ -57,7 +57,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     config = load_config(args.config)
-    out_dir = Path(config.get("output", {}).get("dir", "site"))
+    out_dir = Path(config.get("output", {}).get("dir", "apps/news"))
     out_dir.mkdir(parents=True, exist_ok=True)
 
     now = _now(config)

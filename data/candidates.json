@@ -1,0 +1,54 @@
+{
+  "_meta": {
+    "description": "藤原本＋10年配当データに基づく投資候補の構造化データ。将来の一括管理ソフトが読み込む種データ。",
+    "source": "藤原久敏『年間10%利回りを目指す 攻めのほったらかし投資術』(2023) + WebSearch 2026-06",
+    "fujiwara_criteria": {
+      "dividend_yield_min_pct": 3.0,
+      "payout_ratio_max_pct": 50.0,
+      "must_have_no_dividend_cut": true,
+      "bonus": "連続増配 or 累進配当"
+    },
+    "warning": "利回り・配当性向・価格は変動する。売買前に必ず最新値を再取得すること。"
+  },
+  "funds": [
+    { "name": "eMAXIS Slim 全世界株式(オルカン)", "type": "投信", "role": "core", "expense_ratio_pct": 0.05775, "nisa": "つみたて/成長", "note": "イオンのコア・最初に開始" },
+    { "name": "eMAXIS Slim 米国株式(S&P500)", "type": "投信", "role": "core_alt", "expense_ratio_pct": 0.0814, "nisa": "つみたて/成長" },
+    { "name": "eMAXIS Slim バランス(8資産均等型)", "type": "投信", "role": "diversify", "expense_ratio_pct": 0.143, "nisa": "つみたて/成長" },
+    { "name": "eMAXIS Slim 国内リートインデックス", "type": "投信", "role": "reit_index", "expense_ratio_pct": 0.187, "nisa": "成長" }
+  ],
+  "high_dividend_stocks": [
+    { "name": "三菱HCキャピタル", "code": "8593", "yield_pct": 4.0, "payout_pct": 46, "streak": "連続増配(25期級)", "cut_history": false, "rating": "A", "min_invest_jpy": 80000 },
+    { "name": "KDDI", "code": "9433", "yield_pct": 3.1, "payout_pct": 44, "streak": "24期連続増配", "cut_history": false, "rating": "A" },
+    { "name": "三井物産", "code": "8031", "yield_pct": 3.0, "payout_pct": 40, "streak": "累進配当(下限100円)", "cut_history": false, "rating": "A" },
+    { "name": "三菱商事", "code": "8058", "yield_pct": 2.8, "payout_pct": 52, "streak": "累進配当", "cut_history": false, "rating": "B", "note": "性向やや高・利回り3%弱" },
+    { "name": "NTT", "code": "9432", "yield_pct": 3.4, "payout_pct": null, "streak": "16期連続増配", "cut_history": false, "rating": "B" },
+    { "name": "日本取引所グループ", "code": "8697", "yield_pct": 2.3, "payout_pct": null, "streak": null, "cut_history": false, "rating": "B", "note": "独占インフラだが利回り基準未達" },
+    { "name": "JT", "code": "2914", "yield_pct": 4.1, "payout_pct": 81, "streak": null, "cut_history": true, "rating": "C", "note": "2021年減配・性向80%超" },
+    { "name": "ソフトバンク", "code": "9434", "yield_pct": 4.0, "payout_pct": 76, "streak": "横ばい(増配なし)", "cut_history": false, "rating": "C", "note": "性向高・増配余地小" },
+    { "name": "花王", "code": "4452", "yield_pct": 2.5, "payout_pct": 120, "streak": "35期連続増配", "cut_history": false, "rating": "C", "note": "性向が業績悪化で異常高騰・利回り低" }
+  ],
+  "yutai_stocks": [
+    { "name": "イオン", "code": "8267", "yutai": "買上3〜5%キャッシュバック", "rating": "A", "note": "本業関連・長年継続・生活直結" },
+    { "name": "TOKAIホールディングス", "code": "3167", "yutai": "天然水/ポイント", "yutai_yield_pct": 4, "rating": "B" },
+    { "name": "クリエイト・レストランツHD", "code": "3387", "yutai": "食事ギフト", "yutai_yield_pct": 4, "rating": "B" },
+    { "name": "エディオン", "code": "2730", "yutai": "ギフトカード", "yutai_yield_pct": 3, "rating": "B" },
+    { "name": "ヴィレッジヴァンガード", "code": "2769", "yutai": "買物券(継続増額)", "rating": "B" }
+  ],
+  "reits": [
+    { "name": "イオンリート投資法人", "code": "3292", "yield_pct": 4.30, "price_jpy": 156000, "asset": "全国イオンモール", "rating": "A" },
+    { "name": "大江戸温泉リート投資法人", "code": "3472", "yield_pct": 4.12, "price_jpy": 54000, "asset": "温泉ホテル", "rating": "A", "note": "最も買いやすい" },
+    { "name": "阪急阪神リート投資法人", "code": "8977", "yield_pct": 3.99, "price_jpy": 145000, "asset": "商業・ホテル", "rating": "B" }
+  ],
+  "crowdfunding": [
+    { "name": "Funds", "type": "貸付型", "yield_pct": "1-3", "note": "上場企業向け・安全寄り", "nisa": false, "rating": "A_entry" },
+    { "name": "オーナーズブック", "type": "貸付型(不動産担保)", "yield_pct": "4-5", "nisa": false, "rating": "B" },
+    { "name": "クラウドバンク", "type": "貸付型(再エネ)", "yield_pct": "6", "nisa": false, "rating": "B" },
+    { "name": "CREAL/大家どっとこむ", "type": "不動産投資型", "yield_pct": "4-6", "nisa": false, "rating": "B", "note": "途中解約不可" }
+  ],
+  "avoid_for_now": [
+    { "name": "FX", "reason": "NISA対象外・ハイリスク" },
+    { "name": "個別社債", "reason": "NISA対象外" },
+    { "name": "仕組預金", "reason": "満期延長・中途解約で元本割れリスク" },
+    { "name": "SBIソーシャルレンディング", "reason": "2021年に不正発覚で撤退済み(本書は古い情報)" }
+  ]
+}

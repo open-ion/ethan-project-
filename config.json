@@ -17,7 +17,7 @@
     "slots": ["07:00", "14:00", "21:00"]
   },
   "output": {
-    "dir": "site",
+    "dir": "apps/news",
     "title": "5分ニュースダイジェスト",
     "timezone": "Asia/Tokyo",
     "site_url": ""

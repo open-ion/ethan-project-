@@ -1,8 +1,12 @@
-name: ニュースダイジェスト（毎朝自動更新）
+name: ニュースダイジェスト（1日3便 自動更新）
 
-# 1日3便（7:00 / 14:00 / 21:00 JST）に自動生成して GitHub Pages へ公開。
+# 1日3便（7:00 / 14:00 / 21:00 JST）にニュース＋予定済みブリーフィングを生成し、
+# 既存の公開方式（apps/ を gh-pages ブランチへミラー）で公開する。
 # JST = UTC+9 なので UTC では 22:00 / 05:00 / 12:00。
 # 手動実行（workflow_dispatch）でもいつでも更新できる。
+#
+# ★既存の deploy-pages.yml と同じ peaceiris 方式・publish_dir=./apps なので、
+#   マネークリップなど他アプリは無傷（apps/ をまるごと公開＝1個も失われない）。
 on:
   schedule:
     - cron: "0 22 * * *"   # 07:00 JST
@@ -10,22 +14,20 @@ on:
     - cron: "0 12 * * *"   # 21:00 JST
   workflow_dispatch:
 
+# peaceiris/actions-gh-pages が gh-pages ブランチへ push するため contents: write
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
-# 同時実行を1つに絞る（連続トリガー時の競合を防ぐ）
 concurrency:
-  group: news-digest
+  group: news-digest-pages
   cancel-in-progress: false
+
+env:
+  SITE_URL: https://open-ion.github.io/ethan-project-/news/
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - name: チェックアウト
         uses: actions/checkout@v4
@@ -38,51 +40,44 @@ jobs:
       - name: 依存インストール
         run: pip install -r requirements.txt
 
-      - name: ダイジェスト生成
+      - name: ニュースダイジェスト生成
         env:
           TZ: Asia/Tokyo
-          # 設定すると Claude による要約が有効になる（任意）。
-          # リポジトリの Settings > Secrets に ANTHROPIC_API_KEY を登録。
-          # 未設定でも RSS 概要にフォールバックして必ず生成される。
+          # 設定すると Claude による要約が有効（任意）。未設定でも RSS 概要で必ず生成。
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python digest.py
 
       - name: 予定済みブリーフィング生成
-        # briefings.json のスケジュールに従い、今日該当分を Claude+Web検索で生成。
+        # briefings.json のスケジュールに従い、その便の該当分を Claude+Web検索で生成。
         # ANTHROPIC_API_KEY 未設定なら本文は空でスキップ（落とさない）。
         env:
           TZ: Asia/Tokyo
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python brief.py
 
-      - name: Pages 設定
-        uses: actions/configure-pages@v5
-
-      - name: 成果物アップロード
-        uses: actions/upload-pages-artifact@v3
+      - name: apps/ を gh-pages へ公開
+        # 既存アプリ（apps/moneyclip など）を含む apps/ をまるごとミラー。
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: site
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apps
+          force_orphan: true
+          commit_message: "ニュース更新"
 
-      - name: Pages へデプロイ
-        id: deploy
-        uses: actions/deploy-pages@v4
-
-      - name: LINEへ配信（任意）
-        # Settings > Secrets に LINE_CHANNEL_ACCESS_TOKEN と LINE_TO を登録すると
-        # 毎朝 LINE に届く。未設定なら何もせずスキップ（ワークフローは止めない）。
+      - name: ニュースをLINE配信（任意・朝便のみ）
+        # Settings > Secrets に LINE_CHANNEL_ACCESS_TOKEN と LINE_TO を登録すると届く。
+        # 未設定なら何もせずスキップ（ワークフローは止めない）。
         env:
           TZ: Asia/Tokyo
           LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
           LINE_TO: ${{ secrets.LINE_TO }}
-          # デプロイ先URLをリンクとして添付
-          SITE_URL: ${{ steps.deploy.outputs.page_url }}
         run: python notify_line.py
 
       - name: 予定済みブリーフィングをLINE配信（任意）
-        # 当日分の生成済みブリーフィングを LINE に送る（再生成しない）。
+        # その便で生成できたブリーフィングを LINE に送る（再生成しない）。
         env:
           TZ: Asia/Tokyo
           LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
           LINE_TO: ${{ secrets.LINE_TO }}
-          SITE_URL: ${{ steps.deploy.outputs.page_url }}briefings.html
+          SITE_URL: https://open-ion.github.io/ethan-project-/news/briefings.html
         run: python brief.py --notify-only

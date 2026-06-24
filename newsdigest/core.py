@@ -5,7 +5,6 @@ from __future__ import annotations
 import datetime as dt
 import json
 import os
-import shutil
 from pathlib import Path
 
 from . import render
@@ -23,7 +22,7 @@ DEFAULT_CONFIG = {
         "max_items_to_summarize": 5,
     },
     "output": {
-        "dir": "site",
+        "dir": "apps/news",
         "title": "5分ニュースダイジェスト",
         "timezone": "Asia/Tokyo",
     },
@@ -85,8 +84,12 @@ def build_digest(config: dict, *, fetcher=None) -> dict:
 
 
 def write_outputs(config: dict, digest: dict) -> list[Path]:
-    """HTML（index + 日付アーカイブ）と Markdown を書き出す。"""
-    out_dir = Path(config.get("output", {}).get("dir", "site"))
+    """データ（digest.json）と日付アーカイブを書き出す。
+
+    アプリ本体（PWAシェル）は apps/news/ に原本としてコミット済みなので、
+    ここではアプリが読み込むデータと静的アーカイブだけを生成する。
+    """
+    out_dir = Path(config.get("output", {}).get("dir", "apps/news"))
     out_dir.mkdir(parents=True, exist_ok=True)
 
     ga = digest["generated_at"]
@@ -98,10 +101,6 @@ def write_outputs(config: dict, digest: dict) -> list[Path]:
     )
 
     written: list[Path] = []
-
-    # アプリ本体（PWAシェル＋アセット）を webapp/ から出力先へ配置。
-    # index.html はアプリ（digest.json をクライアント描画）。
-    written.extend(_copy_webapp(out_dir))
 
     datestr = ga.strftime("%Y-%m-%d")
     # 日付アーカイブはJS不要の静的ページ（パーマリンク／フォールバック）
@@ -122,24 +121,6 @@ def write_outputs(config: dict, digest: dict) -> list[Path]:
     written.append(json_path)
 
     return written
-
-
-WEBAPP_DIR = Path(__file__).resolve().parents[1] / "webapp"
-
-
-def _copy_webapp(out_dir: Path) -> list[Path]:
-    """webapp/ のアプリアセットを出力先へコピーする（.py のツールは除外）。"""
-    copied: list[Path] = []
-    if not WEBAPP_DIR.exists():
-        print(f"  [warn] webapp/ が見つかりません: {WEBAPP_DIR}")
-        return copied
-    for src in sorted(WEBAPP_DIR.iterdir()):
-        if not src.is_file() or src.suffix == ".py":
-            continue
-        dst = out_dir / src.name
-        shutil.copy2(src, dst)
-        copied.append(dst)
-    return copied
 
 
 def _digest_to_dict(config: dict, digest: dict) -> dict:

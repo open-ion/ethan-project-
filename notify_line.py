@@ -63,7 +63,7 @@ def main(argv: list[str] | None = None) -> int:
 
     config = load_config(args.config)
     digest_path = args.digest or (
-        f"{config.get('output', {}).get('dir', 'site')}/digest.json"
+        f"{config.get('output', {}).get('dir', 'apps/news')}/digest.json"
     )
 
     print("== LINE配信 ==")

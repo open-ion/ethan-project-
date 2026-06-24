@@ -2,7 +2,7 @@
 """アプリアイコンを生成する（依存ゼロ・純Pythonの最小PNGライタ）。
 
 赤い角丸スクエアに白い「ニュースの行」を描いた簡素なアイコン。
-実行すると webapp/ に icon-192.png / icon-512.png / apple-touch-icon-180.png を出力。
+実行すると apps/news/ に icon-192.png / icon-512.png / apple-touch-icon-180.png を出力。
 """
 
 from __future__ import annotations
@@ -88,7 +88,8 @@ def _in_rounded(x: int, y: int, size: int, radius: int) -> bool:
 
 
 def main() -> None:
-    out = Path(__file__).resolve().parent
+    out = Path(__file__).resolve().parent / "apps" / "news"
+    out.mkdir(parents=True, exist_ok=True)
     for name, size in [
         ("icon-192.png", 192),
         ("icon-512.png", 512),

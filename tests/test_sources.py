@@ -167,8 +167,8 @@ class LineMessageTest(unittest.TestCase):
         self.assertLessEqual(len(text), 5000)
 
 
-class OutputAppTest(unittest.TestCase):
-    def test_write_outputs_builds_app(self):
+class OutputDataTest(unittest.TestCase):
+    def test_write_outputs_writes_data(self):
         import tempfile
         from newsdigest.core import build_digest, write_outputs
         with tempfile.TemporaryDirectory() as tmp:
@@ -177,14 +177,10 @@ class OutputAppTest(unittest.TestCase):
             digest = build_digest(cfg, fetcher=fake_fetcher)
             write_outputs(cfg, digest)
             names = {p.name for p in Path(tmp).iterdir()}
-            # アプリシェル + データ + PWAアセットが揃う
-            for required in ("index.html", "digest.json", "app.js", "app.css",
-                             "manifest.webmanifest", "sw.js", "icon-192.png"):
-                self.assertIn(required, names, f"{required} が出力されていない")
-            # index.html はアプリシェル（digest.json を読み込む）
-            shell = (Path(tmp) / "index.html").read_text(encoding="utf-8")
-            self.assertIn("app.js", shell)
-            self.assertIn("manifest.webmanifest", shell)
+            # アプリシェルは apps/news に原本コミット済み。ここはデータのみ生成。
+            self.assertIn("digest.json", names)
+            self.assertTrue(any(n.startswith("digest-") and n.endswith(".html")
+                                for n in names))
             # digest.json は app.js が期待するキー構造
             data = json.loads((Path(tmp) / "digest.json").read_text(encoding="utf-8"))
             self.assertIn("genres", data)
@@ -193,6 +189,14 @@ class OutputAppTest(unittest.TestCase):
                 set(data["genres"][0]["items"][0].keys()),
                 {"title", "link", "summary", "time"},
             )
+
+    def test_app_shell_committed(self):
+        # アプリ本体（原本）が apps/news に存在すること
+        root = Path(__file__).resolve().parents[1]
+        for f in ("index.html", "app.js", "briefings.html", "briefings.js",
+                  "sw.js", "manifest.webmanifest", "icon-192.png"):
+            self.assertTrue((root / "apps" / "news" / f).exists(),
+                            f"apps/news/{f} が無い")
 
 
 class BriefingsTest(unittest.TestCase):
