@@ -24,7 +24,9 @@ from newsdigest.sources import (  # noqa: E402
 from newsdigest.summarize import SummaryResult, summarize  # noqa: E402
 from newsdigest.notify import build_line_text, build_briefing_line_text  # noqa: E402
 from newsdigest.briefings import (  # noqa: E402
+    current_slot,
     is_due,
+    parse_slot_hours,
     schedule_label,
     run_briefings,
 )
@@ -221,7 +223,30 @@ class BriefingsTest(unittest.TestCase):
             schedule_label({"schedule": {"freq": "weekly", "days": ["sat"], "time": "09:00"}}),
             "毎週土曜 09:00",
         )
-        self.assertEqual(schedule_label({"schedule": {"freq": "daily"}}), "毎日")
+        self.assertEqual(schedule_label({"schedule": {"freq": "daily"}}), "毎日・随時")
+
+    SLOTS = [7, 14, 21]
+
+    def test_parse_slot_hours(self):
+        self.assertEqual(parse_slot_hours(["07:00", "14:00", "21:00"]), self.SLOTS)
+
+    def test_current_slot(self):
+        self.assertEqual(current_slot(dt.datetime(2026, 6, 24, 7, 5), self.SLOTS), 7)
+        self.assertEqual(current_slot(dt.datetime(2026, 6, 24, 14, 12), self.SLOTS), 14)
+        self.assertEqual(current_slot(dt.datetime(2026, 6, 24, 21, 30), self.SLOTS), 21)
+
+    def test_slot_gating_time_specific(self):
+        # 14:00指定は14時便のみ due、7時便では due でない
+        b = {"enabled": True, "schedule": {"freq": "daily", "time": "14:00"}}
+        self.assertTrue(is_due(b, dt.datetime(2026, 6, 24, 14, 0), slot_hours=self.SLOTS))
+        self.assertFalse(is_due(b, dt.datetime(2026, 6, 24, 7, 0), slot_hours=self.SLOTS))
+
+    def test_slot_gating_breaking_every_slot(self):
+        # time なし（速報）は毎便 due
+        b = {"enabled": True, "schedule": {"freq": "daily"}}
+        for h in self.SLOTS:
+            self.assertTrue(
+                is_due(b, dt.datetime(2026, 6, 24, h, 0), slot_hours=self.SLOTS))
 
     def test_run_generates_only_due(self):
         briefings = [

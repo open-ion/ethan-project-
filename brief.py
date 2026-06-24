@@ -24,9 +24,14 @@ import json
 import os
 from pathlib import Path
 
-from newsdigest.briefings import load_briefings, run_briefings
+from newsdigest.briefings import load_briefings, parse_slot_hours, run_briefings
 from newsdigest.core import load_config
 from newsdigest.notify import build_briefing_line_text, send_line
+
+
+def _slot_hours(config: dict) -> list[int]:
+    slots = config.get("schedule", {}).get("slots", ["07:00", "14:00", "21:00"])
+    return parse_slot_hours(slots)
 
 
 def _now(config: dict) -> dt.datetime:
@@ -77,7 +82,10 @@ def main(argv: list[str] | None = None) -> int:
     print("== 予定済みブリーフィング ==")
     if not briefings:
         print("  [info] briefings.json にブリーフィングがありません")
-    results = run_briefings(briefings, now, generate=args.generate, force=args.force)
+    results = run_briefings(
+        briefings, now, generate=args.generate, force=args.force,
+        slot_hours=_slot_hours(config),
+    )
 
     for r in results:
         state = "生成" if r["due"] and args.generate else "予定のみ"

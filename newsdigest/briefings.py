@@ -69,13 +69,42 @@ def schedule_label(briefing: dict) -> str:
         base = f"毎週{jp}曜" if jp else "毎週"
     else:
         base = freq
-    return f"{base} {time}".strip()
+    if time:
+        return f"{base} {time}".strip()
+    return f"{base}・随時".strip()  # time なし = 速報（毎便）
 
 
-def is_due(briefing: dict, now: dt.datetime) -> bool:
-    """now の時点でこのブリーフィングを実行すべきか（曜日ベース）。
+def parse_slot_hours(slots) -> list[int]:
+    """["07:00","14:00","21:00"] → [7,14,21]。"""
+    hours = []
+    for s in slots or []:
+        h = _hour(s)
+        if h is not None:
+            hours.append(h)
+    return hours
 
-    日次cronでの運用を想定し、時刻ではなく「その日に該当するか」で判定する。
+
+def _hour(time_str) -> int | None:
+    try:
+        return int(str(time_str).split(":")[0])
+    except (ValueError, AttributeError):
+        return None
+
+
+def current_slot(now: dt.datetime, slot_hours: list[int]) -> int | None:
+    """now に最も近いスロット時刻を返す（cron遅延を吸収）。"""
+    if not slot_hours:
+        return None
+    return min(slot_hours, key=lambda s: abs(now.hour - s))
+
+
+def is_due(briefing: dict, now: dt.datetime, *, slot_hours: list[int] | None = None) -> bool:
+    """now の実行便でこのブリーフィングを生成すべきか。
+
+    曜日（毎日／平日／毎週◯曜）に加え、slot_hours が与えられた場合は時刻スロットも判定:
+    - briefing に time があれば、その時刻に最も近いスロットの便でのみ実行。
+    - time が無ければ「速報」扱いで毎便実行。
+    slot_hours が None のときは曜日のみで判定（手動実行・テスト用）。
     """
     if not briefing.get("enabled", True):
         return False
@@ -83,13 +112,24 @@ def is_due(briefing: dict, now: dt.datetime) -> bool:
     freq = sch.get("freq", "daily")
     wd = now.weekday()
     if freq == "daily":
-        return True
-    if freq == "weekdays":
-        return wd < 5
-    if freq == "weekly":
+        day_ok = True
+    elif freq == "weekdays":
+        day_ok = wd < 5
+    elif freq == "weekly":
         days = sch.get("days", [])
-        return wd in {_WEEKDAYS[d] for d in days if d in _WEEKDAYS}
-    return False
+        day_ok = wd in {_WEEKDAYS[d] for d in days if d in _WEEKDAYS}
+    else:
+        day_ok = False
+    if not day_ok:
+        return False
+
+    if not slot_hours:
+        return True  # スロット情報なし → 曜日のみ
+    bh = _hour(sch.get("time"))
+    if bh is None:
+        return True  # 速報：毎便
+    return current_slot(now, slot_hours) == min(
+        slot_hours, key=lambda s: abs(bh - s))
 
 
 # ---------------------------------------------------------------------------
@@ -173,18 +213,19 @@ def run_briefings(
     *,
     generate: bool = True,
     force: bool = False,
+    slot_hours: list[int] | None = None,
     generator=generate_ai_briefing,
 ) -> list[dict]:
     """有効なブリーフィングそれぞれの結果（表示用）を返す。
 
-    - due（今日該当）かつ generate=True のとき本文を生成。
+    - due（今便で該当）かつ generate=True のとき本文を生成。
     - それ以外は本文なし（アプリでは予定だけ表示）。
     """
     results: list[dict] = []
     for b in briefings:
         if not b.get("enabled", True):
             continue
-        due = force or is_due(b, now)
+        due = force or is_due(b, now, slot_hours=slot_hours)
         entry = {
             "id": b.get("id", ""),
             "title": b.get("title", ""),
