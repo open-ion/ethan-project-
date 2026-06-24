@@ -45,7 +45,7 @@ def build_line_text(
     全カテゴリのトップ見出しを並べた「ダイジェストの予告」。
     本文は site_url のページで読む導線。
     """
-    title = data.get("title", "5分ニュースダイジェスト")
+    title = data.get("title", "News Brief")
     date_label = _format_date(data.get("date_label", ""))
 
     lines: list[str] = [f"📰 {title}", date_label, ""]

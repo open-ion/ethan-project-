@@ -37,8 +37,8 @@
     // 既存のニュースダイジェストアプリへの導線
     var a = el("a", "card");
     a.href = "./"; a.style.display = "block";
-    a.appendChild(el("div", "title", "🗞 ニュースダイジェスト"));
-    a.appendChild(el("div", "sum", "カテゴリ別の主要ニュースを5分で。タップで開く。"));
+    a.appendChild(el("div", "title", "🗞 News Brief（ニュース）"));
+    a.appendChild(el("div", "sum", "カテゴリ別の主要ニュースを数分で。タップで開く。"));
     var foot = el("div", "foot");
     var chip = el("span", "chip", "毎日");
     chip.style.background = "#ff4d4f";

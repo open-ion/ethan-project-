@@ -23,7 +23,7 @@ DEFAULT_CONFIG = {
     },
     "output": {
         "dir": "apps/news",
-        "title": "5分ニュースダイジェスト",
+        "title": "News Brief",
         "timezone": "Asia/Tokyo",
     },
 }
@@ -148,7 +148,7 @@ def _digest_to_dict(config: dict, digest: dict) -> dict:
             "items": items,
         })
     return {
-        "title": config.get("output", {}).get("title", "5分ニュースダイジェスト"),
+        "title": config.get("output", {}).get("title", "News Brief"),
         "generated_at": ga.isoformat(),
         "date_label": ga.strftime("%Y-%m-%d"),
         "overall": result.overall,

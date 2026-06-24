@@ -1,6 +1,6 @@
-# 5分ニュースダイジェスト
+# News Brief — 数分でわかるニュース
 
-世の中のことを、毎朝5分で。政治・経済・物価・医療・スポーツ・国際…
+世の中のことを、数分で。政治・経済・物価・医療・スポーツ・国際…
 カテゴリ別に主要ニュースを集めて、ニュースに疎い人でも分かる平易な要約にして、
 毎朝自動で更新する。自分でニュースサイトを探さなくていい。勝手に届く。
 
@@ -163,7 +163,7 @@ python brief.py --notify   # 生成後、該当分をLINE配信
   },
   "deliver": { "line": { "enabled": true, "max_headlines_per_genre": 1, "news_at": "07:00" } },
   "schedule": { "slots": ["07:00", "14:00", "21:00"] },
-  "output": { "dir": "site", "title": "5分ニュースダイジェスト", "timezone": "Asia/Tokyo", "site_url": "" }
+  "output": { "dir": "apps/news", "title": "News Brief", "timezone": "Asia/Tokyo", "site_url": "" }
 }
 ```
 

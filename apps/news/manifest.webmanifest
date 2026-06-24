@@ -1,7 +1,7 @@
 {
-  "name": "5分ニュースダイジェスト",
-  "short_name": "5分ニュース",
-  "description": "カテゴリ別に世の中を5分で。気になるジャンルだけ選んで読める。",
+  "name": "News Brief",
+  "short_name": "News Brief",
+  "description": "数分でわかるニュース。カテゴリ別＋定期ブリーフィングで、気になるジャンルだけ。",
   "lang": "ja",
   "start_url": "./",
   "scope": "./",

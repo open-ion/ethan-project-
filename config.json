@@ -18,7 +18,7 @@
   },
   "output": {
     "dir": "apps/news",
-    "title": "5分ニュースダイジェスト",
+    "title": "News Brief",
     "timezone": "Asia/Tokyo",
     "site_url": ""
   }

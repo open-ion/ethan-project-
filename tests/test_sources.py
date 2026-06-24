@@ -97,7 +97,7 @@ class RenderTest(unittest.TestCase):
             data, result, {"genres": ["economy"]},
             generated_at=dt.datetime(2026, 6, 23, 9, 0),
         )
-        self.assertIn("# 5分ニュースダイジェスト", md)
+        self.assertIn("# News Brief", md)
         self.assertIn("[消費者物価指数", md)
 
     def test_empty_genre_renders(self):

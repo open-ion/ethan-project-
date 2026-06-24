@@ -27,7 +27,7 @@
 
 - トップ一覧：`https://open-ion.github.io/ethan-project-/`
 - マネークリップ：`https://open-ion.github.io/ethan-project-/moneyclip/`
-- 5分ニュースダイジェスト：`https://open-ion.github.io/ethan-project-/news/`
+- News Brief（ニュースダイジェスト）：`https://open-ion.github.io/ethan-project-/news/`
 
 **新しいアプリの作り方**：`apps/` に新フォルダを作る（既存をコピーするなら `cp -r apps/moneyclip apps/新名`）→ `apps/index.html` に1行リンクを足す → main にpush。既存アプリは別フォルダ＝別URLなので無傷。
 
@@ -48,7 +48,7 @@ cd apps/moneyclip && python3 -m http.server 8000
 
 データは端末内（localStorage）に保存。バックエンドなし。`apps/moneyclip/` 配下で完結。
 
-### 📰 5分ニュースダイジェスト
+### 📰 News Brief（数分でわかるニュース）
 「何で見ればいいかすらわからない」を終わらせる、カテゴリ別ニュース＋定期ブリーフィングのPWAアプリ。
 スマートニュース風タブUI、アプリ内ジャンル選択、ChatGPTの「予定済み」風の定期ブリーフィング、
 1日3便（7/14/21時 JST）の自動更新とLINE配信。詳細は **[`apps/news/README.md`](apps/news/README.md)**。

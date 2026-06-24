@@ -180,7 +180,7 @@ def render_html(
     *,
     generated_at: dt.datetime,
 ) -> str:
-    title = config.get("output", {}).get("title", "5分ニュースダイジェスト")
+    title = config.get("output", {}).get("title", "News Brief")
     # %-m はWindowsで使えないため fallback を用意
     try:
         date_label = generated_at.strftime("%-m月%-d日 %H:%M")
@@ -249,7 +249,7 @@ def render_html(
 
     out.append("</main>")
     out.append(
-        "<footer>自動更新: 5分ニュースダイジェスト ・ 出典: NHKニュース<br>"
+        "<footer>自動更新: News Brief ・ 出典: NHKニュース<br>"
         "記事の著作権は各報道機関に帰属します。</footer>"
     )
     out.append(f"<script>{_JS}</script>")
@@ -268,7 +268,7 @@ def render_markdown(
     *,
     generated_at: dt.datetime,
 ) -> str:
-    title = config.get("output", {}).get("title", "5分ニュースダイジェスト")
+    title = config.get("output", {}).get("title", "News Brief")
     lines: list[str] = []
     lines.append(f"# {title} — {generated_at:%Y/%m/%d %H:%M}")
     lines.append("")
