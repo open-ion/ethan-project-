@@ -18,7 +18,10 @@
     <header>
       <div class="row">
         <div class="brand">📰 5分ニュースダイジェスト</div>
-        <button id="settingsBtn" class="iconbtn" aria-label="ジャンル設定">⚙</button>
+        <div style="display:flex;gap:6px;">
+          <a class="iconbtn" href="./briefings.html" aria-label="予定済み" style="text-decoration:none;line-height:32px;">📅</a>
+          <button id="settingsBtn" class="iconbtn" aria-label="ジャンル設定">⚙</button>
+        </div>
       </div>
       <div class="date" id="dateLabel">読み込み中…</div>
       <nav class="tabs" id="tabs" role="tablist"></nav>

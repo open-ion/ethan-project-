@@ -1,0 +1,34 @@
+{
+  "briefings": [
+    {
+      "id": "daily-brief",
+      "title": "Daily Briefing",
+      "emoji": "📰",
+      "source": "ai",
+      "enabled": true,
+      "schedule": { "freq": "daily", "time": "07:00" },
+      "instruction": "AI・テクノロジー、投資・株式市場、看護・医療、ビジネス・スタートアップを中心に、世界と日本の今日の主要トピックを日本語でバランスよく。",
+      "model": "claude-opus-4-8"
+    },
+    {
+      "id": "weekend-reads",
+      "title": "週末の読みもの",
+      "emoji": "📖",
+      "source": "ai",
+      "enabled": true,
+      "schedule": { "freq": "weekly", "days": ["sat"], "time": "09:00" },
+      "instruction": "今週話題になった、興味・関心に合う読み応えのある長文記事や解説を3〜5本。各記事の要点を添えて。",
+      "model": "claude-opus-4-8"
+    },
+    {
+      "id": "worldcup",
+      "title": "ワールドカップのまとめ",
+      "emoji": "⚽",
+      "source": "ai",
+      "enabled": false,
+      "schedule": { "freq": "daily", "time": "23:00" },
+      "instruction": "直近のワールドカップの試合結果と注目ポイントを振り返る。次の注目試合も。",
+      "model": "claude-opus-4-8"
+    }
+  ]
+}

@@ -14,6 +14,9 @@
   今日のまとめ＋各カテゴリの主要トピック。誰でも迷わず、開いてすぐ読める。
 - **アプリ内でジャンルを選べる**: ⚙ から表示カテゴリをオン/オフ。選択は端末に保存される
   （PDF要件「自分が気になるジャンルだけ選べる」をユーザー側で実現）。
+- **予定済み（定期ブリーフィング）**: ChatGPTの「予定済みタスク」のように、テーマと頻度を
+  決めた定期レポートを自動生成。毎日の「Daily Briefing」、毎週土曜の「週末の読みもの」など。
+  Claude + Web検索で最新情報をまとめ、アプリの 📅 画面とLINEに届く。
 - **5分で読める**: 1記事1〜2文の平易な要約 ＋ 「今日のまとめ」3行。明るい新聞風・スマホ最優先。
 - **毎朝自動**: GitHub Actions が毎朝6時(JST)に生成して GitHub Pages に公開。ブックマーク1つでOK。
 - **要約はAI（任意）**: `ANTHROPIC_API_KEY` を入れると Claude が要約。無くてもRSS概要で必ず動く。
@@ -91,6 +94,51 @@ export SITE_URL=https://<ユーザー名>.github.io/<リポジトリ名>/
 python notify_line.py
 ```
 
+## 予定済み（定期ブリーフィング）
+
+ChatGPTの「予定済みタスク」に相当する機能。`briefings.json` にテーマと頻度を書いておくと、
+スケジュールに従って **Claude + Web検索** で最新情報を要約生成し、アプリの 📅 画面とLINEに届く。
+
+```json
+{
+  "briefings": [
+    {
+      "id": "daily-brief",
+      "title": "Daily Briefing",
+      "emoji": "📰",
+      "source": "ai",
+      "enabled": true,
+      "schedule": { "freq": "daily", "time": "07:00" },
+      "instruction": "AI・テクノロジー、投資・株式市場、看護・医療、ビジネス・スタートアップを中心に、日本語でバランスよく。",
+      "model": "claude-opus-4-8"
+    },
+    {
+      "id": "weekend-reads", "title": "週末の読みもの", "emoji": "📖",
+      "source": "ai", "enabled": true,
+      "schedule": { "freq": "weekly", "days": ["sat"], "time": "09:00" },
+      "instruction": "今週話題になった読み応えのある記事を3〜5本、要点つきで。",
+      "model": "claude-opus-4-8"
+    }
+  ]
+}
+```
+
+- **schedule.freq**: `daily`（毎日）／`weekdays`（平日）／`weekly`＋`days`（例 `["sat"]`）。
+- **enabled**: `false` でその予定をオフ。
+- **instruction**: 何をまとめてほしいかを自由文で。これがそのままブリーフィングのテーマ。
+- **model**: 既定 `claude-opus-4-8`。コストを抑えたいなら `claude-sonnet-4-6` / `claude-haiku-4-5`。
+  ※Web検索を使うため `ANTHROPIC_API_KEY` が必要（未設定なら本文は空＝予定だけ表示）。
+
+手動実行:
+
+```bash
+python brief.py            # 今日該当分を生成 → site/briefings.json
+python brief.py --force    # スケジュール無視で全件生成（テスト用）
+python brief.py --notify   # 生成後、該当分をLINE配信
+```
+
+毎朝のワークフローでは、ニュース生成 → ブリーフィング生成 → Pages公開 → LINE配信 の順に自動実行される。
+
 ## 設定（`config.json`）
 
 ```json
@@ -131,8 +179,15 @@ config.json ──▶ newsdigest.core
                                   │      ──▶ GitHub Pages（毎朝 cron で自動更新）
                                   └─▶ notify_line.py ──▶ 毎朝 LINE に届く
 
+briefings.json ─▶ brief.py ─▶ newsdigest.briefings
+                  │             ├─ スケジューラ（毎日／平日／毎週◯曜）
+                  │             └─ Claude + Web検索で定期ブリーフィング生成
+                  ▼
+                site/briefings.json ─┬─▶ 📅 予定済み画面（briefings.html）
+                                     └─▶ brief.py --notify-only ──▶ LINE
+
 webapp/ : アプリ本体（PWAシェル・JS・CSS・SW・アイコン）。
-          ビルド時に site/ へコピーされ、digest.json をクライアント描画する。
+          ビルド時に site/ へコピーされ、digest.json / briefings.json を描画する。
 ```
 
 - 物価(`prices`)は経済・暮らしフィードから物価関連キーワードで絞り込んで作っている。

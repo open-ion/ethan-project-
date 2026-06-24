@@ -44,6 +44,14 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python digest.py
 
+      - name: 予定済みブリーフィング生成
+        # briefings.json のスケジュールに従い、今日該当分を Claude+Web検索で生成。
+        # ANTHROPIC_API_KEY 未設定なら本文は空でスキップ（落とさない）。
+        env:
+          TZ: Asia/Tokyo
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python brief.py
+
       - name: Pages 設定
         uses: actions/configure-pages@v5
 
@@ -66,3 +74,12 @@ jobs:
           # デプロイ先URLをリンクとして添付
           SITE_URL: ${{ steps.deploy.outputs.page_url }}
         run: python notify_line.py
+
+      - name: 予定済みブリーフィングをLINE配信（任意）
+        # 当日分の生成済みブリーフィングを LINE に送る（再生成しない）。
+        env:
+          TZ: Asia/Tokyo
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_TO: ${{ secrets.LINE_TO }}
+          SITE_URL: ${{ steps.deploy.outputs.page_url }}briefings.html
+        run: python brief.py --notify-only

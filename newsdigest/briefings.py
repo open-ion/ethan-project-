@@ -1,0 +1,207 @@
+"""定期ブリーフィング（ChatGPTの「予定済み」相当）。
+
+テーマと頻度を briefings.json に定義しておくと、スケジュールに従って
+Claude + Web検索で最新情報を要約生成し、アプリ表示・LINE配信に回す。
+
+- スケジューラ: is_due() で「今日やるべきか」を判定（毎日／平日／毎週◯曜）。
+- 生成: source="ai" は Claude の web_search ツールで最新情報を確認して要約。
+- フォールバック: APIキーや anthropic が無い／失敗しても落とさず ok=False を返す。
+
+外部依存は anthropic（要約時のみ）。スケジューラ部分は標準ライブラリのみ。
+"""
+
+from __future__ import annotations
+
+import datetime as dt
+import json
+import os
+from pathlib import Path
+
+_WEEKDAYS = {"mon": 0, "tue": 1, "wed": 2, "thu": 3, "fri": 4, "sat": 5, "sun": 6}
+_WD_JP = ["月", "火", "水", "木", "金", "土", "日"]
+
+_BRIEFING_DEFAULTS = {
+    "emoji": "📌",
+    "source": "ai",
+    "enabled": True,
+    "model": "claude-opus-4-8",
+    "max_tokens": 3000,
+}
+
+
+# ---------------------------------------------------------------------------
+# 読み込み
+# ---------------------------------------------------------------------------
+
+def load_briefings(path: str | os.PathLike) -> list[dict]:
+    p = Path(path)
+    if not p.exists():
+        return []
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+    except (ValueError, OSError):
+        return []
+    items = data.get("briefings", []) if isinstance(data, dict) else []
+    result = []
+    for raw in items:
+        b = dict(_BRIEFING_DEFAULTS)
+        b.update(raw)
+        b.setdefault("schedule", {"freq": "daily"})
+        result.append(b)
+    return result
+
+
+# ---------------------------------------------------------------------------
+# スケジュール
+# ---------------------------------------------------------------------------
+
+def schedule_label(briefing: dict) -> str:
+    sch = briefing.get("schedule", {})
+    freq = sch.get("freq", "daily")
+    time = sch.get("time", "")
+    if freq == "daily":
+        base = "毎日"
+    elif freq == "weekdays":
+        base = "平日"
+    elif freq == "weekly":
+        days = sch.get("days", [])
+        jp = "・".join(_WD_JP[_WEEKDAYS[d]] for d in days if d in _WEEKDAYS)
+        base = f"毎週{jp}曜" if jp else "毎週"
+    else:
+        base = freq
+    return f"{base} {time}".strip()
+
+
+def is_due(briefing: dict, now: dt.datetime) -> bool:
+    """now の時点でこのブリーフィングを実行すべきか（曜日ベース）。
+
+    日次cronでの運用を想定し、時刻ではなく「その日に該当するか」で判定する。
+    """
+    if not briefing.get("enabled", True):
+        return False
+    sch = briefing.get("schedule", {})
+    freq = sch.get("freq", "daily")
+    wd = now.weekday()
+    if freq == "daily":
+        return True
+    if freq == "weekdays":
+        return wd < 5
+    if freq == "weekly":
+        days = sch.get("days", [])
+        return wd in {_WEEKDAYS[d] for d in days if d in _WEEKDAYS}
+    return False
+
+
+# ---------------------------------------------------------------------------
+# 生成（Claude + Web検索）
+# ---------------------------------------------------------------------------
+
+_SYSTEM = (
+    "あなたは、忙しい人のための定期ブリーフィングの編集者です。"
+    "Web検索で最新かつ信頼できる情報を確認し、日本語で簡潔にまとめます。"
+    "憶測は避け、事実ベースで。前提知識のない読者にも分かる平易な言葉で書いてください。"
+)
+
+
+def _web_search_tool(model: str) -> dict:
+    # 新しい dynamic filtering 版は Opus 4.x / Sonnet 4.6 のみ。それ以外は基本版。
+    m = model.lower()
+    if m.startswith("claude-opus-4") or m.startswith("claude-fable") \
+            or m == "claude-sonnet-4-6":
+        return {"type": "web_search_20260209", "name": "web_search"}
+    return {"type": "web_search_20250305", "name": "web_search"}
+
+
+def generate_ai_briefing(briefing: dict, now: dt.datetime) -> dict:
+    """1件のAIブリーフィングを生成して {ok, body, error} を返す。"""
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        return {"ok": False, "body": "", "error": "ANTHROPIC_API_KEY 未設定"}
+    try:
+        import anthropic
+    except ImportError:
+        return {"ok": False, "body": "", "error": "anthropic 未インストール"}
+
+    model = briefing.get("model", "claude-opus-4-8")
+    instruction = briefing.get("instruction", "今日の主要トピック")
+    user = (
+        f"次のテーマで「{now:%Y年%-m月%-d日}」のブリーフィングを作成してください。\n"
+        f"テーマ: {instruction}\n\n"
+        "出力形式:\n"
+        "1) 冒頭に3行以内の全体まとめ\n"
+        "2) その後、重要トピックを最大5件、"
+        "「・見出し — 1〜2文の説明（出典: URL）」の箇条書きで\n"
+        "必ずWeb検索で最新情報を確認してから書くこと。"
+    )
+
+    try:
+        client = anthropic.Anthropic()
+        messages = [{"role": "user", "content": user}]
+        tool = _web_search_tool(model)
+        resp = None
+        for _ in range(5):  # pause_turn（サーバ側ツールの継続）に対応
+            resp = client.messages.create(
+                model=model,
+                max_tokens=int(briefing.get("max_tokens", 3000)),
+                system=_SYSTEM,
+                messages=messages,
+                tools=[tool],
+            )
+            if resp.stop_reason == "pause_turn":
+                messages = [
+                    {"role": "user", "content": user},
+                    {"role": "assistant", "content": resp.content},
+                ]
+                continue
+            break
+        body = "".join(
+            b.text for b in resp.content if getattr(b, "type", None) == "text"
+        ).strip()
+        if not body:
+            return {"ok": False, "body": "", "error": "本文が空でした"}
+        return {"ok": True, "body": body, "error": None}
+    except Exception as err:  # API失敗を握りつぶして配信全体を止めない
+        return {"ok": False, "body": "", "error": str(err)}
+
+
+# ---------------------------------------------------------------------------
+# まとめて実行
+# ---------------------------------------------------------------------------
+
+def run_briefings(
+    briefings: list[dict],
+    now: dt.datetime,
+    *,
+    generate: bool = True,
+    force: bool = False,
+    generator=generate_ai_briefing,
+) -> list[dict]:
+    """有効なブリーフィングそれぞれの結果（表示用）を返す。
+
+    - due（今日該当）かつ generate=True のとき本文を生成。
+    - それ以外は本文なし（アプリでは予定だけ表示）。
+    """
+    results: list[dict] = []
+    for b in briefings:
+        if not b.get("enabled", True):
+            continue
+        due = force or is_due(b, now)
+        entry = {
+            "id": b.get("id", ""),
+            "title": b.get("title", ""),
+            "emoji": b.get("emoji", "📌"),
+            "source": b.get("source", "ai"),
+            "schedule_label": schedule_label(b),
+            "instruction": b.get("instruction", ""),
+            "due": due,
+            "generated_at": now.isoformat(),
+            "body": "",
+            "ok": None,
+            "error": None,
+        }
+        if due and generate and b.get("source") == "ai":
+            gen = generator(b, now)
+            entry["body"] = gen.get("body", "")
+            entry["ok"] = gen.get("ok")
+            entry["error"] = gen.get("error")
+        results.append(entry)
+    return results

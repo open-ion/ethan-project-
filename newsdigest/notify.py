@@ -86,6 +86,30 @@ def _format_date(iso_or_date: str) -> str:
         return iso_or_date
 
 
+def build_briefing_line_text(entry: dict, *, site_url: str = "") -> str:
+    """1件のブリーフィング結果をLINEテキストにする。"""
+    emoji = entry.get("emoji", "📌")
+    title = entry.get("title", "")
+    lines = [f"{emoji} {title}"]
+    label = entry.get("schedule_label", "")
+    if label:
+        lines.append(label)
+    lines.append("")
+    body = (entry.get("body") or "").strip()
+    if body:
+        lines.append(body)
+    else:
+        lines.append("（本文を生成できませんでした）")
+    if site_url:
+        lines.append("")
+        lines.append("▼ 予定済み一覧")
+        lines.append(site_url)
+    text = "\n".join(lines).strip()
+    if len(text) > _TEXT_LIMIT:
+        text = text[:_TEXT_LIMIT].rstrip() + "…"
+    return text
+
+
 def send_line(text: str, *, token: str, to: str, timeout: int = 20) -> bool:
     """LINE Messaging API でテキストを push。成功で True。"""
     payload = json.dumps({

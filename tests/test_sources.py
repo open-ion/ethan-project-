@@ -22,7 +22,12 @@ from newsdigest.sources import (  # noqa: E402
     parse_feed,
 )
 from newsdigest.summarize import SummaryResult, summarize  # noqa: E402
-from newsdigest.notify import build_line_text  # noqa: E402
+from newsdigest.notify import build_line_text, build_briefing_line_text  # noqa: E402
+from newsdigest.briefings import (  # noqa: E402
+    is_due,
+    schedule_label,
+    run_briefings,
+)
 
 FIXTURE = (Path(__file__).parent / "fixtures" / "sample_nhk.xml").read_bytes()
 
@@ -186,6 +191,62 @@ class OutputAppTest(unittest.TestCase):
                 set(data["genres"][0]["items"][0].keys()),
                 {"title", "link", "summary", "time"},
             )
+
+
+class BriefingsTest(unittest.TestCase):
+    WED = dt.datetime(2026, 6, 24, 7, 0)   # 水曜
+    SAT = dt.datetime(2026, 6, 27, 9, 0)   # 土曜
+
+    def test_is_due_daily(self):
+        b = {"enabled": True, "schedule": {"freq": "daily"}}
+        self.assertTrue(is_due(b, self.WED))
+        self.assertTrue(is_due(b, self.SAT))
+
+    def test_is_due_weekly(self):
+        b = {"enabled": True, "schedule": {"freq": "weekly", "days": ["sat"]}}
+        self.assertFalse(is_due(b, self.WED))
+        self.assertTrue(is_due(b, self.SAT))
+
+    def test_is_due_weekdays(self):
+        b = {"enabled": True, "schedule": {"freq": "weekdays"}}
+        self.assertTrue(is_due(b, self.WED))
+        self.assertFalse(is_due(b, self.SAT))
+
+    def test_disabled_never_due(self):
+        b = {"enabled": False, "schedule": {"freq": "daily"}}
+        self.assertFalse(is_due(b, self.WED))
+
+    def test_schedule_label(self):
+        self.assertEqual(
+            schedule_label({"schedule": {"freq": "weekly", "days": ["sat"], "time": "09:00"}}),
+            "毎週土曜 09:00",
+        )
+        self.assertEqual(schedule_label({"schedule": {"freq": "daily"}}), "毎日")
+
+    def test_run_generates_only_due(self):
+        briefings = [
+            {"id": "a", "title": "毎日", "source": "ai", "enabled": True,
+             "schedule": {"freq": "daily"}},
+            {"id": "b", "title": "土曜", "source": "ai", "enabled": True,
+             "schedule": {"freq": "weekly", "days": ["sat"]}},
+        ]
+        fake = lambda b, now: {"ok": True, "body": "本文", "error": None}
+        res = run_briefings(briefings, self.WED, generator=fake)
+        by_id = {r["id"]: r for r in res}
+        self.assertTrue(by_id["a"]["due"])
+        self.assertEqual(by_id["a"]["body"], "本文")
+        self.assertFalse(by_id["b"]["due"])
+        self.assertEqual(by_id["b"]["body"], "")
+
+    def test_briefing_line_text(self):
+        entry = {"emoji": "📰", "title": "Daily Briefing",
+                 "schedule_label": "毎日 07:00", "body": "まとめ\n・A — 説明",
+                 "due": True, "ok": True}
+        text = build_briefing_line_text(entry, site_url="https://x/briefings.html")
+        self.assertIn("📰 Daily Briefing", text)
+        self.assertIn("毎日 07:00", text)
+        self.assertIn("・A — 説明", text)
+        self.assertIn("https://x/briefings.html", text)
 
 
 if __name__ == "__main__":
