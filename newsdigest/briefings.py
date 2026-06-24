@@ -196,11 +196,47 @@ def generate_ai_briefing(briefing: dict, now: dt.datetime) -> dict:
         body = "".join(
             b.text for b in resp.content if getattr(b, "type", None) == "text"
         ).strip()
+        # 出典URLが引用メタデータ（citations / web_search結果）で返る場合に備え、
+        # 本文に現れていないURLを末尾の「出典」に補う。失敗しても本文は返す。
+        body = _append_missing_sources(body, resp.content)
         if not body:
             return {"ok": False, "body": "", "error": "本文が空でした"}
         return {"ok": True, "body": body, "error": None}
     except Exception as err:  # API失敗を握りつぶして配信全体を止めない
         return {"ok": False, "body": "", "error": str(err)}
+
+
+def _collect_source_urls(content) -> list[str]:
+    """応答ブロックから出典URLを集める（citations と web_search 結果）。"""
+    urls: list[str] = []
+    seen: set[str] = set()
+
+    def add(u):
+        if u and isinstance(u, str) and u.startswith("http") and u not in seen:
+            seen.add(u)
+            urls.append(u)
+
+    for block in content or []:
+        # text ブロックに付く citations メタデータ
+        for cit in getattr(block, "citations", None) or []:
+            add(getattr(cit, "url", None) or (cit.get("url") if isinstance(cit, dict) else None))
+        # web_search_tool_result ブロック内の検索結果
+        inner = getattr(block, "content", None)
+        if isinstance(inner, list):
+            for item in inner:
+                add(getattr(item, "url", None) or (item.get("url") if isinstance(item, dict) else None))
+    return urls
+
+
+def _append_missing_sources(body: str, content) -> str:
+    try:
+        urls = [u for u in _collect_source_urls(content) if u not in body]
+    except Exception:
+        return body
+    if not urls:
+        return body
+    lines = "\n".join(f"・{u}" for u in urls[:5])
+    return f"{body}\n\n出典:\n{lines}"
 
 
 # ---------------------------------------------------------------------------

@@ -102,13 +102,13 @@ def write_outputs(config: dict, digest: dict) -> list[Path]:
 
     written: list[Path] = []
 
-    datestr = ga.strftime("%Y-%m-%d")
-    # 日付アーカイブはJS不要の静的ページ（パーマリンク／フォールバック）
-    archive = out_dir / f"digest-{datestr}.html"
+    # 「最新」のJS不要スナップショット（毎回上書き）。
+    # 公開は force_orphan ミラー＝過去日は残らないため、日付名ではなく latest 固定。
+    archive = out_dir / "digest-latest.html"
     archive.write_text(html_doc, encoding="utf-8")
     written.append(archive)
 
-    md_path = out_dir / f"digest-{datestr}.md"
+    md_path = out_dir / "digest-latest.md"
     md_path.write_text(md_doc, encoding="utf-8")
     written.append(md_path)
 

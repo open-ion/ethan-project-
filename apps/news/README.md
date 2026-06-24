@@ -41,7 +41,7 @@ cd apps/news && python -m http.server 8000
 ```
 
 `apps/news/index.html` がアプリ本体（`digest.json` を読み込んで表示）。
-`apps/news/digest-YYYY-MM-DD.html` / `.md` はJS不要の日付アーカイブ。
+`apps/news/digest-latest.html` / `.md` はJS不要の最新スナップショット（毎回上書き）。
 
 > ⚠️ `index.html` を `file://` で直接開くと、ブラウザのセキュリティ制限で `digest.json` を
 > 読み込めない。上記のように簡易HTTPサーバ経由（または下記のGitHub Pages）で開くこと。
@@ -188,7 +188,7 @@ config.json ──▶ newsdigest.core
                   │
                   ├─ sources.py   NHK RSS をジャンル別に取得・パース（標準ライブラリ）
                   ├─ summarize.py Claude で平易要約（APIキー無ければ自動フォールバック）
-                  ├─ render.py    日付アーカイブHTML / Markdown を出力
+                  ├─ render.py    最新スナップショットHTML / Markdown を出力
                   └─ notify.py    LINE Messaging API へ push（標準ライブラリ）
                   ▼
                 apps/news/digest.json ─┬─▶ apps/news（PWAアプリ：index.html/app.js/sw.js）
