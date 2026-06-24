@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -157,6 +158,34 @@ class LineMessageTest(unittest.TestCase):
     def test_text_within_limit(self):
         text = build_line_text(self._data())
         self.assertLessEqual(len(text), 5000)
+
+
+class OutputAppTest(unittest.TestCase):
+    def test_write_outputs_builds_app(self):
+        import tempfile
+        from newsdigest.core import build_digest, write_outputs
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = {"genres": ["economy"], "max_items_per_genre": 3,
+                   "summarize": {"enabled": False}, "output": {"dir": tmp}}
+            digest = build_digest(cfg, fetcher=fake_fetcher)
+            write_outputs(cfg, digest)
+            names = {p.name for p in Path(tmp).iterdir()}
+            # アプリシェル + データ + PWAアセットが揃う
+            for required in ("index.html", "digest.json", "app.js", "app.css",
+                             "manifest.webmanifest", "sw.js", "icon-192.png"):
+                self.assertIn(required, names, f"{required} が出力されていない")
+            # index.html はアプリシェル（digest.json を読み込む）
+            shell = (Path(tmp) / "index.html").read_text(encoding="utf-8")
+            self.assertIn("app.js", shell)
+            self.assertIn("manifest.webmanifest", shell)
+            # digest.json は app.js が期待するキー構造
+            data = json.loads((Path(tmp) / "digest.json").read_text(encoding="utf-8"))
+            self.assertIn("genres", data)
+            self.assertTrue(data["genres"])
+            self.assertEqual(
+                set(data["genres"][0]["items"][0].keys()),
+                {"title", "link", "summary", "time"},
+            )
 
 
 if __name__ == "__main__":

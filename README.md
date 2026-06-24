@@ -8,9 +8,12 @@
 
 ## できること
 
+- **アプリ形式（PWA）**: ホーム画面に追加すればネイティブアプリのように起動。オフラインでも
+  直近のダイジェストが読める。アプリアイコン付き。
 - **スマートニュース風タブUI**: 上のタブをタップ／左右スワイプでカテゴリ切替。「トップ」に
   今日のまとめ＋各カテゴリの主要トピック。誰でも迷わず、開いてすぐ読める。
-- **カテゴリ別**: 政治・経済・物価・医療・スポーツ・国際・トレンド。気になるジャンルだけ選べる。
+- **アプリ内でジャンルを選べる**: ⚙ から表示カテゴリをオン/オフ。選択は端末に保存される
+  （PDF要件「自分が気になるジャンルだけ選べる」をユーザー側で実現）。
 - **5分で読める**: 1記事1〜2文の平易な要約 ＋ 「今日のまとめ」3行。明るい新聞風・スマホ最優先。
 - **毎朝自動**: GitHub Actions が毎朝6時(JST)に生成して GitHub Pages に公開。ブックマーク1つでOK。
 - **要約はAI（任意）**: `ANTHROPIC_API_KEY` を入れると Claude が要約。無くてもRSS概要で必ず動く。
@@ -28,11 +31,26 @@ python digest.py
 export ANTHROPIC_API_KEY=sk-ant-...
 python digest.py
 
-# 出力は site/ に。ブラウザで開く：
-open site/index.html        # mac
+# 3. アプリとして開く（fetchを使うのでローカルHTTPサーバ経由で）
+cd site && python -m http.server 8000
+#   → ブラウザで http://localhost:8000/ を開く
 ```
 
-`site/index.html`（最新）と `site/digest-YYYY-MM-DD.html` / `.md`（日付アーカイブ）が作られる。
+`site/index.html` がアプリ本体（`digest.json` を読み込んで表示）。
+`site/digest-YYYY-MM-DD.html` / `.md` はJS不要の日付アーカイブ。
+
+> ⚠️ `index.html` を `file://` で直接開くと、ブラウザのセキュリティ制限で `digest.json` を
+> 読み込めない。上記のように簡易HTTPサーバ経由（または下記のGitHub Pages）で開くこと。
+
+## アプリとして使う（ホーム画面に追加）
+
+GitHub Pages で公開したURLをスマホのブラウザで開き、
+
+- **iOS (Safari)**: 共有 → 「ホーム画面に追加」
+- **Android (Chrome)**: メニュー → 「アプリをインストール」/「ホーム画面に追加」
+
+これでアイコンから起動でき、オフラインでも直近のダイジェストが読める。
+アプリ上部の ⚙ から、表示するカテゴリを自分好みに選べる。
 
 ## 毎朝自動で届くようにする（GitHub Pages）
 
@@ -106,11 +124,15 @@ config.json ──▶ newsdigest.core
                   │
                   ├─ sources.py   NHK RSS をジャンル別に取得・パース（標準ライブラリ）
                   ├─ summarize.py Claude で平易要約（APIキー無ければ自動フォールバック）
-                  ├─ render.py    HTML / Markdown を出力
+                  ├─ render.py    日付アーカイブHTML / Markdown を出力
                   └─ notify.py    LINE Messaging API へ push（標準ライブラリ）
                   ▼
-                site/index.html  ──▶ GitHub Pages（毎朝 cron で自動更新）
-                site/digest.json ──▶ notify_line.py ──▶ 毎朝 LINE に届く
+                site/digest.json ─┬─▶ webapp（PWAアプリ：index.html/app.js/sw.js）
+                                  │      ──▶ GitHub Pages（毎朝 cron で自動更新）
+                                  └─▶ notify_line.py ──▶ 毎朝 LINE に届く
+
+webapp/ : アプリ本体（PWAシェル・JS・CSS・SW・アイコン）。
+          ビルド時に site/ へコピーされ、digest.json をクライアント描画する。
 ```
 
 - 物価(`prices`)は経済・暮らしフィードから物価関連キーワードで絞り込んで作っている。
