@@ -1,0 +1,10 @@
+# 生成物（毎回 digest.py / brief.py が生成。アプリ本体=シェルはコミット済み）
+apps/news/digest.json
+apps/news/briefings.json
+apps/news/digest-*.html
+apps/news/digest-*.md
+site/
+*.pyc
+__pycache__/
+.venv/
+venv/
