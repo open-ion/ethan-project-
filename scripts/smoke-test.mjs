@@ -71,7 +71,7 @@ const legacyWorkflowSource = await readFile('.github/workflows/news-schedule.yml
 assert(!legacyWorkflowSource.includes('cron:'), 'Legacy workflow must not run on a schedule');
 assert(legacyWorkflowSource.includes('Legacy Python News Brief workflow is intentionally disabled.'), 'Legacy workflow should explain that it is disabled');
 
-for (const file of ['dist/index.html', 'dist/404.html', 'dist/news/index.html', 'dist/news/app.js', 'dist/news/generated/news.json', 'dist/dashboard/index.html']) {
+for (const file of ['dist/index.html', 'dist/404.html', 'dist/news/index.html', 'dist/news/app.js', 'dist/news/generated/news.json', 'dist/dashboard/index.html', 'dist/moneyclip/index.html', 'dist/moneyclip/app.js', 'dist/moneyclip/sw.js']) {
   try {
     await access(file);
   } catch (error) {

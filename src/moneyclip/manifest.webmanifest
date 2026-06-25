@@ -1,0 +1,13 @@
+{
+  "name": "マネークリップ",
+  "short_name": "マネークリップ",
+  "description": "副業×確定申告×ほったらかし投資のお金見える化アプリ",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#0e7c66",
+  "lang": "ja",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
