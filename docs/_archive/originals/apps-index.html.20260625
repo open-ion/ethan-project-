@@ -52,15 +52,6 @@
       <div class="arrow">›</div>
     </a>
 
-    <a class="app" href="./dashboard/index.html">
-      <span class="ic" style="display:flex;align-items:center;justify-content:center;font-size:26px;background:#0b1220;">🗞️</span>
-      <div>
-        <div class="ttl">News Brief ダッシュボード<span class="badge">MVP</span></div>
-        <div class="sub">毎朝5分 ・ AI/投資/医療/ビジネスを今日のダイジェストで</div>
-      </div>
-      <div class="arrow">›</div>
-    </a>
-
     <!-- 新しいアプリは apps/<名前>/ を作ってここに1行足すだけ。既存は上書きされない。 -->
 
     <div class="note">原本は GitHub の <code>apps/</code> に各アプリ別フォルダで保管。<br>
