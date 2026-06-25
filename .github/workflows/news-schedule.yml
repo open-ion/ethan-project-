@@ -1,70 +1,20 @@
-name: News Brief 自動更新（1日3便）
+name: Legacy News Brief workflow disabled
 
-# GitHubのスケジュール/手動実行はデフォルトブランチのワークフローのみ対象。
-# コード本体は main にあるため、checkout で main を取得してから生成・公開する。
-# JST = UTC+9 → 07:00/14:00/21:00 JST は UTC 22:00/05:00/12:00。
+# This repository now uses `.github/workflows/update-news.yml` for the Node/RSS/OpenAI
+# digest pipeline and GitHub Pages deployment. The previous Python/Anthropic workflow
+# referenced files that are not present in this app and published a different `apps/`
+# tree to gh-pages, which could overwrite the current /news and /dashboard routes.
 on:
-  schedule:
-    - cron: "0 22 * * *"   # 07:00 JST
-    - cron: "0 5 * * *"    # 14:00 JST
-    - cron: "0 12 * * *"   # 21:00 JST
   workflow_dispatch:
 
 permissions:
-  contents: write
-
-concurrency:
-  group: news-brief-pages
-  cancel-in-progress: false
+  contents: read
 
 jobs:
-  build-and-deploy:
+  legacy-disabled:
     runs-on: ubuntu-latest
     steps:
-      - name: コード取得（main）
-        uses: actions/checkout@v4
-        with:
-          ref: main
-
-      - name: Python セットアップ
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: 依存インストール
-        run: pip install -r requirements.txt
-
-      - name: ニュース生成
-        env:
-          TZ: Asia/Tokyo
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: python digest.py
-
-      - name: 予定済みブリーフィング生成
-        env:
-          TZ: Asia/Tokyo
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: python brief.py
-
-      - name: apps/ を gh-pages へ公開（既存アプリ込みでミラー＝moneyclip無傷）
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./apps
-          force_orphan: true
-          commit_message: "News Brief 更新"
-
-      - name: ニュースをLINE配信（任意・朝便のみ）
-        env:
-          TZ: Asia/Tokyo
-          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-          LINE_TO: ${{ secrets.LINE_TO }}
-        run: python notify_line.py
-
-      - name: 予定済みブリーフィングをLINE配信（任意）
-        env:
-          TZ: Asia/Tokyo
-          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-          LINE_TO: ${{ secrets.LINE_TO }}
-          SITE_URL: https://open-ion.github.io/ethan-project-/news/briefings.html
-        run: python brief.py --notify-only
+      - name: Explain replacement workflow
+        run: |
+          echo "Legacy Python News Brief workflow is intentionally disabled."
+          echo "Run 'Update News Digest Data and Pages' instead."
