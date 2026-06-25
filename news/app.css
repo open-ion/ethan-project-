@@ -1,0 +1,72 @@
+:root { --bg:#eef0f2; --card:#fff; --fg:#16181d; --muted:#73767d;
+  --line:#e6e8eb; --accent:#ff4d4f; }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { margin:0; }
+body { background:var(--bg); color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",
+  "Noto Sans JP","Segoe UI",sans-serif; line-height:1.6;
+  -webkit-font-smoothing:antialiased; }
+.app { max-width:720px; margin:0 auto; min-height:100vh; }
+
+header { position:sticky; top:0; z-index:20; background:#fff;
+  border-bottom:1px solid var(--line);
+  padding:max(12px,env(safe-area-inset-top)) 16px 0; }
+header .row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+header .brand { font-size:1.12rem; font-weight:800; }
+header .date { color:var(--muted); font-size:.78rem; margin-top:2px; }
+.iconbtn { appearance:none; border:1px solid var(--line); background:#fff;
+  border-radius:10px; width:38px; height:34px; font-size:1.1rem; cursor:pointer; }
+.iconbtn:active { transform:scale(.96); }
+
+nav.tabs { display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; margin-top:8px; }
+nav.tabs::-webkit-scrollbar { display:none; }
+nav.tabs button { flex:0 0 auto; appearance:none; background:none; border:none;
+  font:inherit; color:var(--muted); font-weight:700; font-size:.95rem;
+  padding:10px 14px 12px; cursor:pointer; position:relative; white-space:nowrap;
+  border-bottom:3px solid transparent; }
+nav.tabs button[aria-selected="true"] { color:var(--fg); }
+nav.tabs button[aria-selected="true"]::after { content:""; position:absolute;
+  left:10px; right:10px; bottom:-1px; height:3px; border-radius:3px;
+  background:var(--tabcolor,var(--accent)); }
+
+main { padding:12px 12px 72px; }
+.panel { animation:fade .18s ease; }
+@keyframes fade { from{opacity:0; transform:translateY(4px);} to{opacity:1;} }
+.summary { background:#fff; border-radius:14px; padding:16px 18px; margin:4px 0 14px;
+  box-shadow:0 1px 3px rgba(0,0,0,.06); border-left:5px solid var(--accent);
+  white-space:pre-wrap; }
+.summary h2 { margin:0 0 8px; font-size:.95rem; color:var(--accent); }
+.sectionhead { font-size:.8rem; font-weight:800; color:var(--muted);
+  letter-spacing:.08em; margin:18px 4px 8px; }
+.card { display:block; background:#fff; border-radius:14px; padding:14px 16px;
+  margin:10px 0; box-shadow:0 1px 3px rgba(0,0,0,.06); text-decoration:none;
+  color:inherit; transition:transform .08s ease, box-shadow .12s ease; }
+.card:active { transform:scale(.99); }
+.card .title { font-weight:700; font-size:1.04rem; line-height:1.45; }
+.card .sum { color:#3a3d44; margin:7px 0 0; font-size:.93rem; }
+.card .foot { display:flex; align-items:center; gap:8px; margin-top:9px;
+  color:var(--muted); font-size:.76rem; }
+.chip { display:inline-block; font-weight:800; font-size:.72rem; color:#fff;
+  padding:2px 8px; border-radius:999px; }
+.empty,.loading { color:var(--muted); text-align:center; padding:40px 16px; }
+.hint { color:var(--muted); font-size:.74rem; text-align:center; margin:8px 0 0; }
+footer { color:var(--muted); font-size:.74rem; text-align:center; padding:20px 16px 32px; }
+
+/* ジャンル選択シート */
+.sheet { position:fixed; inset:0; z-index:40; display:flex; align-items:flex-end;
+  justify-content:center; }
+.sheet-bg { position:absolute; inset:0; background:rgba(0,0,0,.35); }
+.sheet-body { position:relative; width:100%; max-width:720px; background:#fff;
+  border-radius:18px 18px 0 0; padding:20px 18px max(24px,env(safe-area-inset-bottom));
+  animation:up .2s ease; }
+@keyframes up { from{transform:translateY(20px); opacity:.6;} to{transform:none; opacity:1;} }
+.sheet-body h2 { margin:0 0 4px; font-size:1.05rem; }
+.sheet-body .muted { color:var(--muted); font-size:.85rem; margin:0 0 12px; }
+.toggle { display:flex; align-items:center; justify-content:space-between;
+  padding:12px 4px; border-bottom:1px solid var(--line); cursor:pointer; }
+.toggle .lbl { font-weight:600; }
+.toggle input { width:20px; height:20px; accent-color:var(--accent); }
+.primary { appearance:none; border:none; background:var(--accent); color:#fff;
+  font-weight:800; font-size:1rem; width:100%; padding:13px; border-radius:12px;
+  margin-top:16px; cursor:pointer; }
+.muted { color:var(--muted); }

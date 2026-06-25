@@ -1,0 +1,70 @@
+{
+  "generated_at": "2026-06-25T22:27:02.565244+09:00",
+  "briefings": [
+    {
+      "id": "daily-brief",
+      "title": "Daily Briefing",
+      "emoji": "📰",
+      "source": "ai",
+      "schedule_label": "毎日 07:00",
+      "instruction": "AI・テクノロジー、投資・株式市場、看護・医療、ビジネス・スタートアップを中心に、世界と日本の今日の主要トピックを日本語でバランスよく。",
+      "due": false,
+      "generated_at": "2026-06-25T22:27:02.565244+09:00",
+      "body": "",
+      "ok": null,
+      "error": null
+    },
+    {
+      "id": "midday-markets",
+      "title": "昼の経済・マーケット",
+      "emoji": "💹",
+      "source": "ai",
+      "schedule_label": "平日 14:00",
+      "instruction": "午前の株式市場・為替・主要企業の動きと、午後に向けた注目材料を手短に。",
+      "due": false,
+      "generated_at": "2026-06-25T22:27:02.565244+09:00",
+      "body": "",
+      "ok": null,
+      "error": null
+    },
+    {
+      "id": "evening-wrap",
+      "title": "夜のまとめ",
+      "emoji": "🌙",
+      "source": "ai",
+      "schedule_label": "毎日 21:00",
+      "instruction": "今日一日の世の中の動きを振り返り、明日に向けて知っておくべきことを日本語で。",
+      "due": true,
+      "generated_at": "2026-06-25T22:27:02.565244+09:00",
+      "body": "",
+      "ok": false,
+      "error": "ANTHROPIC_API_KEY 未設定"
+    },
+    {
+      "id": "breaking",
+      "title": "速報・注目トピック",
+      "emoji": "📣",
+      "source": "ai",
+      "schedule_label": "毎日・随時",
+      "instruction": "いま速報・話題になっている重要ニュースがあれば手短に。なければ「特になし」と一言。",
+      "due": true,
+      "generated_at": "2026-06-25T22:27:02.565244+09:00",
+      "body": "",
+      "ok": false,
+      "error": "ANTHROPIC_API_KEY 未設定"
+    },
+    {
+      "id": "weekend-reads",
+      "title": "週末の読みもの",
+      "emoji": "📖",
+      "source": "ai",
+      "schedule_label": "毎週土曜 07:00",
+      "instruction": "今週話題になった、興味・関心に合う読み応えのある長文記事や解説を3〜5本。各記事の要点を添えて。",
+      "due": false,
+      "generated_at": "2026-06-25T22:27:02.565244+09:00",
+      "body": "",
+      "ok": null,
+      "error": null
+    }
+  ]
+}

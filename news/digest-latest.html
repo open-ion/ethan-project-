@@ -1,0 +1,183 @@
+<!DOCTYPE html><html lang='ja'><head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='theme-color' content='#ffffff'>
+<title>News Brief 2026-06-25</title>
+<style>
+:root { --bg:#eef0f2; --card:#fff; --fg:#16181d; --muted:#73767d;
+  --line:#e6e8eb; --accent:#ff4d4f; }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { margin:0; }
+body { background:var(--bg); color:var(--fg);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",
+  "Noto Sans JP","Segoe UI",sans-serif; line-height:1.6;
+  -webkit-font-smoothing:antialiased; }
+.app { max-width:720px; margin:0 auto; background:var(--bg);
+  min-height:100vh; }
+
+/* ヘッダー */
+header { position:sticky; top:0; z-index:20; background:#fff;
+  border-bottom:1px solid var(--line); padding:12px 16px 0; }
+header .row { display:flex; align-items:baseline; justify-content:space-between;
+  gap:8px; }
+header .brand { font-size:1.15rem; font-weight:800; letter-spacing:.01em; }
+header .date { color:var(--muted); font-size:.78rem; white-space:nowrap; }
+
+/* タブ */
+nav.tabs { display:flex; gap:2px; overflow-x:auto; scrollbar-width:none;
+  margin-top:8px; -ms-overflow-style:none; }
+nav.tabs::-webkit-scrollbar { display:none; }
+nav.tabs button { flex:0 0 auto; appearance:none; background:none; border:none;
+  font:inherit; color:var(--muted); font-weight:700; font-size:.95rem;
+  padding:10px 14px 12px; cursor:pointer; position:relative; white-space:nowrap;
+  border-bottom:3px solid transparent; }
+nav.tabs button[aria-selected="true"] { color:var(--fg); }
+nav.tabs button[aria-selected="true"]::after { content:""; position:absolute;
+  left:10px; right:10px; bottom:-1px; height:3px; border-radius:3px;
+  background:var(--tabcolor,var(--accent)); }
+
+/* パネル / カード */
+main { padding:12px 12px 72px; }
+.panel { animation:fade .18s ease; }
+@keyframes fade { from{opacity:0; transform:translateY(4px);} to{opacity:1;} }
+.summary { background:#fff; border-radius:14px; padding:16px 18px;
+  margin:4px 0 14px; box-shadow:0 1px 3px rgba(0,0,0,.06);
+  border-left:5px solid var(--accent); white-space:pre-wrap; }
+.summary h2 { margin:0 0 8px; font-size:.95rem; color:var(--accent);
+  letter-spacing:.02em; }
+.sectionhead { font-size:.8rem; font-weight:800; color:var(--muted);
+  letter-spacing:.08em; margin:18px 4px 8px; }
+.card { display:block; background:#fff; border-radius:14px; padding:14px 16px;
+  margin:10px 0; box-shadow:0 1px 3px rgba(0,0,0,.06); text-decoration:none;
+  color:inherit; transition:transform .08s ease, box-shadow .12s ease; }
+.card:active { transform:scale(.99); }
+.card:hover { box-shadow:0 3px 10px rgba(0,0,0,.10); }
+.card .title { font-weight:700; font-size:1.04rem; line-height:1.45; }
+.card .sum { color:#3a3d44; margin:7px 0 0; font-size:.93rem; }
+.card .foot { display:flex; align-items:center; gap:8px; margin-top:9px;
+  color:var(--muted); font-size:.76rem; }
+.chip { display:inline-block; font-weight:800; font-size:.72rem; color:#fff;
+  padding:2px 8px; border-radius:999px; }
+.empty { color:var(--muted); text-align:center; padding:32px 0; }
+footer { color:var(--muted); font-size:.74rem; text-align:center;
+  padding:20px 16px 32px; }
+.hint { color:var(--muted); font-size:.74rem; text-align:center; margin:2px 0 0; }
+</style></head><body><div class='app'>
+<header><div class='row'>
+<div class='brand'>📰 News Brief</div>
+<div class='date'>6月25日 22:27更新 ・ 見出し+概要</div>
+</div>
+<nav class='tabs' role='tablist'>
+<button role='tab' data-tab='top' data-color='#ff4d4f'>⭐ トップ</button>
+<button role='tab' data-tab='trend' data-color='#ff4d4f'>🔥 トレンド・主要</button>
+<button role='tab' data-tab='politics' data-color='#3b6cf6'>🏛️ 政治</button>
+<button role='tab' data-tab='economy' data-color='#16a34a'>💹 経済</button>
+<button role='tab' data-tab='prices' data-color='#f59e0b'>🛒 物価・暮らしのお金</button>
+<button role='tab' data-tab='medical' data-color='#06b6d4'>🩺 医療・科学</button>
+<button role='tab' data-tab='sports' data-color='#8b5cf6'>⚽ スポーツ</button>
+<button role='tab' data-tab='world' data-color='#0ea5e9'>🌏 国際</button>
+</nav></header>
+<main>
+<section class='panel' data-panel='top'>
+<div class='sectionhead'>主要トピック</div>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160331000' target='_blank' rel='noopener'><div class='title'>【プロ野球結果】楽天 前田健太が首位 西武相手に今季初勝利</div><div class='sum'>プロ野球は25日、雨で1試合が中止になり3試合が行われました。楽天は、前田健太投手が先発登板し、首位の西武を相手に好投して今シーズン初勝利を挙げました。チームも同一カード3連勝です。</div><div class='foot'><span class='chip' style='background:#ff4d4f'>🔥 トレンド・主要</span><span>06/25 21:58</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015158451000' target='_blank' rel='noopener'><div class='title'>「国旗損壊罪」法案 衆議院内閣委で審議入り</div><div class='sum'>日本の国旗を損壊する行為を罰する法案が衆議院で審議入りし、提出した自民党は、国旗を大切に思う国民の感情を保護するためのものだとして成立に協力を求めました。これに対し中道改革連合は、思想・信条の自由や表…</div><div class='foot'><span class='chip' style='background:#3b6cf6'>🏛️ 政治</span><span>06/25 21:40</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160271000' target='_blank' rel='noopener'><div class='title'>全日空 上位の特典制度の変更を見直しへ 厳しい意見受け</div><div class='sum'>全日空は、飛行機の利用の多い人などが会員になって発行できるクレジットカードの特典制度を2028年度から変更すると発表していましたが、利用者から厳しい意見などが多く寄せられたことを理由に、変更内容を見直…</div><div class='foot'><span class='chip' style='background:#16a34a'>💹 経済</span><span>06/25 21:13</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160001000' target='_blank' rel='noopener'><div class='title'>5月のデパート売り上げ 5か月連続増加 免税品好調で</div><div class='sum'>全国のデパートの先月の売り上げは4683億円余りと、5か月連続で前の年より増加しました。円安傾向が続き、外国人旅行者向けの免税品が好調だったことが主な要因です。</div><div class='foot'><span class='chip' style='background:#f59e0b'>🛒 物価・暮らしのお金</span><span>06/25 18:39</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015159891000' target='_blank' rel='noopener'><div class='title'>ザ・ビートルズ来日から60年で特設店舗がオープン 東京 原宿</div><div class='sum'>イギリスの伝説的なロックバンドザ・ビートルズの来日から今月で60年になるのにあわせ、60年ぶりに公開された当時の公演の映像も楽しめる特設の店舗が東京 原宿にオープンしました。</div><div class='foot'><span class='chip' style='background:#06b6d4'>🩺 医療・科学</span><span>06/25 17:49</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160331000' target='_blank' rel='noopener'><div class='title'>【プロ野球結果】楽天 前田健太が首位 西武相手に今季初勝利</div><div class='sum'>プロ野球は25日、雨で1試合が中止になり3試合が行われました。楽天は、前田健太投手が先発登板し、首位の西武を相手に好投して今シーズン初勝利を挙げました。チームも同一カード3連勝です。</div><div class='foot'><span class='chip' style='background:#8b5cf6'>⚽ スポーツ</span><span>06/25 21:58</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160401000' target='_blank' rel='noopener'><div class='title'>ウクライナ復興会議開幕 各国や企業の支援が焦点</div><div class='sum'>ロシアによる軍事侵攻が続くウクライナの復興について官民レベルで話し合う国際会議が25日、ポーランドで開幕しました。復興に必要な資金は今後10年間でおよそ94兆円とも推計されるなか、各国や企業からどこま…</div><div class='foot'><span class='chip' style='background:#0ea5e9'>🌏 国際</span><span>06/25 21:50</span><span>NHK</span></div></a>
+<p class='hint'>← タブをタップ／スワイプでカテゴリ切替 →</p>
+</section>
+<section class='panel' data-panel='trend' hidden>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160331000' target='_blank' rel='noopener'><div class='title'>【プロ野球結果】楽天 前田健太が首位 西武相手に今季初勝利</div><div class='sum'>プロ野球は25日、雨で1試合が中止になり3試合が行われました。楽天は、前田健太投手が先発登板し、首位の西武を相手に好投して今シーズン初勝利を挙げました。チームも同一カード3連勝です。</div><div class='foot'><span>06/25 21:58</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160401000' target='_blank' rel='noopener'><div class='title'>ウクライナ復興会議開幕 各国や企業の支援が焦点</div><div class='sum'>ロシアによる軍事侵攻が続くウクライナの復興について官民レベルで話し合う国際会議が25日、ポーランドで開幕しました。復興に必要な資金は今後10年間でおよそ94兆円とも推計されるなか、各国や企業からどこま…</div><div class='foot'><span>06/25 21:50</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160381000' target='_blank' rel='noopener'><div class='title'>検察審査会の審査員の氏名流出 山口地検</div><div class='sum'>検察審査会の審査員を告訴した男性に検察官が捜査結果を伝えた際、秘密事項になっている審査員の氏名を流出させていたと、山口地方検察庁が明らかにしました。山口地検は、不適切だったとして審査員に謝罪したという…</div><div class='foot'><span>06/25 21:42</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160311000' target='_blank' rel='noopener'><div class='title'>厚労省係長 部下女性へのストーカー行為で起訴 自宅侵入も</div><div class='sum'>厚生労働省の係長が、部下の女性職員に業務用のチャットを使って繰り返しメッセージを送ったり自宅に押しかけたりするなどしたとしてストーカー規制法違反の疑いで逮捕・起訴されていたことが、厚生労働省などへの取…</div><div class='foot'><span>06/25 20:25</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015159351000' target='_blank' rel='noopener'><div class='title'>台風7号あすにかけ沖縄 奄美に接近「非常に危険な状況」専門家</div><div class='sum'>台風7号は26日にかけて沖縄・奄美に接近したあと、27日には西日本と東日本の太平洋側に近づくおそれがあります。停滞する前線に向かって台風7号や8号から湿った空気が流れ込むため、すでに大雨となっている九…</div><div class='foot'><span>06/25 19:40</span><span>NHK</span></div></a>
+</section>
+<section class='panel' data-panel='politics' hidden>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015158451000' target='_blank' rel='noopener'><div class='title'>「国旗損壊罪」法案 衆議院内閣委で審議入り</div><div class='sum'>日本の国旗を損壊する行為を罰する法案が衆議院で審議入りし、提出した自民党は、国旗を大切に思う国民の感情を保護するためのものだとして成立に協力を求めました。これに対し中道改革連合は、思想・信条の自由や表…</div><div class='foot'><span>06/25 21:40</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015159871000' target='_blank' rel='noopener'><div class='title'>野党側 予算委集中審議など重ねて要求 参院議運委理事会で</div><div class='sum'>高市総理大臣の陣営がほかの候補をひぼう中傷する動画を投稿したと週刊文春で報じられたことなどをめぐり、参議院議院運営委員会の理事会で野党側は、予算委員会の集中審議や党首討論などを行うよう重ねて求めました…</div><div class='foot'><span>06/25 21:34</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160361000' target='_blank' rel='noopener'><div class='title'>OTC類似薬 追加負担の薬の範囲など議論開始 厚労省検討会</div><div class='sum'>市販薬と似た成分や効能を持つ「OTC類似薬」をめぐり、厚生労働省の検討会は、処方された患者に追加負担を求める薬の範囲などについて議論を始めました。ことし8月ごろまでに中間整理を行ったうえで、秋までにと…</div><div class='foot'><span>06/25 21:28</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015159941000' target='_blank' rel='noopener'><div class='title'>皇位継承 皇室典範改正案の要綱 国会の付帯決議を前提に了承</div><div class='sum'>安定的な皇位継承をめぐり、政府は衆参両院の議長・副議長と各党・各会派に対し、皇族数の確保などに向けた皇室典範改正案の要綱を示しました。議長・副議長は「立法府の総意」に沿った内容だとして、国会の付帯決議…</div><div class='foot'><span>06/25 21:25</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160221000' target='_blank' rel='noopener'><div class='title'>衆院議運委理事会 26日の本会議開催で与野党が合意</div><div class='sum'>選挙期間中のSNSによる偽情報拡散などへの対策をめぐる法案の採決を行うため、26日、衆議院本会議を開催することで与野党が合意しました。</div><div class='foot'><span>06/25 21:06</span><span>NHK</span></div></a>
+</section>
+<section class='panel' data-panel='economy' hidden>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160271000' target='_blank' rel='noopener'><div class='title'>全日空 上位の特典制度の変更を見直しへ 厳しい意見受け</div><div class='sum'>全日空は、飛行機の利用の多い人などが会員になって発行できるクレジットカードの特典制度を2028年度から変更すると発表していましたが、利用者から厳しい意見などが多く寄せられたことを理由に、変更内容を見直…</div><div class='foot'><span>06/25 21:13</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160351000' target='_blank' rel='noopener'><div class='title'>先週の株式市場 個人の株式売買金額が過去最高に</div><div class='sum'>日経平均株価が初めて7万円を超え、5日連続で最高値を更新した先週、国内の株式市場では個人投資家による株式の売買金額が過去最高となったことがわかりました。</div><div class='foot'><span>06/25 21:12</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160001000' target='_blank' rel='noopener'><div class='title'>5月のデパート売り上げ 5か月連続増加 免税品好調で</div><div class='sum'>全国のデパートの先月の売り上げは4683億円余りと、5か月連続で前の年より増加しました。円安傾向が続き、外国人旅行者向けの免税品が好調だったことが主な要因です。</div><div class='foot'><span>06/25 18:39</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015159901000' target='_blank' rel='noopener'><div class='title'>景気動向指数「改善」に上方修正 71か月上昇傾向続く</div><div class='sum'>ことし4月の景気動向指数の改訂値は、景気の現状を示す「一致指数」が速報値を上回る118.1となり、内閣府は景気の基調判断を「改善を示している」に上方修正しました。景気動向指数の上昇傾向は71か月続いて…</div><div class='foot'><span>06/25 18:36</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160101000' target='_blank' rel='noopener'><div class='title'>円相場1ドル＝161円台後半での取り引き 市場介入警戒も</div><div class='sum'>25日の東京外国為替市場、円相場は1ドル＝161円台後半で取り引きされ、神経質な値動きとなりました。</div><div class='foot'><span>06/25 18:18</span><span>NHK</span></div></a>
+</section>
+<section class='panel' data-panel='prices' hidden>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160001000' target='_blank' rel='noopener'><div class='title'>5月のデパート売り上げ 5か月連続増加 免税品好調で</div><div class='sum'>全国のデパートの先月の売り上げは4683億円余りと、5か月連続で前の年より増加しました。円安傾向が続き、外国人旅行者向けの免税品が好調だったことが主な要因です。</div><div class='foot'><span>06/25 18:39</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015159691000' target='_blank' rel='noopener'><div class='title'>日銀 田村委員“利上げは物価動向次第でちゅうちょなく”</div><div class='sum'>日銀の金融政策の決定に関わる田村直樹 審議委員が25日、神戸市で講演し、今月の利上げに続いて今後は数か月に一度のペースで利上げを進める必要があり、物価の動向次第ではペースを加速するべきだという考えを示…</div><div class='foot'><span>06/25 18:11</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015158891000' target='_blank' rel='noopener'><div class='title'>NY原油 一時1バレル＝70ドル割れ 3か月半ぶり安値水準</div><div class='sum'>24日のニューヨーク原油市場では、ホルムズ海峡をめぐる状況が改善し中東からの原油の供給が回復に向かうとの期待感から、国際的な取り引きの指標となるWTIの先物価格はことし3月上旬以来、およそ3か月半ぶり…</div><div class='foot'><span>06/25 05:07</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015158561000' target='_blank' rel='noopener'><div class='title'>消費税減税 超党派「国民会議」実務者会議 中間とりまとめ案</div><div class='sum'>食料品の消費税減税をめぐり、超党派の「国民会議」の実務者会議が開かれ、税率を来年4月から2年間、1％に引き下げるなどとした中間とりまとめの案が示されました。一方、財源について今回は記載されず、政府内で…</div><div class='foot'><span>06/24 19:34</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015158521000' target='_blank' rel='noopener'><div class='title'>日銀 植田総裁 今後も中東情勢見ながら利上げ検討の姿勢示す</div><div class='sum'>日銀の植田総裁は24日、金融業界の会合に寄せたあいさつで、今月利上げに踏み切った理由について物価上昇のリスクに対応するためだとした上で、今後も中東情勢などを見極めながら利上げを検討する姿勢を示しました…</div><div class='foot'><span>06/24 18:40</span><span>NHK</span></div></a>
+</section>
+<section class='panel' data-panel='medical' hidden>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015159891000' target='_blank' rel='noopener'><div class='title'>ザ・ビートルズ来日から60年で特設店舗がオープン 東京 原宿</div><div class='sum'>イギリスの伝説的なロックバンドザ・ビートルズの来日から今月で60年になるのにあわせ、60年ぶりに公開された当時の公演の映像も楽しめる特設の店舗が東京 原宿にオープンしました。</div><div class='foot'><span>06/25 17:49</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015159801000' target='_blank' rel='noopener'><div class='title'>国立映画アーカイブ 交付金減で資金難 1億円の資金募る</div><div class='sum'>映画に関する資料を保存・公開する日本で唯一の国の専門機関「国立映画アーカイブ」は、国からの交付金が減額されたため業務の継続が危ぶまれているとして、クラウドファンディングで1億円の資金を募ると発表しまし…</div><div class='foot'><span>06/25 16:30</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015159441000' target='_blank' rel='noopener'><div class='title'>みらい 与野党の議員対象にAI勉強会を開催 安野党首が講師</div><div class='sum'>チームみらいは与野党の国会議員を対象にAIの勉強会を開き、エンジニアの経験を持つ安野党首が活用するメリットや利用上の注意点を解説しました。</div><div class='foot'><span>06/25 13:28</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015158601000' target='_blank' rel='noopener'><div class='title'>小児がん薬 薬価引き下げなどで11医薬品で採算割れ 供給不安も</div><div class='sum'>これまで使えていたがんの治療薬が使えなくなる懸念が出ています。小児がんの治療で欠かせない、1社しか製造していない11の医薬品が、国が定める薬の価格の引き下げなどで採算が取れなくなっていることが製薬会社…</div><div class='foot'><span>06/24 22:17</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015158471000' target='_blank' rel='noopener'><div class='title'>探査機「はやぶさ2」7月5日に小惑星に接近し高速で通過へ</div><div class='sum'>6年前、小惑星「リュウグウ」のサンプルを地球に届けたあと、次の目的地への飛行を続けている日本の探査機「はやぶさ2」について、JAXA＝宇宙航空研究開発機構は、7月5日に別の小惑星のすぐそばを極めて速い…</div><div class='foot'><span>06/24 17:56</span><span>NHK</span></div></a>
+</section>
+<section class='panel' data-panel='sports' hidden>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160331000' target='_blank' rel='noopener'><div class='title'>【プロ野球結果】楽天 前田健太が首位 西武相手に今季初勝利</div><div class='sum'>プロ野球は25日、雨で1試合が中止になり3試合が行われました。楽天は、前田健太投手が先発登板し、首位の西武を相手に好投して今シーズン初勝利を挙げました。チームも同一カード3連勝です。</div><div class='foot'><span>06/25 21:58</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015158951000' target='_blank' rel='noopener'><div class='title'>W杯 ボスニア・ヘルツェゴビナが勝利 グループ3位で決勝Tへ</div><div class='sum'>サッカーワールドカップ北中米大会の1次リーグのグループB、ボスニア・ヘルツェゴビナ 対 カタールは、ボスニア・ヘルツェゴビナが3対1で勝ってグループ3位となり、他のグループの試合の結果、決勝トーナメン…</div><div class='foot'><span>06/25 19:56</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015158961000' target='_blank' rel='noopener'><div class='title'>W杯 スイスがグループ1位で決勝トーナメントへ カナダも初進出</div><div class='sum'>サッカーワールドカップ北中米大会の1次リーグ、グループBの第3戦、スイス 対 カナダは、スイスが2対1で競り勝ちグループ1位で決勝トーナメント進出を決めました。開催国の1つ、カナダは敗れましたが、グル…</div><div class='foot'><span>06/25 19:45</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015159831000' target='_blank' rel='noopener'><div class='title'>サッカーW杯 日本が活躍 子どもたちのサッカーの交流が広がる</div><div class='sum'>サッカーワールドカップ北中米大会で日本代表が1次リーグの2試合を行うアメリカ南部のダラスでは、日本の活躍などをきっかけにサッカーを通じた子どもたちの交流が広がっています。</div><div class='foot'><span>06/25 19:23</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015159721000' target='_blank' rel='noopener'><div class='title'>W杯 日本代表 決勝トーナメント進出した場合 いつ試合？</div><div class='sum'>「日本代表が決勝トーナメント進出した場合、いつ試合があるの？」サッカーワールドカップ北中米大会、日本代表は日本時間の26日、1次リーグ最終第3戦のスウェーデン戦に臨みます。日本は勝つか引き分けると、自…</div><div class='foot'><span>06/25 19:22</span><span>NHK</span></div></a>
+</section>
+<section class='panel' data-panel='world' hidden>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160401000' target='_blank' rel='noopener'><div class='title'>ウクライナ復興会議開幕 各国や企業の支援が焦点</div><div class='sum'>ロシアによる軍事侵攻が続くウクライナの復興について官民レベルで話し合う国際会議が25日、ポーランドで開幕しました。復興に必要な資金は今後10年間でおよそ94兆円とも推計されるなか、各国や企業からどこま…</div><div class='foot'><span>06/25 21:50</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160191000' target='_blank' rel='noopener'><div class='title'>米 イラン ホルムズ海峡での料金徴収 海上回廊めぐり駆け引き</div><div class='sum'>アメリカのトランプ大統領はイランとの最終合意に向けた協議をめぐり、イラン側がホルムズ海峡での料金の徴収を示唆する中、いかなる料金の徴収も容認できないという考えを改めて示しました。一方、イランの革命防衛…</div><div class='foot'><span>06/25 21:01</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015159971000' target='_blank' rel='noopener'><div class='title'>カナダ国防相 “多角化で日本との連携強化を”</div><div class='sum'>カナダのマクギンティ国防相がNHKのインタビューに応じ、アメリカとの協力関係を維持する一方で多角化を進め、日本との連携を強化する考えを示しました。</div><div class='foot'><span>06/25 20:27</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160281000' target='_blank' rel='noopener'><div class='title'>“ルフィグループ”幹部か フィリピンで日本人容疑者拘束</div><div class='sum'>「ルフィ」などと名乗る指示役による広域強盗事件をめぐり、フィリピン当局は特殊詐欺グループの幹部とみられる56歳の日本人の容疑者を拘束したと発表しました。</div><div class='foot'><span>06/25 20:24</span><span>NHK</span></div></a>
+<a class='card' href='https://news.web.nhk/newsweb/na/na-k10015160251000' target='_blank' rel='noopener'><div class='title'>イラン周辺7か国の「渡航中止勧告」を解除 外務省</div><div class='sum'>アメリカとイランが戦闘終結に向けた覚書に署名したことなどを受けて、外務省は、UAE＝アラブ首長国連邦やカタールなどイラン周辺の7か国に出していた「渡航中止勧告」を解除しました。ただ、不要不急の渡航は中…</div><div class='foot'><span>06/25 20:04</span><span>NHK</span></div></a>
+</section>
+</main>
+<footer>自動更新: News Brief ・ 出典: NHKニュース<br>記事の著作権は各報道機関に帰属します。</footer>
+<script>
+(function(){
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('nav.tabs button'));
+  var panels = {};
+  document.querySelectorAll('.panel').forEach(function(p){ panels[p.dataset.panel]=p; });
+  var order = tabs.map(function(t){ return t.dataset.tab; });
+
+  function show(key, save){
+    tabs.forEach(function(t){
+      var on = t.dataset.tab === key;
+      t.setAttribute('aria-selected', on ? 'true':'false');
+      if(on){ t.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'});
+        document.documentElement.style.setProperty('--accent', t.dataset.color || '#ff4d4f'); }
+    });
+    Object.keys(panels).forEach(function(k){ panels[k].hidden = (k !== key); });
+    if(save){ try{ localStorage.setItem('nd_tab', key); }catch(e){} }
+    window.scrollTo(0,0);
+  }
+  tabs.forEach(function(t){ t.addEventListener('click', function(){ show(t.dataset.tab, true); }); });
+
+  // 復元（無ければ先頭=トップ）
+  var saved = null; try{ saved = localStorage.getItem('nd_tab'); }catch(e){}
+  show((saved && order.indexOf(saved) >= 0) ? saved : order[0], false);
+
+  // スワイプでタブ移動（スマートニュース風）
+  var x0=null, y0=null;
+  var main = document.querySelector('main');
+  main.addEventListener('touchstart', function(e){
+    x0=e.touches[0].clientX; y0=e.touches[0].clientY; }, {passive:true});
+  main.addEventListener('touchend', function(e){
+    if(x0===null) return;
+    var dx=e.changedTouches[0].clientX-x0, dy=e.changedTouches[0].clientY-y0;
+    if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.6){
+      var cur = tabs.findIndex(function(t){ return t.getAttribute('aria-selected')==='true'; });
+      var next = cur + (dx<0 ? 1 : -1);
+      if(next>=0 && next<order.length) show(order[next], true);
+    }
+    x0=y0=null;
+  }, {passive:true});
+})();
+</script>
+</div></body></html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="News Brief">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
+  <title>News Brief — 今日のダッシュボード</title>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brandrow">
+        <div class="brand">📰 News Brief</div>
+        <div class="org">AGATHON LABS</div>
+      </div>
+      <div class="sub"><span id="dateLabel">読み込み中…</span> ・ 5分で今日を把握</div>
+      <nav class="chips" id="chips"></nav>
+    </header>
+
+    <main id="main">
+      <div class="loading" id="loading">ニュースを読み込み中…</div>
+    </main>
+
+    <footer>
+      News Brief ・ AGATHON LABS<br>
+      <span id="sampleNote"></span>記事の著作権は各報道機関に帰属します。
+    </footer>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>
