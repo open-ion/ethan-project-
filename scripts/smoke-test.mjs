@@ -59,7 +59,19 @@ assert(cssSource.includes('accent-color'), 'Category checkbox accent styling is 
 assert(cssSource.includes('trust-row'), 'Trust metadata styling is missing');
 assert(cssSource.includes('top-news-card'), 'Top news card styling is missing');
 
-for (const file of ['dist/index.html', 'dist/404.html', 'dist/news/index.html', 'dist/news/app.js', 'dist/news/generated/news.json', 'dist/dashboard/index.html']) {
+
+const updateWorkflowSource = await readFile('.github/workflows/update-news.yml', 'utf8');
+assert(updateWorkflowSource.includes('OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}'), 'Update workflow must pass OPENAI_API_KEY from secrets');
+assert(updateWorkflowSource.includes('npm run fetch:rss'), 'Update workflow must fetch RSS before summarizing');
+assert(updateWorkflowSource.includes('npm run summarize'), 'Update workflow must summarize generated RSS data');
+assert(updateWorkflowSource.includes('git add src/generated/news.json'), 'Update workflow must commit generated news JSON only');
+assert(updateWorkflowSource.includes('actions/deploy-pages@v4'), 'Update workflow must deploy through GitHub Pages');
+
+const legacyWorkflowSource = await readFile('.github/workflows/news-schedule.yml', 'utf8');
+assert(!legacyWorkflowSource.includes('cron:'), 'Legacy workflow must not run on a schedule');
+assert(legacyWorkflowSource.includes('Legacy Python News Brief workflow is intentionally disabled.'), 'Legacy workflow should explain that it is disabled');
+
+for (const file of ['dist/index.html', 'dist/404.html', 'dist/news/index.html', 'dist/news/app.js', 'dist/news/generated/news.json', 'dist/dashboard/index.html', 'dist/moneyclip/index.html', 'dist/moneyclip/app.js', 'dist/moneyclip/sw.js']) {
   try {
     await access(file);
   } catch (error) {
