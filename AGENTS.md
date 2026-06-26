@@ -277,6 +277,22 @@ Every AI work session must follow these rules:
 
 The latest Ledger entry must explain why the change was made, what changed, current status, blockers, next AI, next steps, and next commands so Claude Code or Codex can recover within 30 seconds.
 
+
+## Recovery Mode Rules
+
+Recovery Mode is the standard AGATHON LABS operating mode for cases where Codex cannot push to GitHub because of environment limitations. In Recovery Mode, the AI Handoff Ledger becomes the complete handoff source until Claude Code can restore the work to GitHub.
+
+When Claude Code starts a new session or receives `resume`, it must:
+
+1. read `docs/handoff/README.md`;
+2. find the latest timestamped Ledger in `docs/handoff/`;
+3. read the latest Ledger before editing code;
+4. list Repository, Current Branch, Latest Commit, Changed Files, Completed work, Current Status, Blockers, Next Steps, Next Commands, and whether GitHub reflection is required;
+5. state exactly what Claude Code should do next;
+6. only then run GitHub synchronization and resume implementation.
+
+Claude Code must not start code edits before reading the latest Ledger. Codex must keep the Ledger detailed enough that Claude Code can resume from `resume` alone within 30 seconds.
+
 ## Development Rules
 
 When working in code or documentation repositories:

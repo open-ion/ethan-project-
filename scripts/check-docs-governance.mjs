@@ -38,11 +38,31 @@ const requiredGovernancePhrases = [
   'repo`, `branch`, `commit`, `PR URL`',
   'AI Handoff Ledger',
   'docs/handoff/YYYY-MM-DD-HHMM-<agent>.md',
+  'Recovery Mode',
 ];
 
 
 const ledgerDirectory = 'docs/handoff';
 const ledgerFilePattern = /^\d{4}-\d{2}-\d{2}-\d{4}-[a-z0-9-]+\.md$/;
+
+const requiredRecoveryFields = [
+  'Repository:',
+  'Branch:',
+  'Latest Commit:',
+  'Changed Files:',
+  'Files Created:',
+  'Files Updated:',
+  'Files Deleted:',
+  'Tests:',
+  'Current Status:',
+  'Current Progress(%):',
+  'Blockers:',
+  'Exactly What Claude Code Should Do Next:',
+  'Commands Claude Should Run:',
+  'Estimated Remaining Work:',
+  'Ready For GitHub Push:',
+];
+
 const requiredLedgerSections = [
   '# AI Handoff Ledger',
   '## Project',
@@ -129,6 +149,23 @@ if (!existsSync(ledgerDirectory) || !statSync(ledgerDirectory).isDirectory()) {
     for (const section of requiredNonEmptySections) {
       if (!sectionBody(ledger, section)) {
         fail(`${latestLedger} has an empty required ledger section: ${section}`);
+      }
+    }
+
+
+    if (!ledger.includes('# Recovery')) {
+      fail(`${latestLedger} is missing required Recovery section: # Recovery`);
+    }
+
+    for (const field of requiredRecoveryFields) {
+      if (!ledger.includes(field)) {
+        fail(`${latestLedger} is missing required Recovery field: ${field}`);
+        continue;
+      }
+
+      const line = ledger.split('\n').find((entry) => entry.startsWith(field));
+      if (!line || !line.slice(field.length).trim()) {
+        fail(`${latestLedger} has an empty required Recovery field: ${field}`);
       }
     }
   }

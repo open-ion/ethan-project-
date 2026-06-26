@@ -19,6 +19,33 @@ docs/handoff/2026-06-26-2030-claude-code.md
 
 Use lowercase agent names in filenames, such as `codex`, `claude-code`, `atlas`, or `echo`.
 
+
+## Recovery Template
+
+Every Ledger must include a `# Recovery` section with these required fields:
+
+```md
+# Recovery
+
+Repository:
+Branch:
+Latest Commit:
+Changed Files:
+Files Created:
+Files Updated:
+Files Deleted:
+Tests:
+Current Status:
+Current Progress(%):
+Blockers:
+Exactly What Claude Code Should Do Next:
+Commands Claude Should Run:
+Estimated Remaining Work:
+Ready For GitHub Push:
+```
+
+Claude Code must read this section first during Recovery Mode.
+
 ## Required Template
 
 ```md
@@ -100,3 +127,4 @@ Claude Code / Codex / Atlas / Echo / etc.
 - Codex must read the latest Ledger before starting work.
 - Code and Ledger must agree on branch, commit, status, and blockers.
 - Work without a Ledger update is incomplete.
+- Recovery Mode requires the latest Ledger to contain a complete `# Recovery` section.

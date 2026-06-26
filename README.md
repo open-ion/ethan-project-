@@ -343,3 +343,28 @@ Rules:
 - If push fails, update the Ledger with the blocker and exact next recovery commands.
 - Code and Ledger must agree on repository, branch, commit, current status, blockers, and next steps.
 - Work without a Ledger update is incomplete.
+
+
+## Recovery Flow
+
+Recovery Mode is the standard flow when Codex cannot push to GitHub. In this mode, the AI Handoff Ledger is the complete handoff source until Claude Code can reflect the work back into GitHub.
+
+```text
+Claude Code復帰
+↓
+docs/handoff確認
+↓
+最新Ledger確認
+↓
+Current Status確認
+↓
+Changed Files確認
+↓
+Next Steps確認
+↓
+GitHubへ反映
+↓
+作業再開
+```
+
+When Claude Code receives `resume`, it should read `resume.md`, then open `docs/handoff/README.md`, then read the latest timestamped Ledger before editing code. Claude Code should display Repository, Current Branch, Latest Commit, Changed Files, Completed work, Current Status, Blockers, Next Steps, Next Commands, and whether GitHub reflection is required.
