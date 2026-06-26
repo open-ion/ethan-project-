@@ -213,3 +213,158 @@ AGATHON LABS exists to expand human possibility through accurate, useful, and hu
 - AGATHON Principles: [`docs/company/principles.md`](docs/company/principles.md)
 - Department instructions: [`docs/company/departments/`](docs/company/departments/)
 - Original file backups: [`docs/_archive/originals/`](docs/_archive/originals/)
+
+## GitHub Synchronization Procedure
+
+GitHub is the only source of truth for AGATHON LABS repository work. Claude Code, Codex, and human operators should always synchronize through GitHub before treating local files as current.
+
+Before starting work:
+
+```bash
+git fetch --prune
+git pull --ff-only
+git status
+git branch --show-current
+git log --oneline -5
+git remote -v
+git rev-parse --abbrev-ref --symbolic-full-name @{u}
+```
+
+Before handing work back to Claude Code or Ion:
+
+```bash
+npm run check:docs-governance
+npm run check:worktree-clean
+git status
+git push
+```
+
+Completion requires both a local commit and a successful push to the configured upstream branch. If `git push` fails, the work is still incomplete and the blocker must be reported with the current branch, latest commit, changed files, remaining issues, and next action.
+
+
+## Codex to Claude Code Handoff Protocol
+
+GitHub is the only source of truth for AGATHON LABS. Claude Code, Codex, and human operators must synchronize through GitHub so work never depends on one local environment or chat history.
+
+Codex work must be saved to GitHub by one of these methods, in priority order:
+
+1. create a pull request;
+2. update an existing pull request;
+3. push a work branch;
+4. create or update a GitHub Issue containing the diff, full changed file contents when necessary, and continuation steps.
+
+Local-only Codex changes are prohibited. Chat-only reports are prohibited as the sole storage location. If work is not saved in a GitHub PR, branch, commit, or Issue, it is incomplete and should be treated as unavailable.
+
+Before Codex starts work, it must record the repository URL, current branch, intended work branch, latest commit, existing PR status, and diff from the `work` branch. Every Codex handoff must include `repo`, `branch`, `commit`, `PR URL`, and next commands for Claude Code.
+
+### Codex作業完了報告
+
+```md
+【Codex作業完了報告】
+- Repo：
+- Base branch：
+- Work branch：
+- PR URL：
+- Latest commit：
+- 変更ファイル：
+- 実行したテスト：
+- Claude Codeが次にやること：
+- 未完了タスク：
+- 注意点：
+```
+
+### Claude Code復帰手順
+
+```md
+【Claude Code復帰手順】
+1. GitHubのPR URLを開く
+2. branch名を確認
+3. git fetch origin
+4. git checkout <work-branch>
+5. git pull --ff-only
+6. 変更ファイル確認
+7. テスト実行
+8. 必要なら追加修正
+9. commit / push / PR更新
+```
+
+
+## AI引き継ぎフロー
+
+GitHub is the source of truth for code. The AI Handoff Ledger is the operational diary for AI context. AGATHON LABS requires both code and context to be preserved so Claude Code and Codex can switch within 30 seconds.
+
+Ledger files live in `docs/handoff/` and use this naming pattern:
+
+```text
+docs/handoff/YYYY-MM-DD-HHMM-<agent>.md
+```
+
+### Claude Code Flow
+
+```text
+Claude Code
+↓
+Ledger確認
+↓
+GitHub Pull
+↓
+作業
+↓
+Commit
+↓
+Ledger更新
+↓
+Push
+↓
+次AI
+```
+
+### Codex Flow
+
+```text
+Codex
+↓
+Ledger確認
+↓
+GitHub Pull
+↓
+作業
+↓
+Ledger更新
+↓
+Claude Code
+```
+
+Rules:
+
+- Claude Code must read the latest Ledger before resuming work.
+- Codex must read the latest Ledger before starting work.
+- Every AI must update the Ledger before ending a work session.
+- If push fails, update the Ledger with the blocker and exact next recovery commands.
+- Code and Ledger must agree on repository, branch, commit, current status, blockers, and next steps.
+- Work without a Ledger update is incomplete.
+
+
+## Recovery Flow
+
+Recovery Mode is the standard flow when Codex cannot push to GitHub. In this mode, the AI Handoff Ledger is the complete handoff source until Claude Code can reflect the work back into GitHub.
+
+```text
+Claude Code復帰
+↓
+docs/handoff確認
+↓
+最新Ledger確認
+↓
+Current Status確認
+↓
+Changed Files確認
+↓
+Next Steps確認
+↓
+GitHubへ反映
+↓
+作業再開
+```
+
+When Claude Code receives `resume`, it should read `resume.md`, then open `docs/handoff/README.md`, then read the latest timestamped Ledger before editing code. Claude Code should display Repository, Current Branch, Latest Commit, Changed Files, Completed work, Current Status, Blockers, Next Steps, Next Commands, and whether GitHub reflection is required.
