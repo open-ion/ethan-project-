@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 
 const requiredFiles = [
   'AGENTS.md',
@@ -36,7 +36,41 @@ const requiredGovernancePhrases = [
   'Codex is not a replacement for Claude Code',
   'GitHub PR, branch, commit, or Issue',
   'repo`, `branch`, `commit`, `PR URL`',
+  'AI Handoff Ledger',
+  'docs/handoff/YYYY-MM-DD-HHMM-<agent>.md',
 ];
+
+
+const ledgerDirectory = 'docs/handoff';
+const ledgerFilePattern = /^\d{4}-\d{2}-\d{2}-\d{4}-[a-z0-9-]+\.md$/;
+const requiredLedgerSections = [
+  '# AI Handoff Ledger',
+  '## Project',
+  '## Repository',
+  '## Base Branch',
+  '## Working Branch',
+  '## Latest Commit',
+  '## PR',
+  '## Issue',
+  '## Agent',
+  '## Mission',
+  '## Why',
+  '## Changed Files',
+  '## Summary',
+  '## Tests',
+  '## Current Status',
+  '## Blockers',
+  '## Next AI',
+  '## Next Steps',
+  '## Next Commands',
+  '## Notes',
+];
+
+function sectionBody(content, heading) {
+  const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const match = content.match(new RegExp(`${escaped}\\n([\\s\\S]*?)(?=\\n## |$)`));
+  return match ? match[1].trim() : '';
+}
 
 function fail(message) {
   console.error(`docs-governance check failed: ${message}`);
@@ -61,6 +95,42 @@ const agents = readFileSync('AGENTS.md', 'utf8');
 for (const phrase of requiredGovernancePhrases) {
   if (!agents.includes(phrase)) {
     fail(`AGENTS.md is missing governance phrase: ${phrase}`);
+  }
+}
+
+
+if (!existsSync(ledgerDirectory) || !statSync(ledgerDirectory).isDirectory()) {
+  fail('missing handoff ledger directory: docs/handoff');
+} else {
+  const ledgerFiles = readdirSync(ledgerDirectory)
+    .filter((file) => ledgerFilePattern.test(file))
+    .sort();
+
+  if (ledgerFiles.length === 0) {
+    fail('missing timestamped handoff ledger file in docs/handoff');
+  } else {
+    const latestLedger = `${ledgerDirectory}/${ledgerFiles.at(-1)}`;
+    const ledger = readFileSync(latestLedger, 'utf8');
+
+    for (const section of requiredLedgerSections) {
+      if (!ledger.includes(section)) {
+        fail(`${latestLedger} is missing required ledger section: ${section}`);
+      }
+    }
+
+    const requiredNonEmptySections = [
+      '## Agent',
+      '## Base Branch',
+      '## Working Branch',
+      '## Latest Commit',
+      '## Next Steps',
+    ];
+
+    for (const section of requiredNonEmptySections) {
+      if (!sectionBody(ledger, section)) {
+        fail(`${latestLedger} has an empty required ledger section: ${section}`);
+      }
+    }
   }
 }
 

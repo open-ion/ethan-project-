@@ -287,3 +287,59 @@ Before Codex starts work, it must record the repository URL, current branch, int
 8. 必要なら追加修正
 9. commit / push / PR更新
 ```
+
+
+## AI引き継ぎフロー
+
+GitHub is the source of truth for code. The AI Handoff Ledger is the operational diary for AI context. AGATHON LABS requires both code and context to be preserved so Claude Code and Codex can switch within 30 seconds.
+
+Ledger files live in `docs/handoff/` and use this naming pattern:
+
+```text
+docs/handoff/YYYY-MM-DD-HHMM-<agent>.md
+```
+
+### Claude Code Flow
+
+```text
+Claude Code
+↓
+Ledger確認
+↓
+GitHub Pull
+↓
+作業
+↓
+Commit
+↓
+Ledger更新
+↓
+Push
+↓
+次AI
+```
+
+### Codex Flow
+
+```text
+Codex
+↓
+Ledger確認
+↓
+GitHub Pull
+↓
+作業
+↓
+Ledger更新
+↓
+Claude Code
+```
+
+Rules:
+
+- Claude Code must read the latest Ledger before resuming work.
+- Codex must read the latest Ledger before starting work.
+- Every AI must update the Ledger before ending a work session.
+- If push fails, update the Ledger with the blocker and exact next recovery commands.
+- Code and Ledger must agree on repository, branch, commit, current status, blockers, and next steps.
+- Work without a Ledger update is incomplete.

@@ -255,6 +255,28 @@ When returning work to Claude Code, Codex must report:
 
 Codex is not a replacement for Claude Code. Codex becomes temporary Lead Developer only when Claude Code is unavailable. Safety, reproducibility, and consistency with GitHub are more important than development speed.
 
+
+## AI Handoff Ledger Rules
+
+The AI Handoff Ledger is the required operating diary for AGATHON LABS AI work. GitHub is the source of truth for code and files; the Ledger is the source of truth for handoff context. Both must be preserved together.
+
+Ledger location and filename format:
+
+```text
+docs/handoff/YYYY-MM-DD-HHMM-<agent>.md
+```
+
+Every AI work session must follow these rules:
+
+- When an AI finishes work, it must update the Handoff Ledger.
+- If GitHub push fails, the Ledger must still be updated with the blocker, latest local commit, changed files, and recovery commands.
+- Claude Code must read the latest Ledger before resuming work.
+- Codex must read the latest Ledger before starting work.
+- GitHub code and Ledger context must agree on repository, branch, commit, status, blockers, and next steps.
+- Work without a Ledger update is prohibited and must be treated as incomplete.
+
+The latest Ledger entry must explain why the change was made, what changed, current status, blockers, next AI, next steps, and next commands so Claude Code or Codex can recover within 30 seconds.
+
 ## Development Rules
 
 When working in code or documentation repositories:
