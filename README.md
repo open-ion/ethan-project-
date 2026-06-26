@@ -213,3 +213,30 @@ AGATHON LABS exists to expand human possibility through accurate, useful, and hu
 - AGATHON Principles: [`docs/company/principles.md`](docs/company/principles.md)
 - Department instructions: [`docs/company/departments/`](docs/company/departments/)
 - Original file backups: [`docs/_archive/originals/`](docs/_archive/originals/)
+
+## GitHub Synchronization Procedure
+
+GitHub is the only source of truth for AGATHON LABS repository work. Claude Code, Codex, and human operators should always synchronize through GitHub before treating local files as current.
+
+Before starting work:
+
+```bash
+git fetch --prune
+git pull --ff-only
+git status
+git branch --show-current
+git log --oneline -5
+git remote -v
+git rev-parse --abbrev-ref --symbolic-full-name @{u}
+```
+
+Before handing work back to Claude Code or Ion:
+
+```bash
+npm run check:docs-governance
+npm run check:worktree-clean
+git status
+git push
+```
+
+Completion requires both a local commit and a successful push to the configured upstream branch. If `git push` fails, the work is still incomplete and the blocker must be reported with the current branch, latest commit, changed files, remaining issues, and next action.

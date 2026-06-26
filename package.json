@@ -9,7 +9,9 @@
     "start": "node scripts/dev-server.mjs --dist",
     "test": "npm run build && node scripts/smoke-test.mjs",
     "fetch:rss": "node scripts/fetch-rss.mjs",
-    "summarize": "node scripts/summarize-news.mjs"
+    "summarize": "node scripts/summarize-news.mjs",
+    "check:docs-governance": "node scripts/check-docs-governance.mjs",
+    "check:worktree-clean": "CHECK_WORKTREE_CLEAN=1 node scripts/check-docs-governance.mjs"
   },
   "engines": {
     "node": ">=20"

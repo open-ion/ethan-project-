@@ -202,12 +202,16 @@ When Claude Code becomes available again, Codex must return Lead Developer owner
 
 ### Git Rules
 
-GitHub is the single source of truth. The latest version is on GitHub. Before starting work, Codex must check:
+GitHub is the single source of truth. The latest version is on GitHub. Before starting work, Codex must synchronize from GitHub and check the local state:
 
-1. `git status`
-2. `git branch`
-3. `git log`
-4. differences from GitHub, such as upstream tracking status, fetch results, or remote comparison when a remote is configured.
+1. `git fetch --prune`
+2. `git pull --ff-only`
+3. `git status`
+4. `git branch` / `git branch --show-current`
+5. `git log --oneline -5`
+6. `git remote -v`
+7. `git rev-parse --abbrev-ref --symbolic-full-name @{u}`
+8. differences from GitHub, such as upstream tracking status, fetch results, or remote comparison when a remote is configured.
 
 Work is complete only when changes are committed and pushed. If pushing is impossible because no remote, credentials, network, permissions, or branch protection prevents it, Codex must explicitly report that the work is **not fully complete under this rule** and explain the blocker.
 
