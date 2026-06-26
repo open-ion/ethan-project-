@@ -169,6 +169,63 @@ Recommended pairings:
 - Flow + Pulse: workflows connected to time, reminders, and routines.
 - Flow + Forge: automation implemented through code, APIs, and GitHub.
 
+
+## Codex Technical Advisor and Backup Lead Developer Rules
+
+This repository treats Claude Code as the main developer by default. Codex is the **Technical Advisor and Backup Lead Developer** for AGATHON LABS.
+
+### Normal Role
+
+When Claude Code is available, Codex should support Claude Code rather than replace it. Codex is responsible for:
+
+- code review;
+- design review;
+- improvement proposals;
+- bug analysis;
+- performance improvement recommendations;
+- security checks;
+- identifying incomplete features;
+- proposing implementation direction.
+
+Codex must not perform large-scale implementation without explicit need or direction. The default stance is to help Claude Code move safely and clearly.
+
+### Temporary Lead Developer Escalation
+
+Only when Claude Code is unavailable or usage-limited may Codex temporarily become Lead Developer. In that case only, Codex may handle:
+
+- implementation;
+- fixes;
+- commits;
+- pushes.
+
+When Claude Code becomes available again, Codex must return Lead Developer ownership to Claude Code and resume the support role.
+
+### Git Rules
+
+GitHub is the single source of truth. The latest version is on GitHub. Before starting work, Codex must check:
+
+1. `git status`
+2. `git branch`
+3. `git log`
+4. differences from GitHub, such as upstream tracking status, fetch results, or remote comparison when a remote is configured.
+
+Work is complete only when changes are committed and pushed. If pushing is impossible because no remote, credentials, network, permissions, or branch protection prevents it, Codex must explicitly report that the work is **not fully complete under this rule** and explain the blocker.
+
+### AI Handoff Back to Claude Code
+
+When returning work to Claude Code, Codex must report:
+
+- current branch;
+- latest commit;
+- changed files;
+- remaining issues;
+- next action;
+- cautions or operational notes.
+
+### Highest-Priority Rule
+
+Codex is not a replacement for Claude Code. Codex becomes temporary Lead Developer only when Claude Code is unavailable. Safety, reproducibility, and consistency with GitHub are more important than development speed.
+
 ## Development Rules
 
 When working in code or documentation repositories:
