@@ -83,15 +83,36 @@ Registered backends:
 | Runtime | Status | Activation |
 | --- | --- | --- |
 | `plan` | active | default, always available |
-| `claude-code` | stub | `AGATHON_CLAUDE_CODE=1` + implement `callModel()` |
+| `claude-code` | **live** | `AGATHON_CLAUDE_CODE=1` + `ANTHROPIC_API_KEY` |
 | `codex` | stub | `AGATHON_CODEX=1` + implement `callModel()` |
 | `openai-agents` | stub | `AGATHON_OPENAI_AGENTS=1` + implement `callModel()` |
 
 `resolveRuntime()` falls back to `plan` when the requested backend is not
 registered or not available, so the OS never hard-fails on a missing backend.
-The external adapters are honest stubs: they assemble the agent prompt (persona +
-task) but return `status: 'skipped'` rather than faking a model response — a
-Guard requirement (never pretend a model ran).
+The remaining external adapters are honest stubs: they assemble the agent prompt
+(persona + task) but return `status: 'skipped'` rather than faking a model
+response — a Guard requirement (never pretend a model ran).
+
+#### claude-code runtime (live)
+
+`claude-code` calls the **Anthropic Messages API** (`src/orchestrator/runtimes/claudeApi.js`,
+dependency-free raw `fetch`, matching `scripts/summarize-news.mjs`). Per dispatched
+agent it sends one `POST /v1/messages` with the agent persona as the `system`
+prompt and the task as the user message, then returns the model's text as the
+agent's output. It checks `stop_reason === "refusal"` before reading content and
+surfaces token usage in the handoff note.
+
+```bash
+export AGATHON_CLAUDE_CODE=1
+export ANTHROPIC_API_KEY=sk-ant-...        # required to actually call the model
+npm run orchestrate -- "競合を3社調べて要点を出して" --runtime=claude-code
+```
+
+Env: `AGATHON_CLAUDE_MODEL` (default `claude-opus-4-8`), `AGATHON_MAX_TOKENS`
+(default 1024), `ANTHROPIC_BASE_URL` (default `https://api.anthropic.com` — override
+for a gateway/proxy or a local test server), `AGATHON_TIMEOUT_MS` (default 60000).
+If the flag or key is missing, the runtime reports unavailable and the orchestrator
+falls back to `plan`.
 
 ## Usage
 
@@ -125,7 +146,8 @@ npm run test:orchestrator
 
 ## Next steps / TODO
 
-- Implement `callModel()` for at least one external runtime (Claude Code first).
+- ~~Implement `callModel()` for at least one external runtime (Claude Code first).~~ ✅ `claude-code` is live (Anthropic Messages API).
+- Wire `codex` and `openai-agents` `callModel()` the same way.
 - Optional LLM reasoner for fuzzier intent than keyword triggers.
 - Persist routing decisions to Echo (memory) for traceability.
 - Let `needsGuard` consider runtime output, not just the request text.

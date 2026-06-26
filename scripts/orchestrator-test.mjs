@@ -10,6 +10,10 @@ import {
   getAgent,
   listRuntimes,
   resolveRuntime,
+  callClaude,
+  extractText,
+  buildAgentPrompt,
+  claudeCodeRuntime,
 } from '../src/orchestrator/index.js';
 
 let passed = 0;
@@ -75,6 +79,56 @@ check('orchestrate returns a report', typeof result.report === 'string' && resul
 check('orchestrate ran owner execution', result.executions.length >= 1);
 check('orchestrate ran Guard review for publish task', result.guardReview !== null);
 check('report names the owner agent', result.report.includes(getAgent(result.plan.owner).name));
+
+// --- claude-code runtime: Anthropic API client (hermetic, injected fetch) ---
+check('extractText concatenates text blocks', extractText({ content: [
+  { type: 'text', text: 'Hello ' }, { type: 'thinking', thinking: 'x' }, { type: 'text', text: 'world' },
+] }) === 'Hello world');
+
+const built = await buildAgentPrompt(getAgent('forge'), 'add a login form');
+check('buildAgentPrompt puts persona in system, task in user',
+  built.system.includes('Forge') && built.user === 'add a login form');
+
+// Fake Anthropic endpoint — proves request shape + response parsing without network.
+let capturedReq = null;
+const fakeFetch = async (url, init) => {
+  capturedReq = { url, headers: init.headers, body: JSON.parse(init.body) };
+  return {
+    ok: true,
+    async json() {
+      return { model: 'claude-opus-4-8', stop_reason: 'end_turn',
+        content: [{ type: 'text', text: 'pong' }], usage: { output_tokens: 1 } };
+    },
+  };
+};
+const called = await callClaude({ prompt: 'ping', system: 'be terse', apiKey: 'test-key',
+  baseUrl: 'http://mock.local', fetchImpl: fakeFetch });
+check('callClaude returns parsed text', called.text === 'pong');
+check('callClaude targets /v1/messages', capturedReq.url === 'http://mock.local/v1/messages');
+check('callClaude sends x-api-key + anthropic-version headers',
+  capturedReq.headers['x-api-key'] === 'test-key' && capturedReq.headers['anthropic-version'] === '2023-06-01');
+check('callClaude sends model + user message', capturedReq.body.model === 'claude-opus-4-8'
+  && capturedReq.body.messages[0].role === 'user' && capturedReq.body.messages[0].content === 'ping');
+
+// Refusal must be detected before reading content.
+let refusalCaught = false;
+try {
+  await callClaude({ prompt: 'x', apiKey: 'k', baseUrl: 'http://m', fetchImpl: async () => ({
+    ok: true, async json() { return { stop_reason: 'refusal', stop_details: { category: 'cyber' }, content: [] }; },
+  }) });
+} catch (e) { refusalCaught = /refused/.test(e.message); }
+check('callClaude throws on stop_reason refusal', refusalCaught);
+
+// Missing API key is a clear error, not a silent empty call.
+let noKeyCaught = false;
+try {
+  await callClaude({ prompt: 'x', apiKey: '', fetchImpl: async () => ({ ok: true, async json() { return {}; } }) });
+} catch (e) { noKeyCaught = /ANTHROPIC_API_KEY/.test(e.message); }
+check('callClaude throws when API key missing', noKeyCaught);
+
+// Availability gating (no flag / no key in test env → unavailable → falls back).
+const wasAvailable = await claudeCodeRuntime.isAvailable();
+check('claude-code unavailable without flag+key in test env', wasAvailable === false);
 
 console.log(`\n${passed} passed, ${failed} failed`);
 if (failed > 0) process.exit(1);

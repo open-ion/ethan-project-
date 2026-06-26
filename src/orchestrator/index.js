@@ -16,3 +16,5 @@ export {
   resolveRuntime,
   makeHandoff,
 } from './runtimes/index.js';
+export { buildAgentPrompt, claudeCodeRuntime } from './runtimes/externalRuntime.js';
+export { callClaude, extractText } from './runtimes/claudeApi.js';
