@@ -203,6 +203,42 @@ AGATHON LABS exists to expand human possibility through accurate, useful, and hu
 | Guard | Security Division |
 | Pulse | Scheduling Division |
 
+## AI Workforce Framework
+
+AGATHON LABS runs on an AI employee model. Each AI has a persona file at the repository root defining its Role, Personality, Mission, Responsibilities, Authority, Collaboration Rules, I/O, Do/Don't, Escalation, and Example Behavior. Any AI (Claude Code / Codex) reads these to behave consistently.
+
+- **Constitution (top priority):** [`AGENTS.md`](AGENTS.md)
+- **CEO:** [`ETHAN.md`](ETHAN.md)
+- **AI employees:** [`NOVA.md`](NOVA.md) · [`ATLAS.md`](ATLAS.md) · [`SAGE.md`](SAGE.md) · [`ECHO.md`](ECHO.md) · [`FORGE.md`](FORGE.md) · [`VISION.md`](VISION.md) · [`FLOW.md`](FLOW.md) · [`GUARD.md`](GUARD.md) · [`PULSE.md`](PULSE.md)
+
+Reading order: `AGENTS.md` → relevant persona file → root [`CLAUDE.md`](CLAUDE.md) → `docs/company/`.
+
+### Orchestration OS
+
+The operating layer (`src/orchestrator/`) lets Ethan analyze a request and
+auto-route it to the right AI employees, run a Guard quality gate, and report
+back — with execution backends that are swappable across Claude Code, Codex, and
+the OpenAI Agents SDK.
+
+```bash
+npm run orchestrate -- "競合を調査して、結果をスライドにデザインして、公開して"
+npm run test:orchestrator
+```
+
+Run it on a real Claude model with the `claude-code` runtime:
+
+```bash
+AGATHON_CLAUDE_CODE=1 ANTHROPIC_API_KEY=sk-ant-... \
+  npm run orchestrate -- "AIエージェントの最新トレンドを3行で" --runtime=claude-code
+```
+
+It also runs in CI via the **AGATHON Orchestrator** workflow
+([`.github/workflows/orchestrate.yml`](.github/workflows/orchestrate.yml)) —
+manual dispatch with a task input, using the `ANTHROPIC_API_KEY` secret; the
+report is written to the job summary.
+
+Architecture and extension points: [`docs/orchestrator/architecture.md`](docs/orchestrator/architecture.md).
+
 ## Documentation
 
 - Product requirements: [`docs/product/requirements.md`](docs/product/requirements.md)
