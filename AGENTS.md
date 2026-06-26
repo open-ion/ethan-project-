@@ -215,6 +215,31 @@ GitHub is the single source of truth. The latest version is on GitHub. Before st
 
 Work is complete only when changes are committed and pushed. If pushing is impossible because no remote, credentials, network, permissions, or branch protection prevents it, Codex must explicitly report that the work is **not fully complete under this rule** and explain the blocker.
 
+
+### Codex GitHub Persistence Rules
+
+AGATHON LABS treats GitHub as the only durable storage and source of truth. Claude Code, Codex, and human operators must synchronize through GitHub; local-only work and chat-only reports are not valid handoffs.
+
+Before Codex starts work, Codex must confirm and record:
+
+- target GitHub repository URL;
+- current local branch;
+- intended work branch name;
+- latest commit SHA;
+- whether an existing PR should be updated;
+- the diff from the `work` branch or the reason it cannot be checked.
+
+When Codex creates or changes work, Codex must preserve it on GitHub using the first available option in this priority order:
+
+1. create a pull request;
+2. update an existing pull request;
+3. push to a work branch;
+4. create or update a GitHub Issue containing the diff, full changed file contents when needed, and exact reproduction / continuation steps.
+
+Work that is not saved to a GitHub PR, branch, commit, or Issue is considered nonexistent for AGATHON LABS operations. A final chat report alone is never sufficient. Work with no successful push, PR update, or Issue backup is incomplete.
+
+When Claude Code returns, Claude Code must resume from Codex's GitHub PR or branch, not from local Codex state. Every Codex final report must include `repo`, `branch`, `commit`, `PR URL`, and next commands for Claude Code. Unknown or ambiguous storage locations are prohibited.
+
 ### AI Handoff Back to Claude Code
 
 When returning work to Claude Code, Codex must report:

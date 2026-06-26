@@ -240,3 +240,50 @@ git push
 ```
 
 Completion requires both a local commit and a successful push to the configured upstream branch. If `git push` fails, the work is still incomplete and the blocker must be reported with the current branch, latest commit, changed files, remaining issues, and next action.
+
+
+## Codex to Claude Code Handoff Protocol
+
+GitHub is the only source of truth for AGATHON LABS. Claude Code, Codex, and human operators must synchronize through GitHub so work never depends on one local environment or chat history.
+
+Codex work must be saved to GitHub by one of these methods, in priority order:
+
+1. create a pull request;
+2. update an existing pull request;
+3. push a work branch;
+4. create or update a GitHub Issue containing the diff, full changed file contents when necessary, and continuation steps.
+
+Local-only Codex changes are prohibited. Chat-only reports are prohibited as the sole storage location. If work is not saved in a GitHub PR, branch, commit, or Issue, it is incomplete and should be treated as unavailable.
+
+Before Codex starts work, it must record the repository URL, current branch, intended work branch, latest commit, existing PR status, and diff from the `work` branch. Every Codex handoff must include `repo`, `branch`, `commit`, `PR URL`, and next commands for Claude Code.
+
+### Codex作業完了報告
+
+```md
+【Codex作業完了報告】
+- Repo：
+- Base branch：
+- Work branch：
+- PR URL：
+- Latest commit：
+- 変更ファイル：
+- 実行したテスト：
+- Claude Codeが次にやること：
+- 未完了タスク：
+- 注意点：
+```
+
+### Claude Code復帰手順
+
+```md
+【Claude Code復帰手順】
+1. GitHubのPR URLを開く
+2. branch名を確認
+3. git fetch origin
+4. git checkout <work-branch>
+5. git pull --ff-only
+6. 変更ファイル確認
+7. テスト実行
+8. 必要なら追加修正
+9. commit / push / PR更新
+```

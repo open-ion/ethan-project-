@@ -34,6 +34,8 @@ const requiredGovernancePhrases = [
   'git pull',
   'Work is complete only when changes are committed and pushed',
   'Codex is not a replacement for Claude Code',
+  'GitHub PR, branch, commit, or Issue',
+  'repo`, `branch`, `commit`, `PR URL`',
 ];
 
 function fail(message) {
