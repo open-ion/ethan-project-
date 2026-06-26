@@ -73,3 +73,104 @@ export function getCategory(categoryId) {
 export function getNewsItem(newsId) {
   return newsItems.find((item) => item.id === newsId);
 }
+
+// --- AI朝ダッシュボード ---------------------------------------------------
+// ETHANは「5分で今日一日の意思決定を終わらせるAI」。
+// 全員に同じ画面ではなく、その人による・その人のための朝ダッシュボードを作る。
+// ここでは将来のウィジェット化に備え、プリセットとウィジェットをデータとして定義する。
+// 今回はAPI連携はせず placeholder 値のみ（DB・認証・天気/波情報APIは未実装）。
+
+// ウィジェットカタログ。kind で描画方法を切り替える:
+//   news   … 実データ（カテゴリ別ニュース件数）と一覧リンク
+//   metric … 数値系プレースホルダ（株価・為替・天気・波など。今後API連携）
+//   note   … 手元メモ系プレースホルダ（ToDo・カレンダー・学び・Notion）
+export const dashboardWidgets = {
+  'ai-news': { id: 'ai-news', label: 'AIニュース', emoji: '🤖', kind: 'news', categoryId: 'ai-technology' },
+  'business-news': { id: 'business-news', label: 'ビジネスニュース', emoji: '🚀', kind: 'news', categoryId: 'business-startups' },
+  'investing-news': { id: 'investing-news', label: '投資ニュース', emoji: '📈', kind: 'news', categoryId: 'markets' },
+  'medical-news': { id: 'medical-news', label: '医療ニュース', emoji: '🏥', kind: 'news', categoryId: 'medical-nursing' },
+  'nursing-news': { id: 'nursing-news', label: '看護ニュース', emoji: '🩺', kind: 'news', categoryId: 'medical-nursing' },
+  'health-policy-news': { id: 'health-policy-news', label: '医療制度ニュース', emoji: '📋', kind: 'news', categoryId: 'medical-nursing' },
+  'surf-news': { id: 'surf-news', label: 'サーフィン関連ニュース', emoji: '🏄', kind: 'news', categoryId: 'sports' },
+  nikkei: { id: 'nikkei', label: '日経平均', emoji: '🇯🇵', kind: 'metric', placeholder: '—（今後API連携）' },
+  sp500: { id: 'sp500', label: 'S&P500', emoji: '🇺🇸', kind: 'metric', placeholder: '—（今後API連携）' },
+  fx: { id: 'fx', label: '為替 USD/JPY', emoji: '💱', kind: 'metric', placeholder: '—（今後API連携）' },
+  weather: { id: 'weather', label: '今日の天気', emoji: '🌤️', kind: 'metric', placeholder: '—（今後API連携）' },
+  'wind-direction': { id: 'wind-direction', label: '風向', emoji: '🧭', kind: 'metric', placeholder: '—（今後API連携）' },
+  'wind-speed': { id: 'wind-speed', label: '風速', emoji: '💨', kind: 'metric', placeholder: '—（今後API連携）' },
+  wave: { id: 'wave', label: '波情報', emoji: '🌊', kind: 'metric', placeholder: '—（今後API連携）' },
+  tide: { id: 'tide', label: '潮汐', emoji: '🌙', kind: 'metric', placeholder: '—（今後API連携）' },
+  'today-learning': { id: 'today-learning', label: '今日の学び', emoji: '📚', kind: 'note', placeholder: '今日ひとつ学ぶことを決めよう。' },
+  todo: { id: 'todo', label: 'ToDo', emoji: '✅', kind: 'note', placeholder: '今日やる3つを書き出す欄（今後実装）。' },
+  calendar: { id: 'calendar', label: 'カレンダー', emoji: '📅', kind: 'note', placeholder: '今日の予定（カレンダー連携は今後）。' },
+  'notion-memo': { id: 'notion-memo', label: 'Notionメモ', emoji: '🗒️', kind: 'note', placeholder: 'Notion連携メモ（今後実装）。' }
+};
+
+// ユーザータイプ別プリセット。categories は「今日読むべき3件」の絞り込みに使う。
+// widgets は上のカタログIDの並び。ethanComment はその人向けの一言。
+export const userPresets = [
+  {
+    id: 'ai-business',
+    label: 'AI・ビジネス型',
+    emoji: '🤖',
+    tagline: 'AIと事業の意思決定を朝イチで。',
+    categories: ['ai-technology', 'business-startups', 'markets'],
+    widgets: ['ai-news', 'business-news', 'investing-news', 'calendar', 'todo'],
+    ethanComment: 'AIと事業は動きが速い。全部追うな。今日の1手に効く情報だけ拾って、すぐ動こう。'
+  },
+  {
+    id: 'investor',
+    label: '投資型',
+    emoji: '📈',
+    tagline: '相場に振り回されず、長期で勝つ。',
+    categories: ['markets', 'business-startups'],
+    widgets: ['nikkei', 'sp500', 'fx', 'investing-news'],
+    ethanComment: '日々の上下は気にするな。長期運用を貫くのが成功の鍵だ。下げた日こそ売るな・やめるな・買い増せ。'
+  },
+  {
+    id: 'medical-nursing',
+    label: '医療・看護型',
+    emoji: '🏥',
+    tagline: '現場の判断を、確かな情報で。',
+    categories: ['medical-nursing'],
+    widgets: ['medical-news', 'nursing-news', 'today-learning', 'health-policy-news'],
+    ethanComment: '医療情報は断定を避けて確認を。今日ひとつ学んで、現場の安全に活かそう。'
+  },
+  {
+    id: 'surfer',
+    label: 'サーファー型',
+    emoji: '🏄',
+    tagline: '今日、海に入るかを5分で決める。',
+    categories: ['sports', 'cost-of-living'],
+    widgets: ['weather', 'wind-direction', 'wind-speed', 'wave', 'tide', 'surf-news'],
+    ethanComment: '波・風・潮をまとめて確認。条件が良ければ迷うな、今日入ろう。'
+  },
+  {
+    id: 'learner',
+    label: '学習型',
+    emoji: '📚',
+    tagline: '毎日ひとつ、確実に積み上げる。',
+    categories: ['ai-technology', 'medical-nursing', 'politics-economy'],
+    widgets: ['today-learning', 'todo', 'notion-memo', 'calendar'],
+    ethanComment: '量より継続。今日ひとつ学んで、メモに残そう。それが1年後に効く。'
+  },
+  {
+    id: 'custom',
+    label: '自由カスタム型',
+    emoji: '🎛️',
+    tagline: '自分の関心カテゴリで組み立てる。',
+    categories: [],
+    widgets: ['ai-news', 'investing-news', 'todo', 'calendar'],
+    ethanComment: '下の「関心カテゴリ」で自分専用に調整しよう。あなたによる、あなたのためのダッシュボードだ。'
+  }
+];
+
+export const defaultPresetId = 'ai-business';
+
+export function getPreset(presetId) {
+  return userPresets.find((preset) => preset.id === presetId) || userPresets.find((preset) => preset.id === defaultPresetId);
+}
+
+export function getWidget(widgetId) {
+  return dashboardWidgets[widgetId];
+}

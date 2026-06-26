@@ -1,5 +1,5 @@
 import { access, readFile } from 'node:fs/promises';
-import { categories, newsItems, getCategory, getNewsItem } from '../src/data.js';
+import { categories, newsItems, getCategory, getNewsItem, userPresets, getPreset, dashboardWidgets } from '../src/data.js';
 
 function assert(condition, message) {
   if (!condition) {
@@ -34,9 +34,34 @@ for (const item of newsItems) {
   assert(getNewsItem(item.id)?.id === item.id, `getNewsItem failed for ${item.id}`);
 }
 
+// --- AI朝ダッシュボード: プリセットとウィジェットのデータ契約 ---
+const requiredPresetLabels = ['AI・ビジネス型', '投資型', '医療・看護型', 'サーファー型', '学習型', '自由カスタム型'];
+assert(userPresets.length === requiredPresetLabels.length, `Expected ${requiredPresetLabels.length} presets, got ${userPresets.length}`);
+for (const label of requiredPresetLabels) {
+  assert(userPresets.some((preset) => preset.label === label), `Missing preset: ${label}`);
+}
+for (const preset of userPresets) {
+  assert(preset.id, 'Preset is missing id');
+  assert(getPreset(preset.id)?.id === preset.id, `getPreset failed for ${preset.id}`);
+  assert(Array.isArray(preset.widgets) && preset.widgets.length > 0, `Preset ${preset.id} has no widgets`);
+  assert(typeof preset.ethanComment === 'string' && preset.ethanComment.length > 0, `Preset ${preset.id} is missing ethanComment`);
+  for (const widgetId of preset.widgets) {
+    assert(dashboardWidgets[widgetId], `Preset ${preset.id} references unknown widget ${widgetId}`);
+  }
+}
+assert(getPreset('does-not-exist')?.id, 'getPreset should fall back to a default preset');
+
 const appSource = await readFile('src/app.js', 'utf8');
 assert(appSource.includes('renderHome'), 'Home render function is missing');
 assert(appSource.includes('renderDetail'), 'Detail render function is missing');
+assert(appSource.includes('renderDashboard'), 'Morning dashboard render function is missing');
+assert(appSource.includes('あなた専用AI朝ダッシュボード'), 'Dashboard hero eyebrow copy is missing');
+assert(appSource.includes('5分で今日を決めよう'), 'Dashboard hero headline copy is missing');
+assert(appSource.includes('今日読むべき3件'), 'Top-three section is missing');
+assert(appSource.includes('Ethanからの一言'), 'Ethan voice section is missing');
+assert(appSource.includes('1日1アイデア'), 'One-idea-per-day section is missing');
+assert(appSource.includes('USER_SETTINGS_KEY'), 'User settings localStorage key is missing');
+assert(appSource.includes('data-preset'), 'Preset picker binding is missing');
 assert(appSource.includes('関心カテゴリ'), 'Category heading is missing from app source');
 assert(appSource.includes('今日の重要ニュース'), 'News list heading is missing from app source');
 assert(appSource.includes('忙しい人向けの結論'), 'Busy-reader takeaway label is missing from app source');
@@ -48,7 +73,8 @@ assert(appSource.includes('confidenceReason'), 'confidence reason display is mis
 
 const htmlSource = await readFile('src/index.html', 'utf8');
 assert(htmlSource.includes('<meta name="viewport"'), 'Viewport meta tag is missing');
-assert(htmlSource.includes('Ethan → Ion Daily Brief'), 'AGATHON header badge is missing');
+assert(htmlSource.includes('あなた専用AI朝ダッシュボード'), 'AI morning dashboard framing is missing from index.html');
+assert(htmlSource.includes('5分で今日を決める'), 'Dashboard header badge is missing');
 assert(htmlSource.includes('href="styles.css"'), 'Stylesheet should use a route-relative path for static hosting');
 assert(htmlSource.includes('src="app.js"'), 'App script should use a route-relative path for static hosting');
 
@@ -58,6 +84,10 @@ assert(cssSource.includes('grid-template-columns: 1fr'), 'Mobile one-column grid
 assert(cssSource.includes('accent-color'), 'Category checkbox accent styling is missing');
 assert(cssSource.includes('trust-row'), 'Trust metadata styling is missing');
 assert(cssSource.includes('top-news-card'), 'Top news card styling is missing');
+assert(cssSource.includes('preset-card'), 'Preset card styling is missing');
+assert(cssSource.includes('widget-grid'), 'Dashboard widget grid styling is missing');
+assert(cssSource.includes('widget-card'), 'Widget card styling is missing');
+assert(cssSource.includes('idea-input'), 'One-idea input styling is missing');
 
 
 const updateWorkflowSource = await readFile('.github/workflows/update-news.yml', 'utf8');

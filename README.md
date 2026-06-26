@@ -1,9 +1,27 @@
-# AGATHON LABS — News Digest App
+# ETHAN — あなた専用AI朝ダッシュボード
 
 **For the Good of Humanity.**<br>
 **人のため、社会のために。**
 
-AGATHON LABS is a human-centered AI organization built around Ion and Ethan. The current product direction is a personal AI news digest app that helps Ion understand important news every morning in roughly five minutes.
+ETHANはニュースアプリではありません。**「5分で今日一日の意思決定を終わらせるAI」**であり、その人による・その人のための・その人の生活をより良くするAI朝ダッシュボードです。
+
+## このアプリの思想
+
+- **その人による** — ユーザータイプ（AI・ビジネス / 投資 / 医療・看護 / サーファー / 学習 / 自由カスタム）で画面が変わる。
+- **その人のための** — 全員に同じ画面を見せない。必要な情報だけを選ぶ。
+- **その人の生活をより良くする** — ニュースを見せるのではなく、今日どう動くかを決める。
+- **5分で今日を決める** — 朝、画面を開けば「今日読むべき3件」「Ethanからの一言」「1日1アイデア」が並ぶ。
+- **情報を増やすのではなく、迷いを減らす** — これがETHANの一貫した設計原則。
+
+### SmartNewsとの違い
+
+SmartNewsはニュース・クーポン・ポイント・広告・エンタメを**大量に見せる**情報プラットフォームです。ETHANは違います。ETHANはその人に必要な情報だけを選び、**今日の判断と行動につなげる**AI朝ダッシュボードです。情報の量ではなく、意思決定の速さで勝負します。
+
+### ウィジェット構造（今後の拡張）
+
+トップ画面はウィジェットの集合として設計しています。AIニュース / 投資（日経平均・S&P500・為替）/ 医療・看護 / 天気・風向・風速・波情報・潮汐 / カレンダー / ToDo / Notionメモ / 1日1アイデア / Ethanコメント。現時点では実データのニュース件数以外は placeholder で、天気・波情報・株価などのAPI連携は今後段階的に追加します（DB・認証・外部APIはまだ導入していません。設定は localStorage に保存）。
+
+その土台として、毎朝のニュースは引き続きカテゴリ別に要約して画面下部に表示します（数分で重要ニュースを把握できる従来機能はそのまま維持）。
 
 ## Worldview
 
@@ -15,9 +33,9 @@ AGATHON LABS is a human-centered AI organization built around Ion and Ethan. The
 
 ## Current Product
 
-The next development target is the **News Digest App**.
+ETHANの中核は上記の**AI朝ダッシュボード**です。その最初の構成要素として、毎朝の**ニュースダイジェスト**（カテゴリ別の要約配信）を実装済みで、ダッシュボード下部に組み込んでいます。
 
-Purpose:
+ニュースダイジェスト部分の目的:
 
 - collect news from NewsAPI or major media RSS feeds;
 - summarize important stories by category;
