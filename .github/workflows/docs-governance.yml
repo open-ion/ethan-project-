@@ -1,0 +1,31 @@
+name: Docs Governance
+
+on:
+  pull_request:
+    paths:
+      - 'AGENTS.md'
+      - '*.md'
+      - 'scripts/check-docs-governance.mjs'
+      - '.github/workflows/docs-governance.yml'
+  push:
+    paths:
+      - 'AGENTS.md'
+      - '*.md'
+      - 'scripts/check-docs-governance.mjs'
+      - '.github/workflows/docs-governance.yml'
+  workflow_dispatch:
+
+jobs:
+  docs-governance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate AGATHON LABS docs governance
+        run: node scripts/check-docs-governance.mjs

@@ -11,7 +11,9 @@
     "test:orchestrator": "node scripts/orchestrator-test.mjs",
     "orchestrate": "node scripts/orchestrate.mjs",
     "fetch:rss": "node scripts/fetch-rss.mjs",
-    "summarize": "node scripts/summarize-news.mjs"
+    "summarize": "node scripts/summarize-news.mjs",
+    "check:docs-governance": "node scripts/check-docs-governance.mjs",
+    "check:worktree-clean": "CHECK_WORKTREE_CLEAN=1 node scripts/check-docs-governance.mjs"
   },
   "engines": {
     "node": ">=20"
