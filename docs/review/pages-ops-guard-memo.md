@@ -79,3 +79,55 @@ Ion has approved continuing the work. Destructive actions still require an expli
 - History rewriting remains prohibited.
 - Existing files should not be deleted without a reviewed cleanup plan.
 - This memo is a risk and operations record, not an implementation change.
+
+## Codex Branch Reflection Safety Rule (Forge, 2026-06-27)
+
+When reflecting Codex work that was synced via the Codex GitHub App (branches
+named like `*-codex/agathon-labs.md`), the branch is based on an **older repo
+state**. A full merge of such a branch would DELETE current work (in one
+observed case the full diff removed the orchestration OS, the dashboard app,
+persona files, and `docs/orchestrator/architecture.md` — about 2,700 deleted
+lines).
+
+Mandatory reflection procedure:
+
+1. Never merge a Codex sync branch wholesale.
+2. Read the Codex ledger's `Changed Files` / `Files Created` list.
+3. Cherry-pick ONLY those net-new files (`git checkout <codex-branch> -- <file>`).
+4. Verify core paths are untouched (`git diff --cached --name-only` shows only the intended files).
+5. Run `npm run check:docs-governance` and `npm test`; both must pass.
+6. Commit and push from the GitHub-connected (Claude Code) environment.
+
+This rule should also be mirrored into `AGENTS.md` / `docs/handoff/README.md`.
+
+## Legacy `deploy-pages.yml` Cleanup Plan (proposed — NOT executed)
+
+Inventory (verified via git, 2026-06-27): legacy `deploy-pages.yml` (push to
+`main`, paths `apps/**`, deploys `apps/` to the `gh-pages` branch — old
+"deploy from a branch" method) exists on:
+
+- `main` (last commit 2026-06-25)
+- `claude/dashboard-mvp` (2026-06-25)
+- `claude/news-digest-app-afdoae` (2026-06-25)
+- `claude/investment-portfolio-plan-ycuf60` (2026-06-22)
+
+The `gh-pages` branch exists. It is **inert for publishing** while Pages Source
+is "GitHub Actions" (the live path is `update-news.yml`). Latent risk only if
+Source is switched to a branch, or if `apps/**` is pushed to `main`.
+
+Proposed minimal-risk plan, in priority order (execute only as one Guard-reviewed,
+Ion-authorized batch — do not run piecemeal):
+
+1. **Confirm + lock Pages Source = "GitHub Actions"** (Settings → Pages). This
+   single settings confirmation neutralizes the entire legacy `gh-pages` path
+   without deleting anything. Highest value, lowest risk. (No code change.)
+2. Leave the legacy `deploy-pages.yml` files on the non-default project branches
+   **as-is** unless those branches are being retired — they belong to separate
+   project lines (incl. the investment project on `main`); deleting them is
+   cross-scope and reversible only via reflog.
+3. Optionally, once Source is confirmed, delete the `gh-pages` branch as the last
+   step (reversible via reflog within GC window). Defer unless Ion wants a clean tree.
+
+Recommendation: do **Step 1 only** now (a settings check, not a deletion).
+Steps 2–3 are low priority and should wait for an explicit retirement decision
+on those branches.
