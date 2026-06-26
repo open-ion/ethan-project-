@@ -213,6 +213,20 @@ AGATHON LABS runs on an AI employee model. Each AI has a persona file at the rep
 
 Reading order: `AGENTS.md` → relevant persona file → root [`CLAUDE.md`](CLAUDE.md) → `docs/company/`.
 
+### Orchestration OS
+
+The operating layer (`src/orchestrator/`) lets Ethan analyze a request and
+auto-route it to the right AI employees, run a Guard quality gate, and report
+back — with execution backends that are swappable across Claude Code, Codex, and
+the OpenAI Agents SDK.
+
+```bash
+npm run orchestrate -- "競合を調査して、結果をスライドにデザインして、公開して"
+npm run test:orchestrator
+```
+
+Architecture and extension points: [`docs/orchestrator/architecture.md`](docs/orchestrator/architecture.md).
+
 ## Documentation
 
 - Product requirements: [`docs/product/requirements.md`](docs/product/requirements.md)
