@@ -235,8 +235,14 @@ CEO, COO, and Guard support Ethan. They are not above Ethan and do not report di
 
 AGATHON LABS v2.0 runs on an Ethan-centered command model. Ethan routes work through the Executive AI Council, Specialized AI Functions, Rules, Skills, RAG, Tools, and Workflows, then consolidates the final report for Ion.
 
-- **Constitution (single source of truth):** [`AGATHON_CONSTITUTION.md`](AGATHON_CONSTITUTION.md)
-- **Operational rules:** [`AGENTS.md`](AGENTS.md)
+**Governance layers:**
+
+| Layer | File | Purpose |
+| --- | --- | --- |
+| Constitution | [`AGATHON_CONSTITUTION.md`](AGATHON_CONSTITUTION.md) | Philosophy, authority, and command structure — highest priority |
+| Operational rules | [`AGENTS.md`](AGENTS.md) | How AI workers operate day-to-day |
+| Rules index | [`docs/rules/README.md`](docs/rules/README.md) | Concrete rules shared by all AI |
+
 - **CIO / Command Center:** [`ETHAN.md`](ETHAN.md)
 - **Executive Support AI:** [`CEO.md`](CEO.md) · [`COO.md`](COO.md)
 - **Specialized AI Functions:** [`NOVA.md`](NOVA.md) · [`ATLAS.md`](ATLAS.md) · [`SAGE.md`](SAGE.md) · [`ECHO.md`](ECHO.md) · [`FORGE.md`](FORGE.md) · [`VISION.md`](VISION.md) · [`FLOW.md`](FLOW.md) · [`GUARD.md`](GUARD.md) · [`PULSE.md`](PULSE.md)
@@ -280,6 +286,7 @@ AGATHON LABS の全 AI が必ず守る最高位の運用ルール。思想・権
 | [`role-creation-policy`](docs/rules/role-creation-policy.md) | 役職追加ルール。新役職はデフォルト禁止。仕組みで拡張する |
 | [`review-policy`](docs/rules/review-policy.md) | レビュー方針。通常は Ethan のみ。迷った場合は Guard を加える |
 | [`quality-gate`](docs/rules/quality-gate.md) | 品質保証。Guard は管理者ではなく Quality Gate / Risk Gate として機能する |
+| [`git-workflow`](docs/rules/git-workflow.md) | Git 運用。GitHub main を唯一の正本とし、全 AI が同じ状態から作業を開始する |
 
 Rules 全体の索引と依存関係: [`docs/rules/README.md`](docs/rules/README.md)
 

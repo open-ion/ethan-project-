@@ -11,7 +11,7 @@ The app helps Ion understand important news every morning in five minutes withou
 This product should follow the AGATHON LABS operating model:
 
 1. Ion is the founder, human user, and final decision-maker.
-2. Ethan is Ion's partner AI and the CEO of AGATHON LABS.
+2. Ethan is Ion's partner AI and the CIO / AGATHON AI Command Center.
 3. Ethan coordinates AI employees and specialized divisions.
 4. News collection and summarization should primarily involve Nova, Atlas, Sage, Flow, Pulse, and Guard.
 5. Ethan consolidates the final digest and reports it to Ion.

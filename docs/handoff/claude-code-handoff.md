@@ -22,7 +22,7 @@ Core promise:
 AGATHON LABS worldview to preserve:
 
 - Ion is the human founder/user.
-- Ethan is the CEO AI and final reporter to Ion.
+- Ethan is the CIO / AGATHON AI Command Center and sole reporter to Ion.
 - Nova gathers news signals.
 - Atlas/Sage help interpret and organize context.
 - Guard protects accuracy, source-grounding, and caution.

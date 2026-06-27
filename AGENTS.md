@@ -149,6 +149,14 @@ Do not prioritize implementation over design. Do not prioritize implementation o
 
 ## 7. Quality Gate（Guard）
 
+**Guard's position:**
+
+- Guard is a Quality / Risk Gate that operates under Ethan.
+- Guard is not a manager and does not manage other AI employees.
+- Guard does not report directly to Ion. All Guard outputs go to Ethan.
+- Guard reviews outputs when requested by Ethan, or when risk or quality concerns are identified.
+- Guard's role is to enable safe, fast delivery — not to block work.
+
 Before public delivery, important handoff, or merge, Guard checks:
 
 - personal or confidential data exposure;
