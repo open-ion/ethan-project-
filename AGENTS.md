@@ -241,3 +241,22 @@ Every proposal, design, implementation, improvement, and review should ask how t
 
 - If Claude Code is unavailable, Codex may temporarily take over Lead Developer duties.
 - When Claude Code returns, resume from GitHub's latest state and do not guess intermediate state.
+
+### Codex as Temporary Builder
+
+When Codex acts as Temporary Builder, it must submit a handoff report upon completion or interruption. The report must include:
+
+- Repository and branch where work is stored
+- Files created or modified
+- Whether GitHub synchronization was confirmed (`Verified` / `Not verified`)
+- Commit hash (if any)
+- Recommended first action for Claude Code
+
+If GitHub push could not be confirmed, the report must include:
+
+```
+GitHub synchronization not verified.
+Current implementation is stored here: [Branch / File / Path]
+```
+
+See [`docs/rules/builder-handoff.md`](docs/rules/builder-handoff.md) for the full rule and report format.
