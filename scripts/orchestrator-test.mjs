@@ -14,6 +14,8 @@ import {
   extractText,
   buildAgentPrompt,
   claudeCodeRuntime,
+  buildDailyBrief,
+  BRIEF_SECTIONS,
 } from '../src/orchestrator/index.js';
 
 let passed = 0;
@@ -129,6 +131,23 @@ check('callClaude throws when API key missing', noKeyCaught);
 // Availability gating (no flag / no key in test env → unavailable → falls back).
 const wasAvailable = await claudeCodeRuntime.isAvailable();
 check('claude-code unavailable without flag+key in test env', wasAvailable === false);
+
+// --- Daily AGATHON Brief (first production orchestrator task) ---
+check('every brief section maps to a real agent', BRIEF_SECTIONS.every((s) => s.owners.every((id) => getAgent(id))));
+const briefEmpty = buildDailyBrief({});
+check('buildDailyBrief renders a titled report', briefEmpty.startsWith('# Daily AGATHON Brief'));
+check('brief has all required sections', ['今日の優先事項', 'GitHub / Pages / app 進捗', 'AI社員ルーティング', 'Guard 注意点', 'Ionへの次の一手'].every((h) => briefEmpty.includes(h)));
+const briefFull = buildDailyBrief({
+  date: '2026-06-27', branch: 'work', latestCommit: 'abc123 test',
+  ledger: { file: 'docs/handoff/x.md', status: 'Ready for Review', nextSteps: ['監視を継続する'], blockers: ['None'] },
+  ci: { docsGovernance: 'success', updateNewsSchedule: 'monitoring' },
+  pages: { source: 'GitHub Actions' },
+});
+check('brief consumes ledger nextSteps', briefFull.includes('監視を継続する'));
+check('brief reports no-blocker state cleanly', briefFull.includes('ブロッカーなし'));
+check('brief shows branch + commit', briefFull.includes('`work` @ abc123 test'));
+const briefBlocked = buildDailyBrief({ ledger: { status: 'Blocked', blockers: ['Codex cannot push'] } });
+check('brief surfaces blockers under Guard', briefBlocked.includes('Codex cannot push') && briefBlocked.includes('未解消ブロッカー'));
 
 console.log(`\n${passed} passed, ${failed} failed`);
 if (failed > 0) process.exit(1);

@@ -9,6 +9,7 @@
 export { AGENTS, getAgent, routableAgents, orchestrator, qualityGate } from './agents.js';
 export { analyzeTask, heuristicReasoner, splitTask } from './analyzer.js';
 export { orchestrate, buildReport } from './orchestrator.js';
+export { buildDailyBrief, BRIEF_SECTIONS } from './dailyBrief.js';
 export {
   registerRuntime,
   getRuntime,
