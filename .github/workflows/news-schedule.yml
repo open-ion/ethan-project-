@@ -1,0 +1,20 @@
+name: Legacy News Brief workflow disabled
+
+# This repository now uses `.github/workflows/update-news.yml` for the Node/RSS/OpenAI
+# digest pipeline and GitHub Pages deployment. The previous Python/Anthropic workflow
+# referenced files that are not present in this app and published a different `apps/`
+# tree to gh-pages, which could overwrite the current /news and /dashboard routes.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  legacy-disabled:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain replacement workflow
+        run: |
+          echo "Legacy Python News Brief workflow is intentionally disabled."
+          echo "Run 'Update News Digest Data and Pages' instead."

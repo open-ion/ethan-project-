@@ -1,71 +1,400 @@
-# プロダクト要件 — News Brief（AGATHON LABS）
+# News Digest App Requirements
 
-> 作成: Ethan（イオンの相棒AI）／ 宛先: Ion
-> 本書は「毎朝開くニュースダイジェストアプリ」のMVP要件。Ethan が実装し Ion に報告する前提で書く。
+## 1. Product Decision
 
-> ⚠️ 補足（実装方針の明記）: 参照指示のあった `docs/company/CLAUDE.md` `docs/company/organization.md`
-> および本ファイルの旧版は、本リポジトリのどのブランチにも存在しなかった。よって会社設計書を
-> 勝手に捏造せず、ルート `CLAUDE.md`（イーサン＝イオンの相棒AI）の世界観を維持しつつ、
-> Ion から与えられた MVP 仕様を一次情報として本要件を新規作成した。会社設計書が後日提供されれば
-> 本要件をそれに整合させる。
+AGATHON LABS will build a personal AI news digest app as the next development target.
 
----
+The app helps Ion understand important news every morning in five minutes without needing to open a new application every day.
 
-## 0. 方針（最重要）— アプリ表示優先
+## 2. AGATHON LABS Context
 
-Email配信・LINE配信は**今回やらない**。まず「**Ion が毎朝アプリを開くだけで、5分で重要ニュースを
-把握できる**」体験を最優先する。配信は後段で再検討する。
+This product should follow the AGATHON LABS operating model:
 
-優先する体験：
-1. 朝アプリを開く
-2. 今日のニュースがカテゴリ別にまとまっている
-3. 5分で読める
-4. 気になったニュースだけ詳細リンクに飛べる
+1. Ion is the founder, human user, and final decision-maker.
+2. Ethan is Ion's partner AI and the CIO / AGATHON AI Command Center.
+3. Ethan coordinates AI employees and specialized divisions.
+4. News collection and summarization should primarily involve Nova, Atlas, Sage, Flow, Pulse, and Guard.
+5. Ethan consolidates the final digest and reports it to Ion.
 
-## 1. 目的
+The product should not exist to replace human judgment. It should expand Ion's ability to understand the world quickly and make better decisions.
 
-毎朝5分で重要ニュースを把握できる、Ion 専用の AI ニュースダイジェスト「アプリ画面」。
+## 3. Purpose
 
-## 2. MVP v0 スコープ
+Users should be able to understand the day's most important news in roughly five minutes each morning.
 
-| # | 要件 |
-|---|---|
-| 1 | アプリ画面（ダッシュボード）でニュースダイジェストを表示する |
-| 2 | 固定カテゴリ4つ：AI・テクノロジー / 投資・株式市場 / 医療・看護 / ビジネス・スタートアップ |
-| 3 | RSS または NewsAPI からニュースを取得（→ 実装計画で RSS を選定） |
-| 4 | AI（Claude）でニュースを要約 |
-| 5 | ダッシュボードに表示：今日の重要ニュース3〜5本／一言要約／なぜ重要か／忙しい人向けの結論／詳細リンク |
-| 6 | Ion 専用の単一ユーザー MVP |
+The product should emphasize:
 
-### 表示する1ニュースの構成
-- **見出し**（元記事タイトルを平易化）
-- **一言要約**（30秒で「何が起きたか」）
-- **なぜ重要か**（Ion視点での意味づけ）
-- **忙しい人向けの結論**（これだけ読めばOKの1行）
-- **詳細リンク**（元記事URL。必ず保持）
-- 出典（媒体名）
+- low-friction daily use;
+- reliable collection of important news;
+- concise AI summaries;
+- personalized categories;
+- delivery through channels users already check, especially LINE or Email.
 
-### 画面構成（体験設計）
-- 上部に「⭐ 今日の重要ニュース（3〜5本）」＝カテゴリ横断ハイライト（まず全体を5分で）
-- その下に**カテゴリ別セクション**（4カテゴリ。各カテゴリ数本）＝気になる分野を深掘り
-- カテゴリチップでジャンプ可能
-- スマホ最優先・明るく読みやすい
+## 4. Target User
 
-## 3. 今回作らないもの（Out of Scope）
-- Email配信 / LINE配信
-- 課金機能 / 複数ユーザー対応 / ログイン機能 / 管理画面
+### Initial Target
 
-## 4. データの扱い
-- 元記事URLは必ず保持する（詳細リンクで飛べること）。
-- MVP v0 の画面は**サンプルニュースデータ**で表示まで実装する。
-- 実ニュースの取得・AI要約は次段階（実装計画に含む）。生成結果はアプリが読む `data.json` を上書きする形にする。
+The first version is for individual personal use.
 
-## 5. 非機能・制約
-- 既存リポジトリ規約（`apps/<名前>/` に原本、`gh-pages` ミラー公開、既存アプリ無上書き）に従う。
-- 既存 `CLAUDE.md` / `README.md` / `docs/company` は削除・上書きしない。
-- まず小さく動くアプリ画面を優先（完璧さより「開けば読める」）。
-- AGATHON LABS の世界観（Ion＝創業者、Ethan＝相棒AI）を維持。
+Primary user profile:
 
-## 6. 成功条件（MVP v0 の完了定義）
-- `apps/dashboard/` をローカル/Pages で開くと、4カテゴリのダイジェストとトップ重要ニュースが
-  サンプルデータで表示され、各ニュースに一言要約・なぜ重要か・結論・詳細リンクが出ること。
+- busy professional;
+- wants important news but has limited time;
+- prefers summaries over opening multiple news apps;
+- wants categories matched to personal interests;
+- wants delivery in the morning without manual effort.
+
+### Future Target
+
+After the personal MVP, the product may expand into:
+
+- Premium personal users;
+- Pro users in specialized industries;
+- corporate teams that need shared news intelligence.
+
+## 5. MVP Scope
+
+The MVP should include the minimum set of features needed to validate a daily personalized AI news digest.
+
+### MVP Feature 1: Interest Category Selection
+
+Users can select their interest categories from the following list:
+
+- AI・テクノロジー
+- 投資・株式市場
+- 医療・看護
+- ビジネス・スタートアップ
+- 政治・経済
+- スポーツ
+- 物価・生活
+
+MVP behavior:
+
+- users can select multiple categories;
+- the Free plan should eventually be limited to three categories;
+- category choices should drive collection, ranking, and summary personalization.
+
+### MVP Feature 2: Scheduled Morning Collection
+
+The system automatically collects news every morning at the user's selected time.
+
+MVP behavior:
+
+- start with one configured delivery time for Ion;
+- later support per-user timezone and delivery settings;
+- collection should run without the user opening the app;
+- failures should be logged and visible to Ethan or the operator.
+
+### MVP Feature 3: AI Digest Format
+
+Ethan should report the daily digest to Ion using this structure:
+
+1. 今日の重要ニュース3〜5本
+2. それぞれ一言要約
+3. なぜ重要か
+4. 忙しい人向けの結論
+5. 詳細を読みたい人向けリンク
+
+Each news item should include:
+
+- title;
+- source;
+- category;
+- one-line summary;
+- why it matters;
+- takeaway for busy readers;
+- original article link.
+
+### MVP Feature 4: LINE or Email Delivery
+
+The digest should be delivered through LINE or Email.
+
+MVP recommendation:
+
+1. Start with Email because implementation and testing are usually simpler.
+2. Add LINE delivery after the digest content and scheduling flow are stable.
+
+Delivery requirements:
+
+- users should not need to open a new app every morning;
+- delivery should be concise and readable on mobile;
+- links should allow deeper reading when needed;
+- failed delivery should be recorded for troubleshooting.
+
+### MVP Feature 5: Personal Use First
+
+The first release should optimize for Ion and individual users, not teams.
+
+Do not overbuild enterprise features in the MVP. Design the data model so paid plans and organizations can be added later.
+
+## 6. User Experience
+
+### Core Experience
+
+1. User selects interest categories.
+2. User selects delivery channel and morning delivery time.
+3. Every morning, the system collects relevant news.
+4. AI summarizes and ranks the important items.
+5. Ethan sends the final digest to the user through LINE or Email.
+6. User reads the digest in about five minutes.
+7. User opens original links only when more detail is needed.
+
+### Product Feel
+
+The experience should feel like Ethan saying:
+
+> Ion, these are the things worth knowing today. Here is what happened, why it matters, and what you should take away.
+
+### Non-goals for MVP UX
+
+The MVP does not need:
+
+- a full social feed;
+- comments;
+- complex dashboards;
+- team workspaces;
+- advanced analytics;
+- native mobile apps.
+
+## 7. Screen Structure
+
+The MVP can be built with a small number of screens.
+
+### 7.1 Onboarding / Category Selection
+
+Purpose:
+
+- let the user select interest categories;
+- explain that the digest is delivered every morning.
+
+Fields:
+
+- selected categories;
+- preferred delivery time;
+- delivery channel;
+- Email address or LINE connection status.
+
+### 7.2 Settings
+
+Purpose:
+
+- allow the user to update categories, delivery time, and delivery channel.
+
+Fields:
+
+- categories;
+- delivery time;
+- timezone;
+- delivery channel;
+- plan status.
+
+### 7.3 Digest Preview
+
+Purpose:
+
+- show the latest generated digest inside the web app;
+- help test output before delivery automation is trusted.
+
+Content:
+
+- generated date;
+- selected categories;
+- top 3-5 stories;
+- source links;
+- delivery status.
+
+### 7.4 Admin / Operator View
+
+Purpose:
+
+- allow Ethan, Ion, or the operator to inspect scheduled jobs and failures.
+
+MVP content:
+
+- latest collection run;
+- latest summarization run;
+- latest delivery run;
+- errors and retry status.
+
+This can be minimal and private in the first version.
+
+## 8. Data Collection
+
+### Sources
+
+The product should collect news from:
+
+- NewsAPI;
+- major media RSS feeds;
+- category-specific sources added over time.
+
+### Collection Requirements
+
+- collect articles by category;
+- avoid duplicate stories where possible;
+- preserve original source links;
+- store source name, title, URL, published time, and raw description;
+- track collection time and source reliability.
+
+### Source Quality
+
+Guard and Nova should help define source quality rules over time:
+
+- prefer reputable sources;
+- avoid fabricated or low-quality sources;
+- preserve uncertainty when source confidence is low;
+- do not present unverified information as fact.
+
+## 9. AI Summarization
+
+### Summary Goals
+
+The AI should make news faster to understand, not distort it.
+
+Summaries must be:
+
+- concise;
+- accurate;
+- source-grounded;
+- easy to read on mobile;
+- clear about why the item matters.
+
+### Ranking Criteria
+
+The system should rank news using:
+
+- relevance to selected categories;
+- importance of the event;
+- source credibility;
+- novelty;
+- likely impact on the user;
+- diversity across categories.
+
+### Output Format
+
+Recommended digest format:
+
+```text
+おはよう、Ion。
+今日5分で押さえるべきニュースです。
+
+1. [Title]
+一言要約: ...
+なぜ重要か: ...
+忙しい人向けの結論: ...
+読む: [link]
+```
+
+### Safety and Accuracy
+
+The AI must:
+
+- avoid hallucinating details not present in source material;
+- include source links;
+- distinguish facts from interpretation;
+- avoid giving medical, financial, or legal advice as a definitive instruction;
+- treat medical and financial categories with extra caution.
+
+## 10. Delivery
+
+### Initial Channel Recommendation
+
+Start with Email for the MVP.
+
+Reasons:
+
+- easier to implement;
+- easier to test;
+- no need for LINE approval flow at the earliest stage;
+- works well for personal daily digests.
+
+### LINE Expansion
+
+LINE delivery should be added after Email delivery is stable.
+
+LINE-specific requirements:
+
+- message should be short enough for mobile chat reading;
+- links should be easy to tap;
+- user should be able to pause or adjust delivery later;
+- authentication and privacy should be handled carefully.
+
+## 11. Pricing Concept
+
+### Free
+
+- three categories;
+- summary only;
+- ads included.
+
+### Premium
+
+- monthly price: 980円;
+- all categories;
+- deeper explanations;
+- weekly report.
+
+### Pro
+
+- monthly price: 2,980円;
+- industry-specific news;
+- examples: medical, finance, IT;
+- deeper professional context.
+
+Pricing should not be implemented in the first MVP unless needed for validation.
+
+## 12. Future Expansion
+
+Potential later features:
+
+- weekly executive report;
+- saved articles;
+- read-later list;
+- keyword tracking;
+- company or stock watchlists;
+- medical and financial specialty modes;
+- team and corporate dashboards;
+- Slack, Teams, or Notion delivery;
+- user feedback buttons to improve personalization;
+- source reliability scoring.
+
+## 13. Suggested Division Responsibilities
+
+| Division | AI Employee | Responsibility |
+| --- | --- | --- |
+| News Division | Nova | Source monitoring, article collection, news relevance. |
+| Research Division | Atlas | Background context, source comparison, importance judgment. |
+| Knowledge Division | Sage | Clear explanations and category organization. |
+| Automation Division | Flow | Scheduled collection, summarization, and delivery workflows. |
+| Scheduling Division | Pulse | Morning delivery time, cadence, and reminders. |
+| Security Division | Guard | Privacy, source safety, delivery security, and risk review. |
+| Engineering Division | Forge | Application implementation and system reliability. |
+| Memory Division | Echo | User preferences, past digests, and personalization history. |
+| Design Division | Vision | Digest readability and mobile-first presentation. |
+
+## 14. Implementation Priority
+
+Recommended first three implementation steps:
+
+1. Build a single-user manual digest generator using fixed categories and sample RSS or NewsAPI data.
+2. Add AI summarization into the required digest format with source links.
+3. Add scheduled Email delivery for the morning digest.
+
+After those are stable, add onboarding, persistent user settings, LINE delivery, and pricing-plan restrictions.
+
+## 15. Open Questions for Claude Code
+
+Claude Code should decide or ask Ion about:
+
+1. Which stack to use for the MVP.
+2. Whether to start with NewsAPI, RSS, or both.
+3. Whether Email delivery should use Resend, SendGrid, SMTP, or another provider.
+4. Whether LINE delivery is required in the first deployable version or should follow Email.
+5. Whether the first version is single-user only for Ion or should include multi-user account support.
+6. Which categories are highest priority for the first digest test.
+
+## 16. Handoff Note
+
+This file is a product requirements document only. It intentionally does not implement application behavior.
+
+Claude Code should use this as the product baseline before creating app code, prompts, scheduled jobs, delivery integrations, or database schemas.

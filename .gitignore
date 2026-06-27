@@ -1,3 +1,10 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+.DS_Store
+npm-debug.log*
 # 生成物（毎回 digest.py / brief.py が生成。アプリ本体=シェルはコミット済み）
 apps/news/digest.json
 apps/news/briefings.json

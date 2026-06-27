@@ -1,0 +1,44 @@
+# Original file backups
+
+This directory keeps pre-change copies of important files before documentation integration work.
+
+- `CLAUDE.md.before-agathon-labs.md`: copy of repository-root `CLAUDE.md` before AGATHON LABS additions.
+- `README.md.before-news-digest.md`: copy of repository-root `README.md` before the news digest product requirements work.
+- `company-CLAUDE.md.before-news-digest.md`: copy of `docs/company/CLAUDE.md` before the news digest product requirements work.
+- `README.md.before-review-role-update.md`: copy of repository-root `README.md` before the Codex review-role and setup documentation update.
+- `README.md.before-working-mvp.md`: copy of repository-root `README.md` before adding the working static MVP app and real run commands.
+- `current-state.md.before-working-mvp.md`: copy of `docs/review/current-state.md` before updating the review snapshot for the working static MVP.
+- `README.md.before-codex-quality-role.md`: copy of repository-root `README.md` before clarifying Codex quality-role and smoke-test commands.
+- `package.json.before-codex-quality-role.json`: copy of `package.json` before adding the smoke test script.
+- `current-state.md.before-codex-quality-role.md`: copy of `docs/review/current-state.md` before clarifying Codex quality-role review guidance.
+- `README.md.before-rss-foundation.md`: copy of repository-root `README.md` before adding RSS/localStorage/Actions foundation notes.
+- `package.json.before-rss-foundation.json`: copy of `package.json` before adding RSS and summary scripts.
+- `build.mjs.before-rss-foundation.mjs`: copy of `scripts/build.mjs` before route-shell and 404 build output changes.
+- `dev-server.mjs.before-rss-foundation.mjs`: copy of `scripts/dev-server.mjs` before news/dashboard static route support changes.
+- `smoke-test.mjs.before-rss-foundation.mjs`: copy of `scripts/smoke-test.mjs` before generated data and build-output checks.
+- `app.js.before-rss-foundation.js`: copy of `src/app.js` before localStorage and generated news loading changes.
+- `index.html.before-rss-foundation.html`: copy of `src/index.html` before route-relative asset paths.
+- `current-state.md.before-rss-foundation.md`: copy of `docs/review/current-state.md` before RSS/localStorage/Actions status updates.
+- `README.md.before-openai-summary.md`: copy of repository-root `README.md` before prioritizing OpenAI summarization.
+- `current-state-short.before-openai-summary.md`: copy of `docs/current-state.md` before OpenAI summarization status updates.
+- `current-state-review.before-openai-summary.md`: copy of `docs/review/current-state.md` before OpenAI summarization status updates.
+- `summarize-news.mjs.before-openai-summary.mjs`: copy of `scripts/summarize-news.mjs` before real OpenAI API summarization path.
+- `env.example.before-openai-summary.txt`: copy of `.env.example` before OpenAI summary settings update.
+- `README.md.before-actions-pages-automation.md`: copy of repository-root `README.md` before full GitHub Pages automation updates.
+- `current-state-short.before-actions-pages-automation.md`: copy of `docs/current-state.md` before full GitHub Pages automation updates.
+- `current-state-review.before-actions-pages-automation.md`: copy of `docs/review/current-state.md` before full GitHub Pages automation updates.
+- `fetch-rss.mjs.before-actions-pages-automation.mjs`: copy of `scripts/fetch-rss.mjs` before retry/timeout/logging improvements.
+- `summarize-news.mjs.before-actions-pages-automation.mjs`: copy of `scripts/summarize-news.mjs` before summary metadata improvements.
+- `update-news.yml.before-actions-pages-automation.yml`: copy of `.github/workflows/update-news.yml` before Pages deploy automation.
+- `env.example.before-actions-pages-automation.txt`: copy of `.env.example` before RSS retry/timeout settings.
+- `README.md.before-rss-quality-tuning.md` — README before live RSS quality tuning.
+- `current-state-short.before-rss-quality-tuning.md` — short current-state before live RSS quality tuning.
+- `current-state-review.before-rss-quality-tuning.md` — review current-state before live RSS quality tuning.
+- `summarize-news.mjs.before-rss-quality-tuning.mjs` — summarizer before scoring/confidence tuning.
+- `rss-sources.mjs.before-rss-quality-tuning.mjs` — RSS sources before live source tuning.
+- `smoke-test.mjs.before-rss-quality-tuning.mjs` — smoke tests before RSS quality assertions.
+- `app.js.before-rss-quality-tuning.js` — app UI before confidence/importance metadata display.
+- `styles.css.before-rss-quality-tuning.css` — styles before trust metadata display.
+- `README.md.before-claude-code-handoff.md` — README before adding the Claude Code handoff link.
+- `current-state-short.before-claude-code-handoff.md` — short current-state before adding the Claude Code handoff note.
+- `current-state-review.before-claude-code-handoff.md` — review current-state snapshot before Claude Code handoff.
