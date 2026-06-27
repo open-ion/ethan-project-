@@ -2,6 +2,19 @@
 
 Use this file when Claude Code receives the instruction `resume` after a Codex handoff or usage-limit recovery.
 
+## One-Command Resume
+
+```bash
+npm run resume
+```
+
+This syncs `work` (fetch / checkout / pull --ff-only), finds and prints the
+latest Ledger's recovery panel (Repository, Branch, Latest Commit, Changed
+Files, Current Status, Blockers, Next Steps, Next Commands), and runs the docs
+governance check — so Claude Code is working again within seconds. Use
+`npm run resume -- --no-sync` to read local state without touching git. The
+rest of this file is the manual procedure the command automates.
+
 ## Goal
 
 Restore the full working context within 30 seconds using the AI Handoff Ledger, even when Codex could not push to GitHub.

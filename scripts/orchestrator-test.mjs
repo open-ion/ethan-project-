@@ -16,6 +16,9 @@ import {
   claudeCodeRuntime,
   buildDailyBrief,
   BRIEF_SECTIONS,
+  parseLedgerSummary,
+  extractSection,
+  recoveryField,
 } from '../src/orchestrator/index.js';
 
 let passed = 0;
@@ -148,6 +151,42 @@ check('brief reports no-blocker state cleanly', briefFull.includes('ブロッカ
 check('brief shows branch + commit', briefFull.includes('`work` @ abc123 test'));
 const briefBlocked = buildDailyBrief({ ledger: { status: 'Blocked', blockers: ['Codex cannot push'] } });
 check('brief surfaces blockers under Guard', briefBlocked.includes('Codex cannot push') && briefBlocked.includes('未解消ブロッカー'));
+
+// --- Ledger parser (powers `resume` and the Daily Brief) ---
+const sampleLedger = [
+  '# AI Handoff Ledger',
+  '# Recovery',
+  'Repository: https://github.com/open-ion/ethan-project-',
+  'Branch: work',
+  'Latest Commit: abc123 do thing',
+  'Changed Files: a.md; b.md',
+  'Tests: npm test passed',
+  'Current Status: Ready for Review',
+  'Blockers: Codex cannot push',
+  'Exactly What Claude Code Should Do Next: read ledger then reflect',
+  'Ready For GitHub Push: No',
+  '',
+  '## Current Status',
+  'Ready for Review',
+  '## Blockers',
+  '- Codex cannot push',
+  '## Next Steps',
+  '1. Read the ledger.',
+  '2. Reflect surgically.',
+  '## Next Commands',
+  '```bash',
+  'git fetch origin',
+  'git push',
+  '```',
+].join('\n');
+const sum = parseLedgerSummary(sampleLedger);
+check('parseLedgerSummary reads status', sum.status === 'Ready for Review');
+check('parseLedgerSummary reads blockers', sum.blockers[0] === 'Codex cannot push');
+check('parseLedgerSummary reads next steps', sum.nextSteps.length === 2 && sum.nextSteps[0] === 'Read the ledger.');
+check('parseLedgerSummary reads next commands block', sum.nextCommands.includes('git push'));
+check('parseLedgerSummary reads recovery fields', sum.recovery.Branch === 'work' && sum.recovery['Ready For GitHub Push'] === 'No');
+check('extractSection isolates a section', extractSection(sampleLedger, 'Current Status') === 'Ready for Review');
+check('recoveryField reads a labelled line', recoveryField(sampleLedger, 'Latest Commit') === 'abc123 do thing');
 
 console.log(`\n${passed} passed, ${failed} failed`);
 if (failed > 0) process.exit(1);

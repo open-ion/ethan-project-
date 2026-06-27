@@ -11,6 +11,7 @@
     "test:orchestrator": "node scripts/orchestrator-test.mjs",
     "orchestrate": "node scripts/orchestrate.mjs",
     "brief": "node scripts/daily-brief.mjs",
+    "resume": "node scripts/resume.mjs",
     "fetch:rss": "node scripts/fetch-rss.mjs",
     "summarize": "node scripts/summarize-news.mjs",
     "check:docs-governance": "node scripts/check-docs-governance.mjs",

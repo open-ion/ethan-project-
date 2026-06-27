@@ -12,6 +12,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { buildDailyBrief } from '../src/orchestrator/dailyBrief.js';
+import { parseLedgerSummary } from '../src/orchestrator/ledger.js';
 
 const exec = promisify(execFile);
 const args = process.argv.slice(2);
@@ -26,29 +27,6 @@ async function git(cmdArgs, fallback = '') {
   }
 }
 
-/** Extract the body lines of a "## Heading" section from markdown. */
-function section(content, heading) {
-  const esc = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const headRe = new RegExp(`^##\\s+${esc}\\s*$`);
-  const lines = content.split('\n');
-  const start = lines.findIndex((l) => headRe.test(l));
-  if (start === -1) return '';
-  const body = [];
-  for (let i = start + 1; i < lines.length; i += 1) {
-    if (/^##\s+/.test(lines[i])) break;
-    body.push(lines[i]);
-  }
-  return body.join('\n').trim();
-}
-
-/** Pull list items ("- x" or "1. x") from a section body. */
-function listItems(body) {
-  return body
-    .split('\n')
-    .map((l) => l.replace(/^\s*(?:[-*]|\d+\.)\s+/, '').trim())
-    .filter((l) => l.length > 0 && !l.startsWith('```'));
-}
-
 async function loadLatestLedger() {
   const dir = 'docs/handoff';
   let files;
@@ -57,23 +35,12 @@ async function loadLatestLedger() {
   } catch {
     return {};
   }
-  const ledgers = files
+  const latest = files
     .filter((f) => /^\d{4}-\d{2}-\d{2}-\d{4}-[a-z0-9-]+\.md$/.test(f))
-    .sort();
-  const latest = ledgers.at(-1);
+    .sort()
+    .at(-1);
   if (!latest) return {};
-  const content = await readFile(`${dir}/${latest}`, 'utf8');
-
-  const statusBody = section(content, 'Current Status');
-  const status = statusBody.split('\n')[0]?.trim() || '';
-  const nextSteps = listItems(section(content, 'Next Steps')).slice(0, 6);
-  let blockers = listItems(section(content, 'Blockers'));
-  // Recovery field fallback: "Blockers: ..."
-  if (blockers.length === 0) {
-    const line = content.split('\n').find((l) => l.startsWith('Blockers:'));
-    const v = line?.slice('Blockers:'.length).trim();
-    if (v && !/^none$/i.test(v)) blockers = [v];
-  }
+  const { status, nextSteps, blockers } = parseLedgerSummary(await readFile(`${dir}/${latest}`, 'utf8'));
   return { file: `${dir}/${latest}`, status, nextSteps, blockers };
 }
 
