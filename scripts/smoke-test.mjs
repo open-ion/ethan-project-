@@ -71,12 +71,21 @@ assert(appSource.includes('getRankedNewsItems'), 'importanceScore ranking is mis
 assert(appSource.includes('AI Confidence'), 'confidence display is missing');
 assert(appSource.includes('confidenceReason'), 'confidence reason display is missing');
 
-assert(appSource.includes('AI自動音声受付デモ'), 'Voice reception demo route is missing');
+assert(appSource.includes('Product Prototype'), 'Voice reception demo route is missing');
 assert(appSource.includes('VOICE_RECEPTION_STORAGE_KEY'), 'Voice reception storage key is missing');
 assert(appSource.includes('SpeechRecognition'), 'Web Speech API microphone path is missing');
 assert(appSource.includes('extractReservation'), 'Reservation extraction logic is missing');
 assert(appSource.includes('営業・ご提案'), 'Sales-call handling copy is missing');
-assert(appSource.includes('予約・会話ログ管理'), 'Voice admin screen is missing');
+assert(appSource.includes('AI受付 管理画面'), 'Voice admin screen is missing');
+
+assert(appSource.includes('VOICE_STORE_SETTINGS_KEY'), 'Store settings storage key is missing');
+assert(appSource.includes('buildVoiceReply'), 'Voice conversation flow is missing');
+assert(appSource.includes('needs_confirmation'), 'Reservation confirmation stage is missing');
+assert(appSource.includes('仮予約を受付しました'), 'Reservation completion message is missing');
+assert(appSource.includes('営業電話ログ'), 'Sales-call admin log is missing');
+assert(appSource.includes('店舗設定'), 'Store settings admin UI is missing');
+assert(appSource.includes('data-confirm-record'), 'Admin confirmation action is missing');
+
 
 
 const htmlSource = await readFile('src/index.html', 'utf8');
@@ -98,6 +107,8 @@ assert(cssSource.includes('widget-card'), 'Widget card styling is missing');
 assert(cssSource.includes('idea-input'), 'One-idea input styling is missing');
 assert(cssSource.includes('voice-grid'), 'Voice reception grid styling is missing');
 assert(cssSource.includes('admin-row'), 'Voice admin row styling is missing');
+assert(cssSource.includes('status-badge'), 'Admin reservation status styling is missing');
+assert(cssSource.includes('settings-form'), 'Store settings form styling is missing');
 
 
 const updateWorkflowSource = await readFile('.github/workflows/update-news.yml', 'utf8');
