@@ -1,0 +1,162 @@
+{
+  "date": "2026-06-25",
+  "date_label": "6月25日(木)",
+  "generated_at": "2026-06-25T07:00:00+09:00",
+  "is_sample": true,
+  "top_picks": [
+    {
+      "key": "ai_tech", "label": "AI・テクノロジー", "emoji": "🤖",
+      "headline": "新世代AIモデルが公開、長時間の自律作業で精度向上",
+      "one_line": "1回の指示で数十分の作業をこなす新しいAIモデルが発表された。",
+      "why": "エージェント型AIの実用度が上がると、調査・開発・事務の自動化が一段進む。AGATHON LABSの自動化方針に直結。",
+      "bottom_line": "自律作業の質が上がった。試す価値あり。",
+      "url": "https://example.com/ai-new-model",
+      "source": "Tech媒体（サンプル）"
+    },
+    {
+      "key": "investing", "label": "投資・株式市場", "emoji": "📈",
+      "headline": "日経平均が3日続伸、半導体関連が相場をけん引",
+      "one_line": "米株高を受け、半導体関連を中心に買いが優勢で3日続伸。",
+      "why": "長期積立の評価額に影響。短期の上下に動じず積立継続が基本方針。",
+      "bottom_line": "上げ相場でも淡々と積立を続ける。",
+      "url": "https://example.com/nikkei-up",
+      "source": "経済媒体（サンプル）"
+    },
+    {
+      "key": "medical", "label": "医療・看護", "emoji": "🩺",
+      "headline": "新しい認知症治療薬、国内で承認の見通し",
+      "one_line": "進行を抑えるタイプの新薬が国内承認される見通しとなった。",
+      "why": "対象患者や費用負担が今後の論点。家族の介護・医療費の判断材料になる。",
+      "bottom_line": "選択肢が増える。費用と対象は要確認。",
+      "url": "https://example.com/dementia-drug",
+      "source": "医療媒体（サンプル）"
+    },
+    {
+      "key": "business", "label": "ビジネス・スタートアップ", "emoji": "🚀",
+      "headline": "国内スタートアップ、AI業務自動化で大型資金調達",
+      "one_line": "中小企業向けAI業務自動化のスタートアップが大型調達を実施。",
+      "why": "同領域の競争と相場感がわかる。AGATHON LABSの立ち位置の参考に。",
+      "bottom_line": "AI×業務自動化に資金が集まっている。",
+      "url": "https://example.com/startup-funding",
+      "source": "ビジネス媒体（サンプル）"
+    }
+  ],
+  "categories": [
+    {
+      "key": "ai_tech", "label": "AI・テクノロジー", "emoji": "🤖",
+      "items": [
+        {
+          "headline": "新世代AIモデルが公開、長時間の自律作業で精度向上",
+          "one_line": "1回の指示で数十分の作業をこなす新しいAIモデルが発表された。",
+          "why": "エージェント型AIの実用度が上がると、調査・開発・事務の自動化が一段進む。",
+          "bottom_line": "自律作業の質が上がった。試す価値あり。",
+          "url": "https://example.com/ai-new-model",
+          "source": "Tech媒体（サンプル）"
+        },
+        {
+          "headline": "半導体大手、次世代チップの量産計画を前倒し",
+          "one_line": "AI需要を背景に、次世代チップの量産時期を前倒しすると発表。",
+          "why": "AIインフラの供給と価格に波及。関連株や電気代にも間接影響。",
+          "bottom_line": "AI向け半導体の増産が続く。",
+          "url": "https://example.com/semiconductor",
+          "source": "Tech媒体（サンプル）"
+        },
+        {
+          "headline": "個人開発者向けの新しいAIコーディング支援が話題",
+          "one_line": "コードをまるごと任せられるAI支援ツールが開発者の間で注目。",
+          "why": "少人数での開発速度が上がる。MVPを速く回す追い風。",
+          "bottom_line": "小さく速く作る環境が整ってきた。",
+          "url": "https://example.com/ai-coding",
+          "source": "Tech媒体（サンプル）"
+        }
+      ]
+    },
+    {
+      "key": "investing", "label": "投資・株式市場", "emoji": "📈",
+      "items": [
+        {
+          "headline": "日経平均が3日続伸、半導体関連が相場をけん引",
+          "one_line": "米株高を受け、半導体関連を中心に買いが優勢で3日続伸。",
+          "why": "長期積立の評価額に影響。短期の上下に動じない方針が基本。",
+          "bottom_line": "上げ相場でも淡々と積立を続ける。",
+          "url": "https://example.com/nikkei-up",
+          "source": "経済媒体（サンプル）"
+        },
+        {
+          "headline": "大手銀行が定期預金の金利を引き上げ",
+          "one_line": "政策金利の変化を背景に、大手銀行が定期預金金利を引き上げ。",
+          "why": "現金の置き場所の選択肢が増える。防衛資金の置き方を見直す材料。",
+          "bottom_line": "預金金利が少し改善。条件を確認。",
+          "url": "https://example.com/deposit-rate",
+          "source": "経済媒体（サンプル）"
+        },
+        {
+          "headline": "新NISAの積立額、過去最高ペースとの調査",
+          "one_line": "新NISAの積立利用が過去最高ペースで伸びているとの調査結果。",
+          "why": "長期・分散・低コストの王道が広がっている裏付け。方針は正しい。",
+          "bottom_line": "オルカン積立の方向性は継続でOK。",
+          "url": "https://example.com/nisa",
+          "source": "経済媒体（サンプル）"
+        }
+      ]
+    },
+    {
+      "key": "medical", "label": "医療・看護", "emoji": "🩺",
+      "items": [
+        {
+          "headline": "新しい認知症治療薬、国内で承認の見通し",
+          "one_line": "進行を抑えるタイプの新薬が国内承認される見通しとなった。",
+          "why": "対象患者や費用負担が論点。家族の介護・医療費の判断材料に。",
+          "bottom_line": "選択肢が増える。費用と対象は要確認。",
+          "url": "https://example.com/dementia-drug",
+          "source": "医療媒体（サンプル）"
+        },
+        {
+          "headline": "夏の熱中症、救急搬送が前年を上回るペース",
+          "one_line": "気温の高い日が続き、熱中症の救急搬送が前年超のペース。",
+          "why": "身近な健康リスク。こまめな水分・塩分補給の徹底が必要。",
+          "bottom_line": "暑さ対策を今日から徹底。",
+          "url": "https://example.com/heatstroke",
+          "source": "医療媒体（サンプル）"
+        },
+        {
+          "headline": "看護現場の業務支援にAI導入の動き広がる",
+          "one_line": "記録や引き継ぎの効率化に、看護現場でAI活用が広がりつつある。",
+          "why": "医療・看護の人手不足対策。現場の負担軽減の方向性が見える。",
+          "bottom_line": "看護×AIで省力化が進む。",
+          "url": "https://example.com/nursing-ai",
+          "source": "医療媒体（サンプル）"
+        }
+      ]
+    },
+    {
+      "key": "business", "label": "ビジネス・スタートアップ", "emoji": "🚀",
+      "items": [
+        {
+          "headline": "国内スタートアップ、AI業務自動化で大型資金調達",
+          "one_line": "中小企業向けAI業務自動化のスタートアップが大型調達を実施。",
+          "why": "同領域の競争と相場感がわかる。AGATHON LABSの参考に。",
+          "bottom_line": "AI×業務自動化に資金が集まっている。",
+          "url": "https://example.com/startup-funding",
+          "source": "ビジネス媒体（サンプル）"
+        },
+        {
+          "headline": "個人事業の開業数が増加、副業からの独立が後押し",
+          "one_line": "副業からの独立を背景に、個人事業の開業が増えているとの統計。",
+          "why": "一人ビジネスの追い風。小さく始めて育てる流れが主流に。",
+          "bottom_line": "小さく始める起業が増えている。",
+          "url": "https://example.com/solo-business",
+          "source": "ビジネス媒体（サンプル）"
+        },
+        {
+          "headline": "新しいノーコード基盤、非エンジニアの内製化を加速",
+          "one_line": "業務アプリを自作できるノーコード基盤が企業の内製化を後押し。",
+          "why": "外注に頼らず仕組みを作れる。自動化の内製化と相性が良い。",
+          "bottom_line": "自分たちで作る選択肢が広がる。",
+          "url": "https://example.com/nocode",
+          "source": "ビジネス媒体（サンプル）"
+        }
+      ]
+    }
+  ]
+}

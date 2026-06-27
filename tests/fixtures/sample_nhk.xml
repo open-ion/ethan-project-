@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+  <channel>
+    <title>NHKニュース 経済</title>
+    <link>https://www3.nhk.or.jp/news/</link>
+    <description>NHKニュース 経済</description>
+    <language>ja</language>
+    <pubDate>Tue, 23 Jun 2026 09:00:00 +0900</pubDate>
+    <item>
+      <title>消費者物価指数 前年同月比2.8%上昇 食品の値上げ続く</title>
+      <link>https://www3.nhk.or.jp/news/html/20260623/k0001.html</link>
+      <guid isPermaLink="false">k0001</guid>
+      <pubDate>Tue, 23 Jun 2026 08:30:00 +0900</pubDate>
+      <description>総務省が発表した5月の消費者物価指数は、生鮮食品を除く指数が前年同月比で2.8%上昇しました。食品の値上げが家計を圧迫しています。</description>
+    </item>
+    <item>
+      <title>日銀 金融政策決定会合で利上げを議論</title>
+      <link>https://www3.nhk.or.jp/news/html/20260623/k0002.html</link>
+      <guid isPermaLink="false">k0002</guid>
+      <pubDate>Tue, 23 Jun 2026 07:15:00 +0900</pubDate>
+      <description>日銀は金融政策決定会合を開き、追加の利上げについて議論を行いました。円安の進行も背景にあります。</description>
+    </item>
+    <item>
+      <title>大手企業の決算 増益が相次ぐ</title>
+      <link>https://www3.nhk.or.jp/news/html/20260623/k0003.html</link>
+      <guid isPermaLink="false">k0003</guid>
+      <pubDate>Tue, 23 Jun 2026 06:00:00 +0900</pubDate>
+      <description>大手メーカーの決算発表が続いており、多くの企業で<b>増益</b>となりました。</description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,25 @@
+{
+  "genres": ["trend", "politics", "economy", "prices", "medical", "sports", "world"],
+  "max_items_per_genre": 5,
+  "summarize": {
+    "enabled": true,
+    "model": "claude-haiku-4-5",
+    "max_items_to_summarize": 5
+  },
+  "deliver": {
+    "line": {
+      "enabled": true,
+      "max_headlines_per_genre": 1,
+      "news_at": "07:00"
+    }
+  },
+  "schedule": {
+    "slots": ["07:00", "14:00", "21:00"]
+  },
+  "output": {
+    "dir": "apps/news",
+    "title": "News Brief",
+    "timezone": "Asia/Tokyo",
+    "site_url": ""
+  }
+}
