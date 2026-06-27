@@ -25,12 +25,11 @@ SmartNewsはニュース・クーポン・ポイント・広告・エンタメ�
 
 ## Worldview
 
-- **Ion** is the Owner and Final Human Decision Maker.
-- **Ethan** is Ion's right hand, co-operator, partner, sole interface, and the CIO / Chief Intelligence Officer / AGATHON AI Command Center.
-- CEO and COO are Executive Support AIs that support Ethan; they are not above Ethan and do not report directly to Ion.
-- All AI officers, AI employees, sub-agents, Rules, Skills, RAG, Tools, and Workflows route through Ethan.
-- Only Ethan reports the final outcome to Ion.
-- Constitution: [`AGATHON_CONSTITUTION.md`](AGATHON_CONSTITUTION.md).
+- **Ion** is the user, human, and founder.
+- **Ethan** is Ion's partner AI and the CEO of AGATHON LABS.
+- Ethan oversees all AI employees.
+- AI employees work as specialized divisions.
+- Ethan consolidates their work and reports the final outcome to Ion.
 
 ## Current Product
 
@@ -205,47 +204,39 @@ AGATHON LABS exists to expand human possibility through accurate, useful, and hu
 
 ## Organization
 
-- **Owner / Final Human Decision Maker:** Ion (Human)
-- **CIO / AGATHON AI Command Center:** Ethan (Chief Intelligence Officer AI)
+- **Founder:** Ion (Human)
+- **CEO:** Ethan (Chief Executive AI)
 
-### Executive AI Council
+### AI Employees
 
-| Executive Support | Function |
+| AI Employee | Division |
 | --- | --- |
-| CEO | Strategy review, priority review, and management consultation for Ethan. |
-| COO | Task decomposition, operations management, execution support, and bottleneck detection for Ethan. |
-| Guard | Quality, security, privacy, accuracy, and risk gate. |
+| Nova | News Division |
+| Forge | Engineering Division |
+| Atlas | Research Division |
+| Flow | Automation Division |
+| Echo | Memory Division |
+| Sage | Knowledge Division |
+| Vision | Design Division |
+| Guard | Security Division |
+| Pulse | Scheduling Division |
 
-CEO, COO, and Guard support Ethan. They are not above Ethan and do not report directly to Ion.
+## AI Workforce Framework
 
-### Specialized AI Functions
+AGATHON LABS runs on an AI employee model. Each AI has a persona file at the repository root defining its Role, Personality, Mission, Responsibilities, Authority, Collaboration Rules, I/O, Do/Don't, Escalation, and Example Behavior. Any AI (Claude Code / Codex) reads these to behave consistently.
 
-| Specialized Function | Domain |
-| --- | --- |
-| Nova | News intelligence |
-| Forge | Engineering |
-| Atlas | Research intelligence |
-| Flow | Automation |
-| Echo | Memory and context |
-| Sage | Knowledge structuring |
-| Vision | Design |
-| Pulse | Scheduling |
+- **Constitution (top priority):** [`AGENTS.md`](AGENTS.md)
+- **CEO:** [`ETHAN.md`](ETHAN.md)
+- **AI employees:** [`NOVA.md`](NOVA.md) · [`ATLAS.md`](ATLAS.md) · [`SAGE.md`](SAGE.md) · [`ECHO.md`](ECHO.md) · [`FORGE.md`](FORGE.md) · [`VISION.md`](VISION.md) · [`FLOW.md`](FLOW.md) · [`GUARD.md`](GUARD.md) · [`PULSE.md`](PULSE.md)
 
-## AGATHON AI Operating Framework
-
-AGATHON LABS v2.0 runs on an Ethan-centered command model. Ethan routes work through the Executive AI Council, Specialized AI Functions, Rules, Skills, RAG, Tools, and Workflows, then consolidates the final report for Ion.
-
-- **Constitution (single source of truth):** [`AGATHON_CONSTITUTION.md`](AGATHON_CONSTITUTION.md)
-- **Operational rules:** [`AGENTS.md`](AGENTS.md)
-- **CIO / Command Center:** [`ETHAN.md`](ETHAN.md)
-- **Executive Support AI:** [`CEO.md`](CEO.md) · [`COO.md`](COO.md)
-- **Specialized AI Functions:** [`NOVA.md`](NOVA.md) · [`ATLAS.md`](ATLAS.md) · [`SAGE.md`](SAGE.md) · [`ECHO.md`](ECHO.md) · [`FORGE.md`](FORGE.md) · [`VISION.md`](VISION.md) · [`FLOW.md`](FLOW.md) · [`GUARD.md`](GUARD.md) · [`PULSE.md`](PULSE.md)
-
-Reading order: `AGATHON_CONSTITUTION.md` → `AGENTS.md` → relevant role/persona file → root [`CLAUDE.md`](CLAUDE.md) → `docs/company/`.
+Reading order: `AGENTS.md` → relevant persona file → root [`CLAUDE.md`](CLAUDE.md) → `docs/company/`.
 
 ### Orchestration OS
 
-The operating layer (`src/orchestrator/`) lets Ethan analyze a request, route it to the right support role or specialized function, run a Guard quality gate, and report back — with execution backends that are swappable across Claude Code, Codex, and the OpenAI Agents SDK.
+The operating layer (`src/orchestrator/`) lets Ethan analyze a request and
+auto-route it to the right AI employees, run a Guard quality gate, and report
+back — with execution backends that are swappable across Claude Code, Codex, and
+the OpenAI Agents SDK.
 
 ```bash
 npm run orchestrate -- "競合を調査して、結果をスライドにデザインして、公開して"
