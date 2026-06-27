@@ -330,6 +330,19 @@ RAG は AI が回答・判断・要約を生成する際に参照する構造化
 
 RAG 全体の索引: [`docs/rag/README.md`](docs/rag/README.md)
 
+## Tools / Integrations
+
+Tools は AI 社員が呼び出せる外部サービス・API 定義。役職を増やさずに機能を拡張する。
+
+| Tool | 概要 | Status |
+| --- | --- | --- |
+| [`openai`](docs/tools/openai.md) | AI 要約・自然言語生成 | 実装済み |
+| [`rss`](docs/tools/rss.md) | ニュース記事収集 | 実装済み |
+| [`email`](docs/tools/email.md) | 朝のダイジェスト Email 配信（Resend） | 未実装 |
+| [`line`](docs/tools/line.md) | LINE へのダイジェスト配信 | 未実装 |
+
+Tools 全体の索引: [`docs/tools/README.md`](docs/tools/README.md)
+
 ## Documentation
 
 - Product requirements: [`docs/product/requirements.md`](docs/product/requirements.md)
