@@ -1,6 +1,6 @@
 import { cp, mkdir, rm } from 'node:fs/promises';
 
-const routeDirs = ['news', 'dashboard'];
+const routeDirs = ['news', 'dashboard', 'voice-reception', 'admin', 'moneyclip'];
 const shellFiles = ['index.html', 'app.js', 'data.js', 'styles.css'];
 
 await rm('dist', { force: true, recursive: true });

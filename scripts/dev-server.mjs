@@ -13,7 +13,8 @@ const contentTypes = {
   '.json': 'application/json; charset=utf-8'
 };
 
-const nestedAssetPattern = /^\/(news|dashboard)\/(app\.js|data\.js|styles\.css|generated\/news\.json)$/;
+const routePattern = '(news|dashboard|voice-reception|admin|moneyclip)';
+const nestedAssetPattern = new RegExp(`^/${routePattern}/(app\\.js|data\\.js|styles\\.css|generated/news\\.json|sw\\.js)$`);
 
 function safePath(urlPath) {
   const normalized = normalize(urlPath).replace(/^\.\.(\/|\\|$)/, '');
@@ -25,7 +26,7 @@ function resolveStaticPath(pathname) {
   if (nestedAsset) {
     return useDist ? safePath(pathname.slice(1)) : join(root, nestedAsset[2]);
   }
-  if (pathname === '/' || pathname === '/news/' || pathname === '/dashboard/' || pathname.startsWith('/news/')) {
+  if (pathname === '/' || pathname === '/news/' || pathname === '/dashboard/' || pathname === '/voice-reception' || pathname === '/voice-reception/' || pathname === '/admin' || pathname === '/admin/' || pathname.startsWith('/news/')) {
     return join(root, 'index.html');
   }
   return safePath(pathname.slice(1));
