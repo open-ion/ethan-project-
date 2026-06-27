@@ -71,6 +71,14 @@ assert(appSource.includes('getRankedNewsItems'), 'importanceScore ranking is mis
 assert(appSource.includes('AI Confidence'), 'confidence display is missing');
 assert(appSource.includes('confidenceReason'), 'confidence reason display is missing');
 
+assert(appSource.includes('AI自動音声受付デモ'), 'Voice reception demo route is missing');
+assert(appSource.includes('VOICE_RECEPTION_STORAGE_KEY'), 'Voice reception storage key is missing');
+assert(appSource.includes('SpeechRecognition'), 'Web Speech API microphone path is missing');
+assert(appSource.includes('extractReservation'), 'Reservation extraction logic is missing');
+assert(appSource.includes('営業・ご提案'), 'Sales-call handling copy is missing');
+assert(appSource.includes('予約・会話ログ管理'), 'Voice admin screen is missing');
+
+
 const htmlSource = await readFile('src/index.html', 'utf8');
 assert(htmlSource.includes('<meta name="viewport"'), 'Viewport meta tag is missing');
 assert(htmlSource.includes('あなた専用AI朝ダッシュボード'), 'AI morning dashboard framing is missing from index.html');
@@ -88,6 +96,8 @@ assert(cssSource.includes('preset-card'), 'Preset card styling is missing');
 assert(cssSource.includes('widget-grid'), 'Dashboard widget grid styling is missing');
 assert(cssSource.includes('widget-card'), 'Widget card styling is missing');
 assert(cssSource.includes('idea-input'), 'One-idea input styling is missing');
+assert(cssSource.includes('voice-grid'), 'Voice reception grid styling is missing');
+assert(cssSource.includes('admin-row'), 'Voice admin row styling is missing');
 
 
 const updateWorkflowSource = await readFile('.github/workflows/update-news.yml', 'utf8');
@@ -101,7 +111,7 @@ const legacyWorkflowSource = await readFile('.github/workflows/news-schedule.yml
 assert(!legacyWorkflowSource.includes('cron:'), 'Legacy workflow must not run on a schedule');
 assert(legacyWorkflowSource.includes('Legacy Python News Brief workflow is intentionally disabled.'), 'Legacy workflow should explain that it is disabled');
 
-for (const file of ['dist/index.html', 'dist/404.html', 'dist/news/index.html', 'dist/news/app.js', 'dist/news/generated/news.json', 'dist/dashboard/index.html', 'dist/moneyclip/index.html', 'dist/moneyclip/app.js', 'dist/moneyclip/sw.js']) {
+for (const file of ['dist/index.html', 'dist/404.html', 'dist/news/index.html', 'dist/news/app.js', 'dist/news/generated/news.json', 'dist/dashboard/index.html', 'dist/voice-reception/index.html', 'dist/admin/index.html', 'dist/moneyclip/index.html', 'dist/moneyclip/app.js', 'dist/moneyclip/sw.js']) {
   try {
     await access(file);
   } catch (error) {
@@ -113,3 +123,13 @@ console.log('Smoke checks passed:', {
   categories: categories.length,
   newsItems: newsItems.length
 });
+
+const readmeSource = await readFile('README.md', 'utf8');
+assert(readmeSource.includes('AGATHON Voice Reception MVP'), 'README voice reception section is missing');
+assert(readmeSource.includes('http://localhost:3000/voice-reception'), 'README voice reception route is missing');
+
+const handoffSource = await readFile('AI_HANDOFF_LEDGER.md', 'utf8');
+assert(handoffSource.includes('AI自動音声受付Web MVP'), 'Handoff ledger voice MVP entry is missing');
+
+const roadmapSource = await readFile('docs/product/voice-reception-roadmap.md', 'utf8');
+assert(roadmapSource.includes('商品化ロードマップ'), 'Voice reception roadmap is missing');

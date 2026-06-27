@@ -11,6 +11,105 @@ import {
 const app = document.querySelector('#app');
 const CATEGORY_STORAGE_KEY = 'agathon-news-selected-categories';
 const USER_SETTINGS_KEY = 'ethan-user-settings';
+
+const VOICE_RECEPTION_STORAGE_KEY = 'agathon-voice-reception-records';
+const storeProfile = {
+  name: 'AGATHON Cafe Demo',
+  hours: '営業時間は平日11:00〜22:00、土日祝10:00〜21:00です。',
+  closed: '定休日は毎週火曜日です。祝日の場合は翌営業日に振り替えます。',
+  access: 'アクセスは駅東口から徒歩5分、サンプル通り沿いです。',
+  parking: '駐車場は店舗裏に3台分あります。満車の場合は近隣コインパーキングをご利用ください。'
+};
+
+function loadVoiceRecords() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(VOICE_RECEPTION_STORAGE_KEY) || '[]');
+    return Array.isArray(saved) ? saved : [];
+  } catch (error) {
+    console.warn('Failed to load voice reception records', error);
+    return [];
+  }
+}
+
+function saveVoiceRecord(record) {
+  const records = [record, ...loadVoiceRecords()].slice(0, 100);
+  localStorage.setItem(VOICE_RECEPTION_STORAGE_KEY, JSON.stringify(records));
+  return records;
+}
+
+function classifyIntent(text) {
+  if (/営業|提案|広告|集客|媒体|取材|代理店|サービス紹介|セールス|売り込み/.test(text)) return 'sales';
+  if (/予約|席|名|人数|伺|行き|空いて|空席|来店/.test(text)) return 'reservation';
+  if (/営業時間|何時|定休日|休み|アクセス|場所|駅|駐車場|駐車|パーキング/.test(text)) return 'faq';
+  return 'general';
+}
+
+function extractReservation(text) {
+  const people = text.match(/(\d+|[一二三四五六七八九十]+)\s*(名|人)/)?.[0] || '';
+  const phone = text.match(/0\d{1,4}[-ー\s]?\d{1,4}[-ー\s]?\d{3,4}/)?.[0] || '';
+  const dateTime = text.match(/(今日|明日|明後日|\d{1,2}[月\/\-]\d{1,2}日?|\d{1,2}日|月曜|火曜|水曜|木曜|金曜|土曜|日曜).{0,16}?(\d{1,2}時|\d{1,2}:\d{2})?/)?.[0] || '';
+  const name = text.match(/(?:名前|氏名|名義|私は|わたしは|僕は|ぼくは)\s*([^、。\s]+)|([^、。\s]+)\s*(?:です|と申します)/)?.[1]
+    || text.match(/(?:名前|氏名|名義|私は|わたしは|僕は|ぼくは)\s*([^、。\s]+)|([^、。\s]+)\s*(?:です|と申します)/)?.[2]
+    || '';
+  return { dateTime, people, name, phone };
+}
+
+function missingReservationFields(reservation) {
+  return [
+    ['dateTime', 'ご希望の日時'],
+    ['people', '人数'],
+    ['name', 'お名前'],
+    ['phone', '電話番号']
+  ].filter(([key]) => !reservation[key]).map(([, label]) => label);
+}
+
+function buildVoiceReply(text, reservation) {
+  const intent = classifyIntent(text);
+  if (intent === 'sales') {
+    return { intent, reply: 'お電話ありがとうございます。営業・ご提案のお電話ですね。担当者へ共有しますので、会社名、ご担当者名、ご連絡先、要件を簡潔にお願いいたします。予約のお客様とは別で記録いたします。' };
+  }
+  if (/営業時間|何時/.test(text)) return { intent, reply: storeProfile.hours };
+  if (/定休日|休み/.test(text)) return { intent, reply: storeProfile.closed };
+  if (/アクセス|場所|駅/.test(text)) return { intent, reply: storeProfile.access };
+  if (/駐車場|駐車|パーキング/.test(text)) return { intent, reply: storeProfile.parking };
+  const missing = missingReservationFields(reservation);
+  if (intent === 'reservation' || missing.length < 4) {
+    return {
+      intent: 'reservation',
+      reply: missing.length === 0
+        ? `ありがとうございます。${reservation.dateTime}、${reservation.people}、${reservation.name}様、電話番号${reservation.phone}で仮予約として承りました。店舗スタッフが確認後、必要があれば折り返します。`
+        : `ご予約ですね。${missing.slice(0, 2).join('と')}を教えていただけますか。`
+    };
+  }
+  return { intent: 'general', reply: 'お電話ありがとうございます。ご予約、営業時間、定休日、アクセス、駐車場についてご案内できます。ご用件をお聞かせください。' };
+}
+
+function renderVoiceReception() {
+  app.innerHTML = `
+    <section class="hero voice-hero">
+      <p class="eyebrow">AGATHON Voice Reception / Web MVP</p>
+      <h1>AI自動音声受付デモ</h1>
+      <p class="hero-lead">電話番号連携前の営業デモです。ブラウザのマイク入力またはテキスト入力で、店舗スタッフとして予約・FAQ・営業電話の一次対応を行います。</p>
+      <div class="hero-actions"><a class="primary-link" href="./admin">管理画面を見る</a><a class="secondary-link" href="./">ETHANへ戻る</a></div>
+    </section>
+    <section class="section voice-console">
+      <div class="section-heading"><p class="eyebrow">Reception Console</p><h2>受付会話</h2><p>Chrome/Safari系ブラウザでは Web Speech API の音声入力を利用できます。未対応環境ではテキスト入力で同じ保存処理を確認できます。</p></div>
+      <div class="voice-grid">
+        <div class="voice-panel"><label for="voice-input"><strong>お客様の発話</strong></label><textarea id="voice-input" class="idea-input" rows="5" placeholder="例: 明日の19時に4名で予約したいです。田中です。電話番号は090-1234-5678です。"></textarea><div class="idea-actions"><button type="button" class="primary-link" data-start-voice>🎙️ マイク入力</button><button type="button" class="secondary-link" data-send-voice>AI受付に送信</button></div><small class="idea-note" data-voice-status>待機中</small></div>
+        <div class="voice-panel"><strong>AIスタッフ応答</strong><p class="voice-reply" data-voice-reply>いらっしゃいませ。AGATHON Cafe Demoでございます。ご予約でしょうか。</p><div class="store-faq"><p>${storeProfile.hours}</p><p>${storeProfile.closed}</p><p>${storeProfile.access}</p><p>${storeProfile.parking}</p></div></div>
+      </div>
+    </section>`;
+}
+
+function renderVoiceAdmin() {
+  const records = loadVoiceRecords();
+  const reservations = records.filter((record) => record.intent === 'reservation');
+  app.innerHTML = `
+    <section class="hero"><p class="eyebrow">Admin</p><h1>予約・会話ログ管理</h1><p class="hero-lead">localStorage保存のMVP管理画面です。将来はDB/API、電話番号連携、LINE通知、Googleカレンダー連携に置き換えます。</p><div class="hero-actions"><a class="primary-link" href="./voice-reception">受付デモへ戻る</a></div></section>
+    <section class="section"><div class="section-heading"><p class="eyebrow">Reservations</p><h2>予約一覧</h2><p>${reservations.length}件</p></div><div class="admin-table">${reservations.map((record) => `<article class="admin-row"><strong>${escapeHtml(record.reservation.name || '名前未取得')}</strong><span>${escapeHtml(record.reservation.dateTime || '日時未取得')}</span><span>${escapeHtml(record.reservation.people || '人数未取得')}</span><span>${escapeHtml(record.reservation.phone || '電話未取得')}</span><small>${formatDate(record.createdAt)}</small></article>`).join('') || '<p class="empty">予約ログはまだありません。</p>'}</div></section>
+    <section class="section"><div class="section-heading"><p class="eyebrow">Conversation Logs</p><h2>会話ログ</h2><p>${records.length}件</p></div><div class="news-list">${records.map((record) => `<article class="news-card"><div class="card-meta"><span>${escapeHtml(record.intent)}</span><span>${formatDate(record.createdAt)}</span></div><h3>お客様</h3><p>${escapeHtml(record.transcript)}</p><h3>AI受付</h3><p>${escapeHtml(record.reply)}</p></article>`).join('') || '<p class="empty">会話ログはまだありません。</p>'}</div></section>`;
+}
+
 let activeNewsItems = sampleNewsItems;
 let generatedMeta = { generatedAt: null };
 
@@ -390,6 +489,33 @@ function renderDetail(newsId) {
   `;
 }
 
+function bindVoiceEvents() {
+  const input = app.querySelector('#voice-input');
+  const status = app.querySelector('[data-voice-status]');
+  const replyBox = app.querySelector('[data-voice-reply]');
+  const send = () => {
+    const transcript = input?.value.trim() || '';
+    if (!transcript) { if (status) status.textContent = '発話またはテキストを入力してください。'; return; }
+    const reservation = extractReservation(transcript);
+    const { intent, reply } = buildVoiceReply(transcript, reservation);
+    saveVoiceRecord({ id: `voice-${Date.now()}`, createdAt: new Date().toISOString(), intent, transcript, reply, reservation });
+    if (replyBox) replyBox.textContent = reply;
+    if (status) status.textContent = `保存しました（${intent}）`;
+  };
+  app.querySelector('[data-send-voice]')?.addEventListener('click', send);
+  app.querySelector('[data-start-voice]')?.addEventListener('click', () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) { if (status) status.textContent = 'このブラウザは音声入力に未対応です。テキスト入力を使ってください。'; return; }
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ja-JP';
+    recognition.interimResults = false;
+    recognition.onstart = () => { if (status) status.textContent = '聞き取り中です...'; };
+    recognition.onerror = () => { if (status) status.textContent = '音声入力に失敗しました。テキスト入力を使ってください。'; };
+    recognition.onresult = (event) => { input.value = event.results[0][0].transcript; if (status) status.textContent = '聞き取り完了。AI受付に送信できます。'; };
+    recognition.start();
+  });
+}
+
 function bindEvents() {
   app.querySelectorAll('[data-category-toggle]').forEach((input) => {
     input.addEventListener('change', () => toggleSavedCategory(input.dataset.categoryToggle));
@@ -415,6 +541,15 @@ function bindEvents() {
 
 function render() {
   const detailMatch = window.location.pathname.match(/\/news\/([^/]+)\/?$/);
+  if (window.location.pathname.includes('/admin')) {
+    renderVoiceAdmin();
+    return;
+  }
+  if (window.location.pathname.includes('/voice-reception')) {
+    renderVoiceReception();
+    bindVoiceEvents();
+    return;
+  }
   if (detailMatch) {
     renderDetail(detailMatch[1]);
   } else {
