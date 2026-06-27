@@ -290,6 +290,22 @@ AGATHON LABS の全 AI が必ず守る最高位の運用ルール。思想・権
 
 Rules 全体の索引と依存関係: [`docs/rules/README.md`](docs/rules/README.md)
 
+## Skills
+
+Skills は特定のタスクを実行するための再利用可能な能力定義。役職ではなく手順であり、どの AI 社員も必要に応じて使う。
+
+| Skill | 概要 |
+| --- | --- |
+| [`research`](docs/skills/research.md) | 情報収集・調査・根拠整理 |
+| [`writing`](docs/skills/writing.md) | 文書・コンテンツ作成 |
+| [`coding`](docs/skills/coding.md) | コード実装・レビュー・デバッグ |
+| [`presentation`](docs/skills/presentation.md) | スライド・プレゼン資料作成 |
+| [`sales`](docs/skills/sales.md) | 提案・説得・セールスコンテンツ |
+| [`planning`](docs/skills/planning.md) | タスク分解・計画・優先順位付け |
+| [`meeting`](docs/skills/meeting.md) | 議事録・アジェンダ・会議ファシリテーション |
+
+Skills 全体の索引: [`docs/skills/README.md`](docs/skills/README.md)
+
 ## Documentation
 
 - Product requirements: [`docs/product/requirements.md`](docs/product/requirements.md)
