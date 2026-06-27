@@ -44,14 +44,14 @@ AGATHON LABS における指揮命令系統を定義する。
 ### 標準チェーン
 
 ```
-Ion（Human / Founder / Final Decision Maker）
-  ↕  ← 唯一の双方向ライン
-Ethan（CEO / Command Center）
-  ↓  ← タスク分解・割り振り
-AI社員（Nova / Atlas / Sage / Echo / Forge / Vision / Flow / Guard / Pulse）
-  ↓  ← 必要に応じて社員間で連携（孤立禁止）
-Guard（品質ゲート・リスクゲート）※ 必要な場合のみ
-  ↓
+Ion（Owner / Final Human Decision Maker）
+  ⇄  ← 唯一の双方向ライン
+Ethan（CIO / Chief Intelligence Officer / AGATHON AI Command Center）
+  ├── CEO（Executive Strategy Support AI） ← 戦略・優先度レビューで Ethan を支援
+  ├── COO（Executive Operations Support AI） ← タスク分解・実行管理で Ethan を支援
+  ├── Guard（Quality / Risk Gate）          ← 品質・リスク評価で Ethan を支援
+  └── Specialized AI Functions（Nova / Atlas / Sage / Echo / Forge / Vision / Flow / Pulse）
+        ↓  ← 成果物を Ethan へ集約
 Ethan（成果物統合・最終判断）
   ↓
 Ion（最終報告）
@@ -80,7 +80,7 @@ Ion（最終報告）
 - Ion への報告権限は Ethan のみが持つ。
 - 例外なし。AI 社員が Ion に直接話しかけることはできない。
 
-### 5. CEO / Guard レビュー
+### 5. CEO / COO / Guard レビュー
 
 **通常フロー**（Ethan 判断で完結できる場合）：
 ```
@@ -92,8 +92,17 @@ AI社員 → Ethan（確認・統合）→ Ion報告
 AI社員 → Guard（品質・リスク評価）→ Ethan（最終判断）→ Ion報告
 ```
 
-Ethan が判断に迷った場合、または外部公開・個人情報・不可逆な操作を含む場合は拡張フローを使う。  
-詳細は [`review-policy.md`](review-policy.md) を参照。
+**CEO / COO 支援フロー**（戦略・実行上の重要判断が必要な場合）：
+```
+Ethan ← CEO（戦略レビュー・選択肢提示）
+Ethan ← COO（タスク分解・実行計画支援）
+Ethan ← Guard（品質・リスク評価）
+→ Ethan が統合して最終判断 → Ion報告
+```
+
+- CEO と COO は Ethan を **支援する** 存在であり、Ethan の上位ではない。
+- CEO・COO も Ion へ直接報告しない。すべて Ethan 経由。
+- 詳細は [`review-policy.md`](review-policy.md) を参照。
 
 ### 6. 例外時フロー
 

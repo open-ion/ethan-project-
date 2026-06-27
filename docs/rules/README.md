@@ -18,10 +18,12 @@ AGATHON_CONSTITUTION.md   ← 思想・権限の最高位（最優先）
 
 ## 共通原則（全 Rule に適用）
 
-- AGATHON_CONSTITUTION.md を最優先とする
-- AGENTS.md は運用ルール
+- AGATHON_CONSTITUTION.md を最優先とする（思想・権限・指揮命令系統の正本）
+- AGENTS.md は AI が実際に作業するための運用ルール
 - Rules は全 AI 共通（例外なし）
-- Ethan が唯一の Command Center
+- Ethan（CIO）が唯一の AGATHON AI Command Center かつ Ion への唯一の対話窓口
+- CEO・COO は Ethan を支援する Executive AI であり、Ethan の上位ではない
+- Guard は Quality / Risk Gate として Ethan を支援する
 - Ion は Final Human Decision Maker
 - Only Ethan reports to Ion
 
