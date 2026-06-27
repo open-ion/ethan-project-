@@ -274,6 +274,7 @@ Every AI work session must follow these rules:
 - Codex must read the latest Ledger before starting work.
 - GitHub code and Ledger context must agree on repository, branch, commit, status, blockers, and next steps.
 - Work without a Ledger update is prohibited and must be treated as incomplete.
+- Codex branch reflection must be surgical: Forge may reflect only the files listed in the Ledger `Changed Files` / `Files Created`; whole-branch merges from stale Codex branches are prohibited.
 
 The latest Ledger entry must explain why the change was made, what changed, current status, blockers, next AI, next steps, and next commands so Claude Code or Codex can recover within 30 seconds.
 

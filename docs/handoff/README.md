@@ -128,3 +128,19 @@ Claude Code / Codex / Atlas / Echo / etc.
 - Code and Ledger must agree on branch, commit, status, and blockers.
 - Work without a Ledger update is incomplete.
 - Recovery Mode requires the latest Ledger to contain a complete `# Recovery` section.
+
+## Codex Branch Surgical Reflection Rules
+
+Codex branches can be based on stale repository snapshots. To prevent accidental deletion of newer Claude Code work, Forge must not merge a Codex branch wholesale unless the branch base is verified current.
+
+Default recovery rule:
+
+1. Read the latest Ledger.
+2. Use only the files listed in `Changed Files` and `Files Created`.
+3. Reflect those files or hunks surgically into the current `work` branch.
+4. Do not carry over unrelated deletions, old file versions, or broad branch diffs.
+5. If the Ledger lists existing-file edits, inspect the diff and apply only the intended hunks.
+6. If the Ledger omits a file, treat that file as out of scope until Codex updates the Ledger.
+7. Whole-branch merges from Codex are prohibited when the Codex branch is stale or would delete current work.
+
+Codex must keep `Changed Files`, `Files Created`, and `Files Deleted` exact so Forge can safely cherry-pick only the intended work.
