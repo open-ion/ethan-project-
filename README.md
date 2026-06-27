@@ -257,6 +257,23 @@ report is written to the job summary.
 
 Architecture and extension points: [`docs/orchestrator/architecture.md`](docs/orchestrator/architecture.md).
 
+## Rules
+
+AGATHON LABS の全 AI が必ず守る最高位の運用ルール。思想・権限は `AGATHON_CONSTITUTION.md`（最優先）、組織・連携は `AGENTS.md` に従う。
+
+能力の拡張は役職追加ではなく Rules / Skills / Workflows / RAG / Tools で行う。
+
+| Rule | 概要 |
+| --- | --- |
+| [`command-chain`](docs/rules/command-chain.md) | 指揮命令系統。Ion ⇄ Ethan ↔ AI の命令・報告の流れ |
+| [`reporting-policy`](docs/rules/reporting-policy.md) | 報告ルール。全 AI は Ethan へ報告。Ethan のみが Ion へ報告する |
+| [`ion-facing-interface`](docs/rules/ion-facing-interface.md) | Ion インターフェース。Ion との対話は Ethan のみが担う |
+| [`role-creation-policy`](docs/rules/role-creation-policy.md) | 役職追加ルール。新役職はデフォルト禁止。仕組みで拡張する |
+| [`review-policy`](docs/rules/review-policy.md) | レビュー方針。通常は Ethan のみ。迷った場合は Guard を加える |
+| [`quality-gate`](docs/rules/quality-gate.md) | 品質保証。Guard は管理者ではなく Quality Gate / Risk Gate として機能する |
+
+Rules 全体の索引と依存関係: [`docs/rules/README.md`](docs/rules/README.md)
+
 ## Documentation
 
 - Product requirements: [`docs/product/requirements.md`](docs/product/requirements.md)
