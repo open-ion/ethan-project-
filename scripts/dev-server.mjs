@@ -1,5 +1,6 @@
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
+import { handleTwilioVoiceRequest } from '../src/twilio-voice-webhook.js';
 import { extname, join, normalize } from 'node:path';
 
 const useDist = process.argv.includes('--dist');
@@ -42,6 +43,8 @@ async function serveFile(pathname) {
 const server = createServer(async (request, response) => {
   try {
     const url = new URL(request.url || '/', `http://${request.headers.host}`);
+    if (url.pathname === '/api/twilio/voice') return handleTwilioVoiceRequest(request, response, { mode: 'incoming' });
+    if (url.pathname === '/api/twilio/respond') return handleTwilioVoiceRequest(request, response, { mode: 'respond' });
     const { body, type } = await serveFile(url.pathname);
     response.writeHead(200, { 'Content-Type': type });
     response.end(body);

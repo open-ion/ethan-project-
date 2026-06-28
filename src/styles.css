@@ -678,6 +678,15 @@ main {
   color: var(--brand-dark);
 }
 
+.status-pending {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+
+.notification-card {
+  border-left: 4px solid #2563eb;
+}
+
 .compact-action {
   min-height: 34px;
   padding: 6px 10px;
