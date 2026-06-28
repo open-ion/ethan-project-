@@ -52,6 +52,7 @@ for (const preset of userPresets) {
 assert(getPreset('does-not-exist')?.id, 'getPreset should fall back to a default preset');
 
 const appSource = await readFile('src/app.js', 'utf8');
+const voiceSource = await readFile('src/voice-reception.js', 'utf8');
 assert(appSource.includes('renderHome'), 'Home render function is missing');
 assert(appSource.includes('renderDetail'), 'Detail render function is missing');
 assert(appSource.includes('renderDashboard'), 'Morning dashboard render function is missing');
@@ -72,19 +73,24 @@ assert(appSource.includes('AI Confidence'), 'confidence display is missing');
 assert(appSource.includes('confidenceReason'), 'confidence reason display is missing');
 
 assert(appSource.includes('Product Prototype'), 'Voice reception demo route is missing');
-assert(appSource.includes('VOICE_RECEPTION_STORAGE_KEY'), 'Voice reception storage key is missing');
+assert(voiceSource.includes('VOICE_RECEPTION_STORAGE_KEY'), 'Voice reception storage key is missing');
 assert(appSource.includes('SpeechRecognition'), 'Web Speech API microphone path is missing');
-assert(appSource.includes('extractReservation'), 'Reservation extraction logic is missing');
-assert(appSource.includes('営業・ご提案'), 'Sales-call handling copy is missing');
-assert(appSource.includes('AI受付 管理画面'), 'Voice admin screen is missing');
+assert(voiceSource.includes('extractReservation'), 'Reservation extraction logic is missing');
+assert(voiceSource.includes('営業・ご提案'), 'Sales-call handling copy is missing');
+assert(appSource.includes('AI電話受付 管理画面'), 'Voice admin screen is missing');
 
-assert(appSource.includes('VOICE_STORE_SETTINGS_KEY'), 'Store settings storage key is missing');
-assert(appSource.includes('buildVoiceReply'), 'Voice conversation flow is missing');
-assert(appSource.includes('needs_confirmation'), 'Reservation confirmation stage is missing');
-assert(appSource.includes('仮予約を受付しました'), 'Reservation completion message is missing');
+assert(voiceSource.includes('VOICE_STORE_SETTINGS_KEY'), 'Store settings storage key is missing');
+assert(voiceSource.includes('buildVoiceReply'), 'Voice conversation flow is missing');
+assert(voiceSource.includes('needs_confirmation'), 'Reservation confirmation stage is missing');
+assert(voiceSource.includes('予約を受付しました'), 'Reservation completion message is missing');
 assert(appSource.includes('営業電話ログ'), 'Sales-call admin log is missing');
+assert(appSource.includes('人への転送ログ'), 'Human transfer admin log is missing');
 assert(appSource.includes('店舗設定'), 'Store settings admin UI is missing');
 assert(appSource.includes('data-confirm-record'), 'Admin confirmation action is missing');
+assert(appSource.includes('data-incoming-call'), 'Incoming call simulator is missing');
+assert(voiceSource.includes('3回聞き取れなかった'), 'Three-strike transfer handling is missing');
+assert(voiceSource.includes('席数'), 'Restaurant FAQ structure is missing seats');
+assert(voiceSource.includes('支払'), 'Restaurant FAQ structure is missing payment');
 
 
 
@@ -122,7 +128,7 @@ const legacyWorkflowSource = await readFile('.github/workflows/news-schedule.yml
 assert(!legacyWorkflowSource.includes('cron:'), 'Legacy workflow must not run on a schedule');
 assert(legacyWorkflowSource.includes('Legacy Python News Brief workflow is intentionally disabled.'), 'Legacy workflow should explain that it is disabled');
 
-for (const file of ['dist/index.html', 'dist/404.html', 'dist/news/index.html', 'dist/news/app.js', 'dist/news/generated/news.json', 'dist/dashboard/index.html', 'dist/voice-reception/index.html', 'dist/admin/index.html', 'dist/moneyclip/index.html', 'dist/moneyclip/app.js', 'dist/moneyclip/sw.js']) {
+for (const file of ['dist/index.html', 'dist/404.html', 'dist/news/index.html', 'dist/news/app.js', 'dist/news/voice-reception.js', 'dist/news/generated/news.json', 'dist/dashboard/index.html', 'dist/voice-reception/index.html', 'dist/admin/index.html', 'dist/moneyclip/index.html', 'dist/moneyclip/app.js', 'dist/moneyclip/sw.js']) {
   try {
     await access(file);
   } catch (error) {

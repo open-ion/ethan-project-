@@ -7,11 +7,12 @@
     "dev": "node scripts/dev-server.mjs",
     "build": "node scripts/build.mjs",
     "start": "node scripts/dev-server.mjs --dist",
-    "test": "npm run build && node scripts/smoke-test.mjs && node scripts/orchestrator-test.mjs",
+    "test": "npm run build && node scripts/smoke-test.mjs && node scripts/voice-reception-test.mjs && node scripts/orchestrator-test.mjs",
     "test:orchestrator": "node scripts/orchestrator-test.mjs",
     "orchestrate": "node scripts/orchestrate.mjs",
     "fetch:rss": "node scripts/fetch-rss.mjs",
-    "summarize": "node scripts/summarize-news.mjs"
+    "summarize": "node scripts/summarize-news.mjs",
+    "test:voice": "node scripts/voice-reception-test.mjs"
   },
   "engines": {
     "node": ">=20"

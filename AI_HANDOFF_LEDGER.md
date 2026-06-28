@@ -86,3 +86,48 @@
 ## Ethanへの引き継ぎ事項
 - 今回の目的は商品デモの説得力向上。アーキテクチャはまだ静的MVPの範囲。
 - Claude Code復帰後は、このUXを壊さずにAI/API/DB境界へ分離してほしい。
+
+---
+
+## 2026-06-27 — Codex CEO実行: Restaurant AI Reception MVP完成化
+
+## 完了したこと
+- 受付ロジックを `src/voice-reception.js` に分離し、UIから再利用しやすい構造にした。
+- 電話着信開始、AI挨拶、用件判定、予約、FAQ、営業電話、人への転送、終了までの流れを実装。
+- FAQを飲食店向けに拡張（営業時間、定休日、駐車場、席数、支払方法、個室、禁煙/喫煙、テイクアウト）。
+- 人への転送条件を追加（3回聞き取れない、スタッフ希望、想定外、怒り、緊急）。
+- 空入力/無言/雑音/想定外へのエラー処理と聞き返しを追加。
+- `scripts/voice-reception-test.mjs` を追加し、予約成功、FAQ成功、営業電話成功、転送成功、例外成功を検証。
+- `npm test` にVoice Receptionのフローテストを組み込んだ。
+- build/dev serverに `voice-reception.js` のルート配信を追加。
+
+## 変更したファイル
+- `src/voice-reception.js`
+- `src/app.js`
+- `src/styles.css`
+- `scripts/build.mjs`
+- `scripts/dev-server.mjs`
+- `scripts/smoke-test.mjs`
+- `scripts/voice-reception-test.mjs`
+- `package.json`
+- `README.md`
+- `AI_HANDOFF_LEDGER.md`
+
+## 変更理由
+- AGATHON LABS初プロダクトとして、機能追加より「今日最後まで動く」ことを優先するため。
+- 予約/FAQ/営業/転送/例外を最低限すべて動作確認できる状態にするため。
+
+## 残タスク
+- Web Speech APIの認識精度はブラウザ依存。本番電話品質はTwilio等で別検証が必要。
+- 予約日時の厳密な正規化、営業時間外判定、満席判定は未実装。
+- localStorage保存のため、DB/API/認証/複数店舗対応が必要。
+- AI応答はまだルールベース。OpenAI等の構造化抽出・自然応答へ置き換える。
+
+## 次にやるべきこと
+1. SQLite/PostgreSQLで `stores`, `conversations`, `reservations`, `sales_calls`, `transfers` を永続化する。
+2. OpenAI Responses APIで予約抽出と意図判定をJSON Schema化する。
+3. Twilioで実電話着信WebhookのPoCを作る。
+4. LINE通知とGoogleカレンダー登録を予約完了時のイベントとして接続する。
+
+## Ethanへの引き継ぎ事項
+- 今日のデモ範囲は完成。次は本番化のため、現在の `src/voice-reception.js` の純粋ロジックをAPI層へ移すのが最短。

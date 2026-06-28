@@ -7,206 +7,24 @@ import {
   getWidget,
   defaultPresetId
 } from './data.js';
+import {
+  buildVoiceReply,
+  defaultStoreSettings,
+  formatReservationSummary,
+  loadStoreSettings,
+  loadVoiceRecords,
+  loadVoiceSession,
+  resetVoiceSession,
+  saveStoreSettings,
+  saveVoiceRecord,
+  startIncomingCall,
+  updateVoiceRecord
+} from './voice-reception.js';
 
 const app = document.querySelector('#app');
 const CATEGORY_STORAGE_KEY = 'agathon-news-selected-categories';
 const USER_SETTINGS_KEY = 'ethan-user-settings';
 
-const VOICE_RECEPTION_STORAGE_KEY = 'agathon-voice-reception-records';
-const VOICE_RECEPTION_SESSION_KEY = 'agathon-voice-reception-active-session';
-const VOICE_STORE_SETTINGS_KEY = 'agathon-voice-store-settings';
-
-const defaultStoreSettings = {
-  name: 'AGATHON Cafe Prototype',
-  businessType: '飲食店',
-  hours: '平日11:00〜22:00、土日祝10:00〜21:00',
-  closed: '毎週火曜日（祝日の場合は翌営業日）',
-  address: '東京都サンプル区イオン通り1-2-3 AGATHONビル1F',
-  parking: '店舗裏に3台分あります。満車の場合は近隣コインパーキングをご利用ください。',
-  tone: '丁寧で落ち着いた店舗スタッフ。短く確認し、不足項目は一つずつ聞き返す。',
-  faq: 'キャンセルは前日までにご連絡ください。ベビーカー入店可。アレルギーや記念日プレートは予約時にご相談ください。'
-};
-
-const reservationFieldLabels = {
-  dateTime: 'ご希望日時',
-  people: '人数',
-  name: 'お名前',
-  phone: '電話番号',
-  request: 'ご要望'
-};
-
-function loadStoreSettings() {
-  try {
-    return { ...defaultStoreSettings, ...JSON.parse(localStorage.getItem(VOICE_STORE_SETTINGS_KEY) || '{}') };
-  } catch (error) {
-    console.warn('Failed to load store settings', error);
-    return { ...defaultStoreSettings };
-  }
-}
-
-function saveStoreSettings(settings) {
-  const next = { ...loadStoreSettings(), ...settings };
-  localStorage.setItem(VOICE_STORE_SETTINGS_KEY, JSON.stringify(next));
-  return next;
-}
-
-function createEmptyReservation() {
-  return { dateTime: '', people: '', name: '', phone: '', request: '', status: 'draft' };
-}
-
-function loadVoiceSession() {
-  try {
-    return {
-      stage: 'greeting',
-      reservation: createEmptyReservation(),
-      lastPrompt: null,
-      ...JSON.parse(localStorage.getItem(VOICE_RECEPTION_SESSION_KEY) || '{}')
-    };
-  } catch (error) {
-    console.warn('Failed to load voice reception session', error);
-    return { stage: 'greeting', reservation: createEmptyReservation(), lastPrompt: null };
-  }
-}
-
-function saveVoiceSession(session) {
-  const next = { ...session, reservation: { ...createEmptyReservation(), ...(session.reservation || {}) } };
-  localStorage.setItem(VOICE_RECEPTION_SESSION_KEY, JSON.stringify(next));
-  return next;
-}
-
-function resetVoiceSession() {
-  const session = { stage: 'greeting', reservation: createEmptyReservation(), lastPrompt: null };
-  localStorage.setItem(VOICE_RECEPTION_SESSION_KEY, JSON.stringify(session));
-  return session;
-}
-
-function loadVoiceRecords() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(VOICE_RECEPTION_STORAGE_KEY) || '[]');
-    return Array.isArray(saved) ? saved : [];
-  } catch (error) {
-    console.warn('Failed to load voice reception records', error);
-    return [];
-  }
-}
-
-function saveVoiceRecord(record) {
-  const records = [{ id: `voice-${Date.now()}-${Math.random().toString(16).slice(2)}`, createdAt: new Date().toISOString(), ...record }, ...loadVoiceRecords()].slice(0, 200);
-  localStorage.setItem(VOICE_RECEPTION_STORAGE_KEY, JSON.stringify(records));
-  return records;
-}
-
-function updateVoiceRecord(recordId, patch) {
-  const records = loadVoiceRecords().map((record) => record.id === recordId ? { ...record, ...patch, updatedAt: new Date().toISOString() } : record);
-  localStorage.setItem(VOICE_RECEPTION_STORAGE_KEY, JSON.stringify(records));
-  return records;
-}
-
-function normalizePhone(value = '') {
-  return value.replace(/[ー−―]/g, '-').replace(/\s+/g, '-');
-}
-
-function classifyIntent(text) {
-  if (/営業|提案|広告|集客|媒体|取材|代理店|サービス紹介|セールス|売り込み|SEO|求人|決済|電気|通信/.test(text)) return 'sales';
-  if (/予約|席|名|人数|伺|行き|空いて|空席|来店|お願い|取りたい/.test(text)) return 'reservation';
-  if (/営業時間|何時|定休日|休み|アクセス|場所|住所|駅|駐車場|駐車|パーキング|キャンセル|ベビーカー|アレルギー|記念日/.test(text)) return 'faq';
-  if (/はい|大丈夫|それで|お願いします|確定|OK|オーケー/.test(text)) return 'confirm';
-  return 'general';
-}
-
-function extractReservation(text) {
-  const people = text.match(/(\d+|[一二三四五六七八九十]+)\s*(名|人)/)?.[0] || '';
-  const phone = normalizePhone(text.match(/0\d{1,4}[-ー−―\s]?\d{1,4}[-ー−―\s]?\d{3,4}/)?.[0] || '');
-  const dateTime = text.match(/(今日|明日|明後日|今週|来週|\d{1,2}[月\/\-]\d{1,2}日?|\d{1,2}日|月曜|火曜|水曜|木曜|金曜|土曜|日曜).{0,20}?(午前|午後|\d{1,2}時半?|\d{1,2}:\d{2})?/)?.[0] || '';
-  const name = text.match(/(?:名前|氏名|名義|私は|わたしは|僕は|ぼくは)\s*([^、。\s]+)|([^、。\s]+)\s*(?:です|と申します)/)?.[1]
-    || text.match(/(?:名前|氏名|名義|私は|わたしは|僕は|ぼくは)\s*([^、。\s]+)|([^、。\s]+)\s*(?:です|と申します)/)?.[2]
-    || '';
-  const request = text.match(/(?:要望|希望|お願い|できれば|可能なら|備考)[:：はを\s]*([^。]+)/)?.[1] || '';
-  return { dateTime, people, name, phone, request };
-}
-
-function mergeReservation(current, extracted) {
-  return Object.fromEntries(Object.entries({ ...createEmptyReservation(), ...current }).map(([key, value]) => [key, extracted[key] || value]));
-}
-
-function missingReservationFields(reservation) {
-  return ['dateTime', 'people', 'name', 'phone'].filter((key) => !reservation[key]);
-}
-
-function formatReservationSummary(reservation) {
-  return [
-    `日時: ${reservation.dateTime || '未取得'}`,
-    `人数: ${reservation.people || '未取得'}`,
-    `お名前: ${reservation.name || '未取得'}`,
-    `電話番号: ${reservation.phone || '未取得'}`,
-    `ご要望: ${reservation.request || '特になし'}`
-  ].join(' / ');
-}
-
-function getFaqReply(text, settings) {
-  if (/営業時間|何時/.test(text)) return `${settings.name}の営業時間は${settings.hours}です。`;
-  if (/定休日|休み/.test(text)) return `定休日は${settings.closed}です。`;
-  if (/アクセス|場所|住所|駅/.test(text)) return `住所は${settings.address}です。アクセスに迷われた場合は、この番号に折り返しできるよう記録します。`;
-  if (/駐車場|駐車|パーキング/.test(text)) return `駐車場については、${settings.parking}`;
-  if (/キャンセル|ベビーカー|アレルギー|記念日/.test(text)) return settings.faq;
-  return null;
-}
-
-function buildVoiceReply(text, session = loadVoiceSession(), settings = loadStoreSettings()) {
-  const intent = classifyIntent(text);
-  if (intent === 'sales') {
-    resetVoiceSession();
-    return {
-      intent,
-      session: loadVoiceSession(),
-      record: { kind: 'sales', intent, transcript: text, status: 'unconfirmed', company: text.match(/([^、。\s]+)(?:です|と申します|の)/)?.[1] || '', summary: text },
-      reply: `お電話ありがとうございます。${settings.name} AI受付です。営業・ご提案のお電話ですね。担当者に共有しますので、会社名、ご担当者名、ご連絡先、ご用件を記録いたします。予約のお客様とは別で管理し、必要な場合のみ折り返します。`
-    };
-  }
-
-  const faqReply = getFaqReply(text, settings);
-  if (intent === 'faq' && faqReply) {
-    return { intent, session, record: { kind: 'conversation', intent, transcript: text, reply: faqReply }, reply: faqReply };
-  }
-
-  const extracted = extractReservation(text);
-  const reservation = mergeReservation(session.reservation, extracted);
-  const missing = missingReservationFields(reservation);
-
-  if (session.stage === 'confirming' && intent === 'confirm' && missing.length === 0) {
-    const completedReservation = { ...reservation, status: 'unconfirmed' };
-    const completedSession = resetVoiceSession();
-    return {
-      intent: 'reservation',
-      session: completedSession,
-      record: { kind: 'reservation', intent: 'reservation', transcript: text, reply: '', status: 'unconfirmed', reservation: completedReservation },
-      reply: `ありがとうございます。${reservation.name}様、${reservation.dateTime}に${reservation.people}で仮予約を受付しました。店舗スタッフが確認し、必要があれば${reservation.phone}へご連絡します。ご要望は「${reservation.request || '特になし'}」で承ります。`
-    };
-  }
-
-  if (intent === 'reservation' || session.stage !== 'greeting' || Object.values(extracted).some(Boolean)) {
-    if (missing.length > 0) {
-      const nextField = missing[0];
-      const nextSession = saveVoiceSession({ stage: 'collecting', reservation, lastPrompt: nextField });
-      return {
-        intent: 'reservation',
-        session: nextSession,
-        record: { kind: 'conversation', intent: 'reservation', transcript: text, reply: '', reservation, status: 'draft' },
-        reply: `${settings.name}です。ご予約を承ります。${reservationFieldLabels[nextField]}を教えてください。現在の受付内容は「${formatReservationSummary(reservation)}」です。`
-      };
-    }
-    const nextSession = saveVoiceSession({ stage: 'confirming', reservation, lastPrompt: 'confirm' });
-    return {
-      intent: 'reservation',
-      session: nextSession,
-      record: { kind: 'conversation', intent: 'reservation', transcript: text, reply: '', reservation, status: 'needs_confirmation' },
-      reply: `確認します。${formatReservationSummary(reservation)}。この内容で仮予約を受付してよろしいですか？ よろしければ「はい」とお答えください。`
-    };
-  }
-
-  const greeting = `お電話ありがとうございます。${settings.name} AI受付です。ご予約、営業時間、定休日、アクセス、駐車場、その他FAQをご案内できます。ご予約の場合は、ご希望日時・人数・お名前・電話番号をお聞かせください。`;
-  return { intent: 'general', session, record: { kind: 'conversation', intent: 'general', transcript: text, reply: greeting }, reply: greeting };
-}
 
 function renderStoreFacts(settings) {
   return `
@@ -216,6 +34,11 @@ function renderStoreFacts(settings) {
       <p><strong>定休日:</strong> ${escapeHtml(settings.closed)}</p>
       <p><strong>住所:</strong> ${escapeHtml(settings.address)}</p>
       <p><strong>駐車場:</strong> ${escapeHtml(settings.parking)}</p>
+      <p><strong>席数:</strong> ${escapeHtml(settings.seats)}</p>
+      <p><strong>支払方法:</strong> ${escapeHtml(settings.payment)}</p>
+      <p><strong>個室:</strong> ${escapeHtml(settings.privateRoom)}</p>
+      <p><strong>禁煙/喫煙:</strong> ${escapeHtml(settings.smoking)}</p>
+      <p><strong>テイクアウト:</strong> ${escapeHtml(settings.takeout)}</p>
       <p><strong>FAQ:</strong> ${escapeHtml(settings.faq)}</p>
       <p><strong>口調:</strong> ${escapeHtml(settings.tone)}</p>
     </div>`;
@@ -227,26 +50,26 @@ function renderVoiceReception() {
   app.innerHTML = `
     <section class="hero voice-hero">
       <p class="eyebrow">AGATHON Voice Reception / Product Prototype</p>
-      <h1>${escapeHtml(settings.name)}のAI受付</h1>
-      <p class="hero-lead">電話番号連携前でも、初回挨拶・聞き返し・予約確認・仮予約完了・営業電話一次対応まで自然に体験できる商品プロトタイプです。</p>
-      <div class="hero-actions"><a class="primary-link" href="./admin">管理画面を見る</a><button type="button" class="secondary-link" data-reset-voice>会話をリセット</button></div>
+      <h1>${escapeHtml(settings.name)}のAI電話受付</h1>
+      <p class="hero-lead">電話着信 → AI挨拶 → 用件判定 → 予約/FAQ/営業電話/人への転送 → 終了まで、今日デモできる飲食店向け商品MVPです。</p>
+      <div class="hero-actions"><button type="button" class="primary-link" data-incoming-call>☎️ 電話着信を開始</button><a class="secondary-link" href="./admin">管理画面を見る</a><button type="button" class="secondary-link" data-reset-voice>会話をリセット</button></div>
     </section>
     <section class="section voice-console">
-      <div class="section-heading"><p class="eyebrow">Reception Console</p><h2>受付会話</h2><p>例:「明日の19時に4名で予約したいです。田中です。電話番号は090-1234-5678です。要望は窓側です。」→ AIが確認 →「はい」で仮予約完了。</p></div>
+      <div class="section-heading"><p class="eyebrow">Reception Console</p><h2>受付会話</h2><p>予約例:「明日の19時に4名で予約したいです。田中です。電話番号は090-1234-5678です。席は窓側希望です。」→ AIが復唱 →「はい」で予約受付完了。</p></div>
       <div class="voice-grid">
         <div class="voice-panel">
           <label for="voice-input"><strong>お客様の発話</strong></label>
-          <textarea id="voice-input" class="idea-input" rows="5" placeholder="予約、FAQ、営業電話の内容を話す/入力してください"></textarea>
+          <textarea id="voice-input" class="idea-input" rows="5" placeholder="予約、FAQ、営業電話、スタッフ転送の内容を話す/入力してください"></textarea>
           <div class="idea-actions"><button type="button" class="primary-link" data-start-voice>🎙️ マイク入力</button><button type="button" class="secondary-link" data-send-voice>AI受付に送信</button></div>
           <small class="idea-note" data-voice-status>現在の状態: ${escapeHtml(session.stage)} / ${escapeHtml(formatReservationSummary(session.reservation))}</small>
         </div>
-        <div class="voice-panel"><strong>AIスタッフ応答</strong><p class="voice-reply" data-voice-reply>お電話ありがとうございます。${escapeHtml(settings.name)} AI受付です。ご予約でしょうか。</p>${renderStoreFacts(settings)}</div>
+        <div class="voice-panel"><strong>AIスタッフ応答</strong><p class="voice-reply" data-voice-reply>電話着信を開始するとAI受付が挨拶します。</p>${renderStoreFacts(settings)}</div>
       </div>
     </section>`;
 }
 
 function getStatusLabel(status) {
-  return ({ unconfirmed: '未確認', confirmed: '確認済み', needs_confirmation: '確認待ち', draft: '入力中' }[status] || status || '未確認');
+  return ({ unconfirmed: '未確認', confirmed: '確認済み', needs_confirmation: '確認待ち', draft: '入力中', ai_confirmed: 'AI受付済み', retrying: '聞き返し中' }[status] || status || '未確認');
 }
 
 function renderVoiceAdmin() {
@@ -254,14 +77,17 @@ function renderVoiceAdmin() {
   const records = loadVoiceRecords();
   const reservations = records.filter((record) => record.kind === 'reservation');
   const salesLogs = records.filter((record) => record.kind === 'sales');
+  const transfers = records.filter((record) => record.kind === 'transfer');
   const conversations = records.filter((record) => record.kind === 'conversation');
+  const settingLabels = { name: '店舗名', businessType: '業種', hours: '営業時間', closed: '定休日', address: '住所', parking: '駐車場', seats: '席数', payment: '支払方法', privateRoom: '個室', smoking: '禁煙・喫煙', takeout: 'テイクアウト', faq: 'FAQ', tone: 'AI受付の口調' };
   app.innerHTML = `
-    <section class="hero"><p class="eyebrow">Store Admin</p><h1>AI受付 管理画面</h1><p class="hero-lead">予約、会話ログ、営業電話ログ、店舗設定を1画面で確認できます。現在はlocalStorage保存のプロトタイプです。</p><div class="hero-actions"><a class="primary-link" href="./voice-reception">受付デモへ戻る</a></div></section>
-    <section class="section admin-stats"><div class="stat-card"><strong>${reservations.length}</strong><span>予約</span></div><div class="stat-card"><strong>${salesLogs.length}</strong><span>営業電話</span></div><div class="stat-card"><strong>${conversations.length}</strong><span>会話ログ</span></div></section>
-    <section class="section"><div class="section-heading"><p class="eyebrow">Reservations</p><h2>予約一覧</h2><p>未確認の予約はスタッフ確認後に「確認済み」へ変更できます。</p></div><div class="admin-table">${reservations.map((record) => `<article class="admin-row reservation-row"><strong>${escapeHtml(record.reservation?.name || '名前未取得')}</strong><span>${escapeHtml(record.reservation?.dateTime || '日時未取得')}</span><span>${escapeHtml(record.reservation?.people || '人数未取得')}</span><span>${escapeHtml(record.reservation?.phone || '電話未取得')}</span><span>${escapeHtml(record.reservation?.request || '要望なし')}</span><span class="status-badge status-${escapeHtml(record.status || 'unconfirmed')}">${getStatusLabel(record.status)}</span><button type="button" class="secondary-link compact-action" data-confirm-record="${record.id}">確認済み</button><small>${formatDate(record.createdAt)}</small></article>`).join('') || '<p class="empty">予約ログはまだありません。</p>'}</div></section>
-    <section class="section"><div class="section-heading"><p class="eyebrow">Sales Calls</p><h2>営業電話ログ</h2><p>予約と分けて、折り返しが必要な営業・提案だけを確認できます。</p></div><div class="news-list">${salesLogs.map((record) => `<article class="news-card"><div class="card-meta"><span class="status-badge status-${escapeHtml(record.status || 'unconfirmed')}">${getStatusLabel(record.status)}</span><span>${formatDate(record.createdAt)}</span></div><h3>営業電話</h3><p>${escapeHtml(record.summary || record.transcript)}</p><button type="button" class="secondary-link compact-action" data-confirm-record="${record.id}">確認済み</button></article>`).join('') || '<p class="empty">営業電話ログはまだありません。</p>'}</div></section>
+    <section class="hero"><p class="eyebrow">Store Admin</p><h1>AI電話受付 管理画面</h1><p class="hero-lead">予約、会話ログ、営業電話ログ、人への転送、店舗設定を1画面で確認できます。現在はlocalStorage保存のプロトタイプです。</p><div class="hero-actions"><a class="primary-link" href="./voice-reception">受付デモへ戻る</a></div></section>
+    <section class="section admin-stats"><div class="stat-card"><strong>${reservations.length}</strong><span>予約</span></div><div class="stat-card"><strong>${salesLogs.length}</strong><span>営業電話</span></div><div class="stat-card"><strong>${transfers.length}</strong><span>転送</span></div><div class="stat-card"><strong>${conversations.length}</strong><span>会話ログ</span></div></section>
+    <section class="section"><div class="section-heading"><p class="eyebrow">Reservations</p><h2>予約一覧</h2><p>AI受付済み予約はスタッフ確認後に「確認済み」へ変更できます。</p></div><div class="admin-table">${reservations.map((record) => `<article class="admin-row reservation-row"><strong>${escapeHtml(record.reservation?.name || '名前未取得')}</strong><span>${escapeHtml(record.reservation?.dateTime || '日時未取得')}</span><span>${escapeHtml(record.reservation?.people || '人数未取得')}</span><span>${escapeHtml(record.reservation?.phone || '電話未取得')}</span><span>${escapeHtml(record.reservation?.seatType || '席指定なし')}</span><span>${escapeHtml(record.reservation?.request || '要望なし')}</span><span class="status-badge status-${escapeHtml(record.status || 'unconfirmed')}">${getStatusLabel(record.status)}</span><button type="button" class="secondary-link compact-action" data-confirm-record="${record.id}">確認済み</button><small>${formatDate(record.createdAt)}</small></article>`).join('') || '<p class="empty">予約ログはまだありません。</p>'}</div></section>
+    <section class="section"><div class="section-heading"><p class="eyebrow">Sales Calls</p><h2>営業電話ログ</h2><p>営業担当へ直接取次がず、必要なものだけ折り返し判断できます。</p></div><div class="news-list">${salesLogs.map((record) => `<article class="news-card"><div class="card-meta"><span class="status-badge status-${escapeHtml(record.status || 'unconfirmed')}">${getStatusLabel(record.status)}</span><span>${formatDate(record.createdAt)}</span></div><h3>営業電話</h3><p>${escapeHtml(record.summary || record.transcript)}</p><button type="button" class="secondary-link compact-action" data-confirm-record="${record.id}">確認済み</button></article>`).join('') || '<p class="empty">営業電話ログはまだありません。</p>'}</div></section>
+    <section class="section"><div class="section-heading"><p class="eyebrow">Human Transfer</p><h2>人への転送ログ</h2><p>3回聞き取れない、本人希望、想定外、怒り、緊急はスタッフ対応に回します。</p></div><div class="news-list">${transfers.map((record) => `<article class="news-card"><div class="card-meta"><span class="status-badge status-${escapeHtml(record.status || 'unconfirmed')}">${getStatusLabel(record.status)}</span><span>${formatDate(record.createdAt)}</span></div><h3>転送理由</h3><p>${escapeHtml(record.reason || record.transcript || '転送')}</p><p>${escapeHtml(record.reply)}</p><button type="button" class="secondary-link compact-action" data-confirm-record="${record.id}">確認済み</button></article>`).join('') || '<p class="empty">転送ログはまだありません。</p>'}</div></section>
     <section class="section"><div class="section-heading"><p class="eyebrow">Conversation Logs</p><h2>会話ログ</h2><p>${conversations.length}件</p></div><div class="news-list">${conversations.map((record) => `<article class="news-card"><div class="card-meta"><span>${escapeHtml(record.intent)}</span><span>${formatDate(record.createdAt)}</span></div><h3>お客様</h3><p>${escapeHtml(record.transcript)}</p><h3>AI受付</h3><p>${escapeHtml(record.reply)}</p></article>`).join('') || '<p class="empty">会話ログはまだありません。</p>'}</div></section>
-    <section class="section"><div class="section-heading"><p class="eyebrow">Store Settings</p><h2>店舗設定</h2><p>AI受付の回答に即時反映されます。</p></div><form class="settings-form" data-store-settings>${['name','businessType','hours','closed','address','parking','faq','tone'].map((key) => `<label><span>${escapeHtml({ name: '店舗名', businessType: '業種', hours: '営業時間', closed: '定休日', address: '住所', parking: '駐車場', faq: 'FAQ', tone: 'AI受付の口調' }[key])}</span><textarea name="${key}" rows="${key === 'faq' || key === 'tone' ? 3 : 2}">${escapeHtml(settings[key])}</textarea></label>`).join('')}<button type="submit" class="primary-link">店舗設定を保存</button><small class="idea-note" data-settings-note>保存すると受付画面の応答に反映されます。</small></form></section>`;
+    <section class="section"><div class="section-heading"><p class="eyebrow">Store Settings</p><h2>店舗設定</h2><p>AI受付の回答に即時反映されます。</p></div><form class="settings-form" data-store-settings>${Object.keys(settingLabels).map((key) => `<label><span>${escapeHtml(settingLabels[key])}</span><textarea name="${key}" rows="${key === 'faq' || key === 'tone' ? 3 : 2}">${escapeHtml(settings[key] ?? defaultStoreSettings[key] ?? '')}</textarea></label>`).join('')}<button type="submit" class="primary-link">店舗設定を保存</button><small class="idea-note" data-settings-note>保存すると受付画面の応答に反映されます。</small></form></section>`;
 }
 
 let activeNewsItems = sampleNewsItems;
@@ -650,7 +476,7 @@ function bindVoiceEvents() {
   const send = () => {
     const transcript = input?.value.trim() || '';
     if (!transcript) { if (status) status.textContent = '発話またはテキストを入力してください。'; return; }
-    const { intent, reply, record } = buildVoiceReply(transcript);
+    const { intent, reply, record } = buildVoiceReply(transcript, loadVoiceSession(), loadStoreSettings());
     saveVoiceRecord({ ...record, intent, transcript, reply });
     const session = loadVoiceSession();
     if (replyBox) replyBox.textContent = reply;
@@ -658,6 +484,12 @@ function bindVoiceEvents() {
     if (input) input.value = '';
   };
   app.querySelector('[data-send-voice]')?.addEventListener('click', send);
+  app.querySelector('[data-incoming-call]')?.addEventListener('click', () => {
+    const { intent, reply, record } = startIncomingCall();
+    saveVoiceRecord({ ...record, intent, reply });
+    if (replyBox) replyBox.textContent = reply;
+    if (status) status.textContent = `電話着信を開始しました / 現在の状態: ${loadVoiceSession().stage}`;
+  });
   app.querySelector('[data-reset-voice]')?.addEventListener('click', () => {
     resetVoiceSession();
     renderVoiceReception();

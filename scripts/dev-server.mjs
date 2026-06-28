@@ -14,7 +14,7 @@ const contentTypes = {
 };
 
 const routePattern = '(news|dashboard|voice-reception|admin|moneyclip)';
-const nestedAssetPattern = new RegExp(`^/${routePattern}/(app\\.js|data\\.js|styles\\.css|generated/news\\.json|sw\\.js)$`);
+const nestedAssetPattern = new RegExp(`^/${routePattern}/(app\\.js|data\\.js|voice-reception\\.js|styles\\.css|generated/news\\.json|sw\\.js)$`);
 
 function safePath(urlPath) {
   const normalized = normalize(urlPath).replace(/^\.\.(\/|\\|$)/, '');
