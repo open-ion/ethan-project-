@@ -25,7 +25,9 @@ function runReservationSuccess() {
   assert(result.reply.includes('確認します'), 'complete reservation should ask for confirmation');
   result = send(storage, 'はい');
   assert(result.reply.includes('予約を受付しました'), 'confirmation should complete reservation');
-  assert(loadVoiceRecords(storage).some((record) => record.kind === 'reservation' && record.status === 'ai_confirmed'), 'reservation record should be saved as ai_confirmed');
+  const reservationRecord = loadVoiceRecords(storage).find((record) => record.kind === 'reservation' && record.status === 'ai_confirmed');
+  assert(reservationRecord, 'reservation record should be saved as ai_confirmed');
+  assert(reservationRecord.notification?.body.includes('090-1234-5678'), 'reservation notification should include customer phone');
 }
 
 function runFaqSuccess() {
@@ -40,7 +42,9 @@ function runSalesSuccess() {
   const result = send(storage, 'SEO集客サービスの営業です');
   assert(result.intent === 'sales', 'sales text should be classified as sales');
   assert(result.reply.includes('直接のお取次ぎはしておりません'), 'sales reply should protect owner time');
-  assert(loadVoiceRecords(storage).some((record) => record.kind === 'sales'), 'sales log should be stored separately');
+  const salesRecord = loadVoiceRecords(storage).find((record) => record.kind === 'sales');
+  assert(salesRecord, 'sales log should be stored separately');
+  assert(salesRecord.notification?.title.includes('営業電話'), 'sales log should create a staff notification');
 }
 
 function runTransferSuccess() {
@@ -48,6 +52,7 @@ function runTransferSuccess() {
   let result = send(storage, 'スタッフにつないでください');
   assert(result.intent === 'transfer', 'human request should transfer');
   assert(result.reply.includes('店舗スタッフへ引き継ぎます'), 'transfer reply should mention staff handoff');
+  assert(loadVoiceRecords(storage).some((record) => record.kind === 'transfer' && record.notification?.type === 'transfer'), 'transfer should create a staff notification');
 
   const retryStorage = createMemoryStorage();
   send(retryStorage, '');

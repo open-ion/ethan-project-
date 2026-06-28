@@ -318,6 +318,8 @@ npm run dev
 
 - 受付デモ: <http://localhost:3000/voice-reception>
 - 管理画面: <http://localhost:3000/admin>
+- Twilio音声Webhook: `POST /api/twilio/voice`
+- Twilio音声応答Webhook: `POST /api/twilio/respond`
 
 ビルド後の確認:
 
@@ -337,7 +339,8 @@ npm start
 | `OPENAI_API_KEY` | 自然応答・予約抽出・営業電話判定のAI処理 | 未接続（既存ニュース要約では利用可能） |
 | `AI_MODEL` | AI応答モデル指定 | 未接続 |
 | `DATABASE_URL` | 予約・会話ログ永続化 | 未実装 |
-| `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_PHONE_NUMBER` | 電話番号連携 | 未実装 |
+| `TWILIO_PHONE_NUMBER` | Twilioで取得した受付電話番号のメモ | Webhook実装済み / 番号設定はTwilio側 |
+| `TWILIO_WEBHOOK_BASE_URL` | Twilio Voice Webhook公開URLのメモ | 任意 |
 | `LINE_CHANNEL_ACCESS_TOKEN` | LINE通知 | 未実装 |
 | `GOOGLE_CALENDAR_CLIENT_ID` / `GOOGLE_CALENDAR_CLIENT_SECRET` | Googleカレンダー連携 | 未実装 |
 
@@ -352,29 +355,32 @@ npm start
 - 会話ログを `localStorage` に保存
 - 予約情報を構造化して `localStorage` に保存
 - 管理画面で予約一覧と会話ログを確認
+- 予約・転送・営業電話のスタッフ通知キューを管理画面で確認
+- Twilio互換Webhookで実電話着信にTwiML応答し、音声入力を既存AI受付ロジックへ接続
 
 ### 設計判断
 
-- **優先順位A（動くこと）**を満たすため、サーバーDBや外部電話APIはまだ導入していません。
+- **優先順位A（動くこと）**を満たすため、DBはまだ導入していません。電話接続はTwilio Voice Webhook互換のTwiML応答から開始します。
 - 音声認識はブラウザ依存の Web Speech API を使い、未対応環境では同じ受付ロジックをテキスト入力で検証できます。
 - 保存キーは `agathon-voice-reception-records` に分離し、既存ニュースダッシュボードの保存領域を壊さないようにしています。
-- 将来の電話番号連携、LINE通知、Googleカレンダー連携は、現在の `record`（intent / transcript / reply / reservation）をAPI/DBへ移す前提で拡張できます。
+- Twilio Webhookは `POST /api/twilio/voice` を電話番号の着信URLに設定し、会話継続は `POST /api/twilio/respond` に集約します。
+- 将来のLINE通知、Googleカレンダー連携は、現在の `record`（intent / transcript / reply / reservation / notification）をAPI/DBへ移す前提で拡張できます。
 
 ### 未実装・技術的負債
 
 - OpenAI等の実AI応答は未接続。現在は営業デモ用のルールベース応答です。
 - 予約日時の自然言語パースは簡易正規表現です。本番ではAI抽出とバリデーションが必要です。
-- `localStorage` 保存のため、端末をまたいだ管理・共有はできません。
+- Web管理画面は `localStorage` 保存のため、端末をまたいだ管理・共有はできません。Twilio Webhook側の通話中メモリも本番永続化ではありません。
 - 認証、店舗ごとの設定、営業時間例外、満席判定、キャンセル対応は未実装です。
-- 電話番号連携、LINE通知、Googleカレンダー登録は未実装です。
+- Twilio電話番号の購入・本番Webhook設定・外部LINE送信・Googleカレンダー登録は未実装です。管理画面内の通知キュー生成とTwiML応答は実装済みです。
 
 ### 今後の拡張方針
 
 1. 受付ドメインを `conversation`, `reservation`, `notification`, `calendar`, `telephony` に分ける。
-2. 予約・ログ保存を `localStorage` からSQLite/PostgreSQLへ移す。
+2. 予約・ログ保存とTwilio通話セッションを `localStorage` / インメモリからSQLite/PostgreSQLへ移す。
 3. OpenAIで会話応答、予約情報抽出、営業電話分類を構造化JSONとして返す。
-4. Twilio等で電話番号連携し、Webデモと同じ会話状態管理を使う。
-5. LINE通知で新規予約・営業電話メモを店舗スタッフに送る。
+4. Twilio電話番号を購入/設定し、`/api/twilio/voice` を本番Webhookとして接続する。
+5. 現在の通知キューをLINE/メール/Webhookに接続し、新規予約・転送・営業電話メモを店舗スタッフに送る。
 6. Googleカレンダーに仮予約イベントを作成し、スタッフ確認後に確定する。
 7. 店舗設定（営業時間、定休日、席数、駐車場、アクセス、予約ルール）を管理画面で編集可能にする。
 

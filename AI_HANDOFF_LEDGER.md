@@ -131,3 +131,157 @@
 
 ## Ethanへの引き継ぎ事項
 - 今日のデモ範囲は完成。次は本番化のため、現在の `src/voice-reception.js` の純粋ロジックをAPI層へ移すのが最短。
+
+## 2026-06-28 — Codex: GitHub Connector検証コミットの整理
+
+## ①何を変更したか
+- 前回のGitHub Connector検証で追加された一時ファイル `test.txt` を削除。
+- Codexの役割分担ルールに合わせ、Push/PR/MergeはClaude Code担当であることを前提に、作業終了時の引き継ぎ情報をこの台帳へ記録。
+
+## ②追加したファイル
+- なし。
+
+## ③変更したファイル
+- `AI_HANDOFF_LEDGER.md`
+
+## ④削除したファイル
+- `test.txt`
+
+## ⑤次の担当AIがやること
+- Claude CodeはGitHub側の正式Workspace/Connector環境で `open-ion/agathon-voice-reception` を最新状態から確認する。
+- 必要なら今回の整理コミットを確認後、GitHubへPushし、Pull Requestを作成する。
+- Connector APIの有無は、シェルの `git push` ではなく、利用可能なGitHub Connector/ネイティブGitツール一覧で確認する。
+
+## ⑥懸念事項
+- この実行環境にはGitHub Connector APIが提供されておらず、ネイティブConnector経由のcommit/push検証はできない。
+- `gh` CLIも未インストールのため、GitHub認証状態はCLIでは確認できない。
+- 前回のシェル `git push` 試行は `CONNECT tunnel failed, response 403` で失敗しており、以後この環境からシェルPushを実行しないこと。
+
+## ⑦コミットメッセージ案
+- `chore: remove connector verification artifact`
+
+## 完了したこと
+- 一時検証ファイルを削除し、作業終了時に必要なAI Handoff Ledger項目を記録した。
+
+## 変更したファイル
+- `AI_HANDOFF_LEDGER.md`
+
+## 変更理由
+- GitHub Connector検証用の一時ファイルをアプリケーションコードベースへ残さないため。
+- AGATHON LABS開発ルールに従い、次担当AIが迷わず引き継げる状態にするため。
+
+## 残タスク
+- GitHub Connectorが提供されている正式環境で、Connector経由のcommit/push可否を確認する。
+
+## 次にやるべきこと
+- Claude CodeがGitHub Push / Pull Request / Merge / Vercel Deployを担当する。
+
+## Ethanへの引き継ぎ事項
+- Codex環境ではConnector APIが見えないため、GitHub側操作はClaude CodeまたはConnector提供済みWorkspaceで継続してほしい。
+
+---
+
+## 2026-06-28 — Codex Lead Software Engineer: スタッフ通知キューMVP
+
+## 実装内容
+- AGATHON Voice Receptionの次価値として、予約・人への転送・営業電話からスタッフ向け通知文を自動生成する通知キューMVPを追加。
+- 管理画面に通知キュー件数と通知本文を表示し、外部LINE/メール連携前に「何をスタッフへ届けるか」を確認できる状態にした。
+- 店舗設定に通知先メモを追加し、通知文の宛先として保存・表示できるようにした。
+- 実装前設計として、通知MVPの目的・範囲・非対象・受け入れ条件を設計メモに記録。
+
+## 追加ファイル
+- `docs/product/voice-reception-notification-mvp-design.md`
+
+## 変更ファイル
+- `src/voice-reception.js`
+- `src/app.js`
+- `src/styles.css`
+- `scripts/voice-reception-test.mjs`
+- `scripts/smoke-test.mjs`
+- `README.md`
+- `AI_HANDOFF_LEDGER.md`
+
+## 削除ファイル
+- なし。
+
+## 次担当AI
+- Claude Code: GitHub Push / Pull Request / Merge / Vercel Deployを担当。
+- Claude Codeまたは次のCodex: 通知キューをLINE/メール/Webhookへ接続する前に、DB/API永続化の境界を決める。
+
+## 懸念事項
+- 現在の通知は外部送信ではなく、localStorage内の通知キュー生成・管理画面表示まで。
+- localStorage保存のため、別端末スタッフ共有や本番運用にはDB/API/認証が必要。
+- 通知文はルールベース生成のため、本番ではOpenAI構造化抽出結果や店舗別通知テンプレートと接続したい。
+
+## コミットメッセージ案
+- `feat: add staff notification queue for voice reception`
+
+## 次に実装すべき機能
+- 通知キューを永続化するAPI/DB層を追加し、予約・転送・営業電話の通知をLINEまたはメールへ送信できるようにする。
+
+## 完了したこと
+- 小さく設計し、小さく実装し、`npm test`で既存MVPの受付・ログ・管理画面・通知キューの最低限の動作を確認した。
+
+## 変更理由
+- 飲食店オーナーが「AIが受けた重要な電話をスタッフが見落とさない」と判断できることが、販売可能性を上げる直近の顧客価値だから。
+
+## 残タスク
+- 外部通知送信、DB永続化、認証、店舗別テンプレート、通知済みステータス管理。
+
+## Ethanへの引き継ぎ事項
+- 通知キューは外部連携前の仕様固定レイヤーとして実装済み。次はDB/API化してLINE/メール送信へ接続するのが最短。
+
+---
+
+## 2026-06-28 — Codex Lead Software Engineer: Twilio電話接続Webhook MVP
+
+## 実装内容
+- 「実際に電話をかけ、AIが応答すること」を今日の最優先目標として、Twilio Voice互換のTwiML Webhookを追加。
+- `POST /api/twilio/voice` で着信時のAI挨拶と日本語音声入力Gatherを返すようにした。
+- `POST /api/twilio/respond` でTwilioの `SpeechResult` を既存のAI受付ロジックへ渡し、予約/FAQ/営業電話/転送の応答をTwiMLで返すようにした。
+- ローカル開発サーバーでも `/api/twilio/voice` と `/api/twilio/respond` を検証できるようにした。
+- Twilio Webhookのユニットテストを追加し、`npm test` に組み込んだ。
+
+## 追加ファイル
+- `src/twilio-voice-webhook.js`
+- `api/twilio/voice.js`
+- `api/twilio/respond.js`
+- `scripts/twilio-voice-webhook-test.mjs`
+
+## 変更ファイル
+- `scripts/dev-server.mjs`
+- `scripts/smoke-test.mjs`
+- `package.json`
+- `.env.example`
+- `README.md`
+- `AI_HANDOFF_LEDGER.md`
+
+## 削除ファイル
+- なし。
+
+## 次担当AI
+- Claude Codeまたは次の実装AI: Vercelへ反映後、Twilioで電話番号を購入/設定し、Voice Webhookに `https://<公開URL>/api/twilio/voice` を指定して実機通話テストを行う。
+
+## 懸念事項
+- この環境では外部公開URLとTwilio番号がないため、実電話の発着信テストは未実施。
+- Webhook通話セッションは現時点でプロセス内メモリ保存。本番ではDB/Redis等に移す必要がある。
+- Twilio署名検証、認証、録音/個人情報同意、営業時間外ルール、満席判定は未実装。
+- 現在のAI応答はルールベース。OpenAI構造化抽出/自然応答への置換が必要。
+
+## コミットメッセージ案
+- `feat: add twilio voice webhook mvp`
+
+## 次に実装すべき機能
+- Vercel公開URLにデプロイし、Twilio Voice Webhookへ接続して実電話で「着信→AI挨拶→発話認識→AI応答」まで確認する。
+
+## 完了したこと
+- 電話接続に必要な最小Webhook入口、TwiML応答、既存受付ロジック接続、ローカルテストを実装した。
+
+## 変更理由
+- Webデモだけでは販売に届かないため、実電話番号からAI受付へ接続するための最短経路を作る必要があった。
+
+## 残タスク
+- Twilio番号設定、公開URLでの実通話テスト、通話セッション永続化、Twilio署名検証、外部通知送信、DB/API化。
+
+## Ethanへの引き継ぎ事項
+- GitHubではなく電話接続が優先。次はTwilio番号と公開Webhook URLを用意して、実電話でTwiML応答を確認すること。

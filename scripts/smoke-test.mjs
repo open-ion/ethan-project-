@@ -53,6 +53,7 @@ assert(getPreset('does-not-exist')?.id, 'getPreset should fall back to a default
 
 const appSource = await readFile('src/app.js', 'utf8');
 const voiceSource = await readFile('src/voice-reception.js', 'utf8');
+const twilioWebhookSource = await readFile('src/twilio-voice-webhook.js', 'utf8');
 assert(appSource.includes('renderHome'), 'Home render function is missing');
 assert(appSource.includes('renderDetail'), 'Detail render function is missing');
 assert(appSource.includes('renderDashboard'), 'Morning dashboard render function is missing');
@@ -87,6 +88,10 @@ assert(appSource.includes('営業電話ログ'), 'Sales-call admin log is missin
 assert(appSource.includes('人への転送ログ'), 'Human transfer admin log is missing');
 assert(appSource.includes('店舗設定'), 'Store settings admin UI is missing');
 assert(appSource.includes('data-confirm-record'), 'Admin confirmation action is missing');
+assert(appSource.includes('スタッフ通知キュー'), 'Notification queue admin UI is missing');
+assert(voiceSource.includes('buildStaffNotification'), 'Staff notification builder is missing');
+assert(twilioWebhookSource.includes('createIncomingCallTwiml'), 'Twilio incoming call webhook is missing');
+assert(twilioWebhookSource.includes('<Gather'), 'Twilio speech gather TwiML is missing');
 assert(appSource.includes('data-incoming-call'), 'Incoming call simulator is missing');
 assert(voiceSource.includes('3回聞き取れなかった'), 'Three-strike transfer handling is missing');
 assert(voiceSource.includes('席数'), 'Restaurant FAQ structure is missing seats');

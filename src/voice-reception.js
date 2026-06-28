@@ -14,6 +14,7 @@ export const defaultStoreSettings = {
   privateRoom: '完全個室はありませんが、半個室風の4名テーブルが2卓あります。',
   smoking: '全席禁煙です。店外に喫煙スペースがあります。',
   takeout: '一部メニューはテイクアウト可能です。受け取り希望時間をお伝えください。',
+  notificationTo: '店長LINEグループ / staff@example.com',
   tone: '柔らかく丁寧な飲食店スタッフ。短く確認し、不足項目は一つずつ聞き返す。',
   faq: 'キャンセルは前日までにご連絡ください。ベビーカー入店可。アレルギーや記念日プレートは予約時にご相談ください。'
 };
@@ -93,8 +94,42 @@ export function loadVoiceRecords(storage) {
   return Array.isArray(records) ? records : [];
 }
 
+export function buildStaffNotification(record = {}, settings = loadStoreSettings()) {
+  if (record.kind === 'reservation' && record.reservation) {
+    const reservation = record.reservation;
+    return {
+      type: 'reservation',
+      title: '新しいAI受付予約',
+      to: settings.notificationTo,
+      body: `${settings.name}: ${reservation.dateTime || '日時未取得'} / ${reservation.people || '人数未取得'} / ${reservation.name || '名前未取得'}様 / ${reservation.phone || '電話未取得'} / 席: ${reservation.seatType || '指定なし'} / 要望: ${reservation.request || '特になし'}`,
+      status: 'pending'
+    };
+  }
+  if (record.kind === 'transfer') {
+    return {
+      type: 'transfer',
+      title: 'スタッフ対応が必要です',
+      to: settings.notificationTo,
+      body: `${settings.name}: ${record.reason || record.transcript || '転送理由未取得'}。折り返しまたは店内確認をお願いします。`,
+      status: 'pending'
+    };
+  }
+  if (record.kind === 'sales') {
+    return {
+      type: 'sales',
+      title: '営業電話ログ',
+      to: settings.notificationTo,
+      body: `${settings.name}: ${record.summary || record.transcript || '営業電話の内容未取得'}。必要な場合のみ折り返してください。`,
+      status: 'pending'
+    };
+  }
+  return null;
+}
+
 export function saveVoiceRecord(record, storage) {
-  const records = [{ id: `voice-${Date.now()}-${Math.random().toString(16).slice(2)}`, createdAt: new Date().toISOString(), ...record }, ...loadVoiceRecords(storage)].slice(0, 300);
+  const settings = loadStoreSettings(storage);
+  const notification = record.notification === undefined ? buildStaffNotification(record, settings) : record.notification;
+  const records = [{ id: `voice-${Date.now()}-${Math.random().toString(16).slice(2)}`, createdAt: new Date().toISOString(), ...record, notification }, ...loadVoiceRecords(storage)].slice(0, 300);
   return writeJson(storage, VOICE_RECEPTION_STORAGE_KEY, records);
 }
 
