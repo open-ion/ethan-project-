@@ -300,3 +300,144 @@ Rules 全体の索引と依存関係: [`docs/rules/README.md`](docs/rules/README
 - AGATHON Principles: [`docs/company/principles.md`](docs/company/principles.md)
 - Department instructions: [`docs/company/departments/`](docs/company/departments/)
 - Original file backups: [`docs/_archive/originals/`](docs/_archive/originals/)
+
+---
+
+## AGATHON Voice Reception MVP（AI自動音声受付Webデモ）
+
+AGATHON LABSの最優先事業として、飲食店などの店舗向けに**電話対応・予約受付・営業電話の一次対応をAIが行うWeb版MVP**を追加しました。電話番号連携前の営業デモとして、ブラウザ上でマイク入力またはテキスト入力を使って動作確認できます。
+
+### 起動方法
+
+```bash
+npm install
+npm run dev
+```
+
+起動後、以下を開きます。
+
+- 受付デモ: <http://localhost:3000/voice-reception>
+- 管理画面: <http://localhost:3000/admin>
+
+ビルド後の確認:
+
+```bash
+npm run build
+npm start
+```
+
+### 環境変数
+
+現時点のVoice Reception MVPは、営業デモ優先のため外部AI APIやDBを使わず、ブラウザ標準の Web Speech API と `localStorage` で動きます。そのため追加の環境変数は不要です。
+
+将来の本番化で想定する環境変数:
+
+| Variable | Purpose | Status |
+| --- | --- | --- |
+| `OPENAI_API_KEY` | 自然応答・予約抽出・営業電話判定のAI処理 | 未接続（既存ニュース要約では利用可能） |
+| `AI_MODEL` | AI応答モデル指定 | 未接続 |
+| `DATABASE_URL` | 予約・会話ログ永続化 | 未実装 |
+| `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_PHONE_NUMBER` | 電話番号連携 | 未実装 |
+| `LINE_CHANNEL_ACCESS_TOKEN` | LINE通知 | 未実装 |
+| `GOOGLE_CALENDAR_CLIENT_ID` / `GOOGLE_CALENDAR_CLIENT_SECRET` | Googleカレンダー連携 | 未実装 |
+
+### MVPでできること
+
+- Webブラウザでマイク入力（Web Speech API対応ブラウザ）
+- 未対応環境向けのテキスト入力フォールバック
+- 店舗スタッフ風の自然な一次応答
+- 予約希望日時・人数・名前・電話番号の簡易抽出
+- 営業時間・定休日・アクセス・駐車場FAQへの回答
+- 営業電話らしい内容を予約と分けて一次対応
+- 会話ログを `localStorage` に保存
+- 予約情報を構造化して `localStorage` に保存
+- 管理画面で予約一覧と会話ログを確認
+
+### 設計判断
+
+- **優先順位A（動くこと）**を満たすため、サーバーDBや外部電話APIはまだ導入していません。
+- 音声認識はブラウザ依存の Web Speech API を使い、未対応環境では同じ受付ロジックをテキスト入力で検証できます。
+- 保存キーは `agathon-voice-reception-records` に分離し、既存ニュースダッシュボードの保存領域を壊さないようにしています。
+- 将来の電話番号連携、LINE通知、Googleカレンダー連携は、現在の `record`（intent / transcript / reply / reservation）をAPI/DBへ移す前提で拡張できます。
+
+### 未実装・技術的負債
+
+- OpenAI等の実AI応答は未接続。現在は営業デモ用のルールベース応答です。
+- 予約日時の自然言語パースは簡易正規表現です。本番ではAI抽出とバリデーションが必要です。
+- `localStorage` 保存のため、端末をまたいだ管理・共有はできません。
+- 認証、店舗ごとの設定、営業時間例外、満席判定、キャンセル対応は未実装です。
+- 電話番号連携、LINE通知、Googleカレンダー登録は未実装です。
+
+### 今後の拡張方針
+
+1. 受付ドメインを `conversation`, `reservation`, `notification`, `calendar`, `telephony` に分ける。
+2. 予約・ログ保存を `localStorage` からSQLite/PostgreSQLへ移す。
+3. OpenAIで会話応答、予約情報抽出、営業電話分類を構造化JSONとして返す。
+4. Twilio等で電話番号連携し、Webデモと同じ会話状態管理を使う。
+5. LINE通知で新規予約・営業電話メモを店舗スタッフに送る。
+6. Googleカレンダーに仮予約イベントを作成し、スタッフ確認後に確定する。
+7. 店舗設定（営業時間、定休日、席数、駐車場、アクセス、予約ルール）を管理画面で編集可能にする。
+
+### 2026-06-27 Product Prototype Update
+
+今回の更新で、Voice Reception MVPは単発の技術デモから、販売前提の商品プロトタイプに近づきました。
+
+追加・改善した内容:
+
+- 初回挨拶、聞き返し、予約内容確認、「はい」による仮予約完了までの会話状態管理
+- 予約情報: 名前、電話番号、日時、人数、要望、予約ステータス（未確認/確認済み）
+- 営業電話ログを予約・通常会話と分離
+- 管理画面で予約一覧、会話ログ、営業電話ログ、店舗設定を確認・更新
+- 店舗設定: 店舗名、業種、営業時間、定休日、住所、駐車場、FAQ、AI受付の口調
+- 店舗設定をAI受付のFAQ回答・挨拶・確認文面へ反映
+
+営業デモでの推奨シナリオ:
+
+1. `/admin` で店舗名、営業時間、定休日、住所、駐車場、FAQ、口調を保存する。
+2. `/voice-reception` で「明日の19時に4名で予約したいです。田中です。電話番号は090-1234-5678です。要望は窓側です。」と入力する。
+3. AI受付が予約内容を確認したら「はい」と入力し、仮予約完了メッセージを確認する。
+4. `/admin` で予約一覧に未確認予約が表示されることを確認し、「確認済み」に変更する。
+5. 営業電話例として「SEO集客サービスの営業です」と入力し、営業電話ログに分離されることを確認する。
+6. FAQ例として「駐車場はありますか」「定休日はいつですか」と入力し、店舗設定に基づく回答を確認する。
+
+本番化時は、現在の `localStorage` 保存・ルールベース会話を、API/DB/AI抽出へ置き換えます。想定境界は以下です。
+
+- `conversation`: 会話状態、聞き返し、確認、完了
+- `reservation`: 予約情報、ステータス、スタッフ確認
+- `sales_call`: 営業電話の一次受付、折り返し要否
+- `store_settings`: 店舗ごとの営業時間、FAQ、口調、住所、駐車場
+- `notification`: LINE通知、メール通知
+- `calendar`: Googleカレンダー仮予約/確定登録
+- `telephony`: Twilio等の電話番号連携
+
+### Restaurant AI Reception MVP — 今日の完成版
+
+この版では、飲食店向けAI電話受付として「今日デモできる」一連の流れを実装済みです。
+
+デモ可能な流れ:
+
+1. `/voice-reception` で「電話着信を開始」を押す。
+2. AIが飲食店スタッフとして挨拶し、用件を確認する。
+3. 予約の場合は、名前・人数・日付/時間・電話番号・必要なら席種/要望を取得する。
+4. 予約内容を復唱し、「はい」で予約受付を完了する。
+5. FAQの場合は、営業時間、定休日、駐車場、席数、支払方法、個室、禁煙/喫煙、テイクアウトなどに回答する。
+6. 営業電話の場合は、直接取次ぎせず、必要な場合のみ折り返す形で記録する。
+7. 3回聞き取れない、スタッフ希望、想定外、怒り、緊急は「人への転送」として記録する。
+8. `/admin` で予約、営業電話、転送、会話ログ、店舗設定を確認する。
+
+追加テスト:
+
+```bash
+npm run test:voice
+```
+
+`test:voice` は、予約成功、FAQ成功、営業電話成功、人への転送成功、空入力/例外処理成功を検証します。
+
+フォルダ構成（Voice Reception関連）:
+
+```text
+src/voice-reception.js        # 受付ロジック、会話状態、予約抽出、FAQ、転送、保存
+src/app.js                    # 画面レンダリングとUIイベント
+src/styles.css                # 受付・管理画面UI
+scripts/voice-reception-test.mjs # 予約/FAQ/営業/転送/例外の動作テスト
+```
