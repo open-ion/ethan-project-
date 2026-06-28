@@ -106,3 +106,53 @@ Before creating a new role, AGATHON LABS must consider whether the need can be s
 5. Workflows.
 
 New roles should be added only when they clearly increase Ion's time, reduce Ethan's coordination burden, and cannot be handled cleanly by the existing operating system.
+
+---
+
+## 8. Product Isolation Rule — Single Source of Truth
+
+This rule applies to every AGATHON LABS product, MVP, repository, deployment, and public URL.
+
+**One product must have exactly one independent source of truth:**
+
+- 1 Product = 1 GitHub Repository
+- 1 Product = 1 Vercel Project
+- 1 Product = 1 Public URL
+- 1 Product = 1 Original Source
+
+Existing products must never host, contain, toggle, or publicly serve a different product.
+
+### Prohibited
+
+- Adding a new product to `ethan-project` or any existing product repository.
+- Reusing another product's UI, CSS, README, images, copy, data, components, or public URL.
+- Deploying a different product to the same Vercel Project.
+- Adding a different service to an existing URL.
+- Using feature flags to switch between separate products.
+- Saying "it is only an MVP" as a reason to colocate products.
+
+### Required for every new product
+
+Before development begins, create or use a dedicated:
+
+1. GitHub Repository;
+2. Vercel Project;
+3. dedicated domain or dedicated `*.vercel.app` URL;
+4. product-specific README;
+5. product-specific `package.json`;
+6. product-specific `CLAUDE.md`, `AGENTS.md`, `RULES.md`, and `AI_HANDOFF_LEDGER.md` where applicable;
+7. product-specific environment variables, GitHub Actions, issues, and project board.
+
+Before public delivery, verify that no other product name, URL, README, image, CSS, component, data, or copy is present.
+
+If another product is detected in the repository or public output, do not patch around it with conditional logic. Split the product into a new repository and deployment.
+
+### Codex / AI Agent Opening Rule
+
+When asked to build a new service, Codex and all AGATHON AI agents must begin by stating:
+
+> 新しいRepositoryを作成します。
+
+If instructed to add a new product to an existing product repository, the agent must respond:
+
+> AGATHON Constitutionに反するため、新規Repositoryを作成します。

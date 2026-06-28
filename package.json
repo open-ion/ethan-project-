@@ -1,17 +1,18 @@
 {
-  "name": "agathon-news-digest",
+  "name": "agathon-restaurant-ai-reception",
   "version": "0.1.0",
   "private": true,
-  "description": "AGATHON LABS personal AI news digest MVP for Ion, reported by Ethan.",
+  "description": "AGATHON Bistro Demo restaurant AI phone reception MVP.",
   "scripts": {
     "dev": "node scripts/dev-server.mjs",
     "build": "node scripts/build.mjs",
     "start": "node scripts/dev-server.mjs --dist",
-    "test": "npm run build && node scripts/smoke-test.mjs && node scripts/orchestrator-test.mjs",
+    "test": "npm run build && node scripts/smoke-test.mjs && node scripts/voice-reception-test.mjs && node scripts/orchestrator-test.mjs",
     "test:orchestrator": "node scripts/orchestrator-test.mjs",
     "orchestrate": "node scripts/orchestrate.mjs",
     "fetch:rss": "node scripts/fetch-rss.mjs",
-    "summarize": "node scripts/summarize-news.mjs"
+    "summarize": "node scripts/summarize-news.mjs",
+    "test:voice": "node scripts/voice-reception-test.mjs"
   },
   "engines": {
     "node": ">=20"

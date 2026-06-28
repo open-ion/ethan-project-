@@ -241,3 +241,45 @@ Every proposal, design, implementation, improvement, and review should ask how t
 
 - If Claude Code is unavailable, Codex may temporarily take over Lead Developer duties.
 - When Claude Code returns, resume from GitHub's latest state and do not guess intermediate state.
+
+---
+
+## 12. Product Isolation Operating Rule（絶対ルール）
+
+AGATHON LABS Constitution section 8 is mandatory for all repository work.
+
+### Single Source of Truth
+
+- 1 Product = 1 GitHub Repository
+- 1 Product = 1 Vercel Project
+- 1 Product = 1 Public URL
+- 1 Product = 1 Original Source
+
+### Do not colocate products
+
+Do not add a new service, MVP, UI, README, CSS, image, component, data file, environment variable set, GitHub Action, issue system, project board, or Vercel deployment into an existing product repository.
+
+Do not use feature flags or routing to switch separate products inside one repository or one public URL.
+
+### Required response for new services
+
+When Ion asks for a new service or MVP, start with:
+
+> 新しいRepositoryを作成します。
+
+If Ion or any workflow asks to add a new product into an existing product repository, respond:
+
+> AGATHON Constitutionに反するため、新規Repositoryを作成します。
+
+### Public delivery gate
+
+Before any public deployment or PR that changes a product, verify:
+
+- no other product name appears;
+- no other product URL appears;
+- no other product README appears;
+- no other product image appears;
+- no other product CSS or component appears;
+- no other product data appears.
+
+If contamination is detected, stop adding features and split the product into its own repository and deployment.
