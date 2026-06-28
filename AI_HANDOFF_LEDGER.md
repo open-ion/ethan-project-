@@ -191,3 +191,32 @@
 
 ## Ethanへの引き継ぎ事項
 - 今後、新規サービス開発依頼への初動は必ず「新しいRepositoryを作成します。」から始める。
+
+---
+
+## 2026-06-28 — Codex: AGATHON LABS Constitution v1.0 Rebuild
+
+## 完了したこと
+- `AGATHON_CONSTITUTION.md` を v1.0 としてゼロベース再構成。
+- Product Isolation, Repository First, Original Source, AI Handoff, Naming, No Mixed Products, Release Checklist, AI Self Check, Constitution Priority, Future Proof を憲法化。
+- `AGENTS.md` を Constitution v1.0 に従う運用ルールとして再構成。
+- `RULES.md` を Constitution v1.0 のクイックルールとして再構成。
+- AI視点の「まだ足りないルール / Risk Register」を Constitution に追加。
+
+## 変更したファイル
+- `AGATHON_CONSTITUTION.md`
+- `AGENTS.md`
+- `RULES.md`
+- `AI_HANDOFF_LEDGER.md`
+
+## 変更理由
+- AGATHON LABSが100製品、100Repository、100Vercel、100AIになっても破綻しない開発憲法を作るため。
+- 今後、新規サービスを既存Repositoryへ混在させる事故を制度として防止するため。
+
+## 残タスク
+- Constitution v1.0 を全既存/新規Repositoryへ配布するテンプレート化。
+- 新規Repository作成、Vercel作成、汚染スキャン、Release Checklistを自動化するCLIまたはGitHub Actionを作る。
+
+## Ethanへの引き継ぎ事項
+- 今後の新規プロダクト開発依頼は、必ず「新しいRepositoryを作成します。」から始める。
+- 既存Repositoryへの新規製品追加指示は、Constitution違反として停止する。

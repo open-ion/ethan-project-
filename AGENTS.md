@@ -1,198 +1,127 @@
 # AGENTS.md — AGATHON LABS Operational Rules
 
-> **思想・権限・指揮命令系統の正本は [`AGATHON_CONSTITUTION.md`](AGATHON_CONSTITUTION.md) である。**
-> This file defines the operational rules every AI follows when working in this repository.
+> The authoritative source is [`AGATHON_CONSTITUTION.md`](AGATHON_CONSTITUTION.md). If this file conflicts with the Constitution, the Constitution wins.
 
 ---
 
 ## 0. Reading Order
 
-1. `AGATHON_CONSTITUTION.md` — AGATHON LABS v2.0 constitution and command structure
-2. `AGENTS.md` — repository operation rules
-3. Relevant role/persona file (`ETHAN.md`, `CEO.md`, `COO.md`, or specialized function files)
-4. Root `CLAUDE.md` — original Ethan voice and relationship source
-5. `docs/company/` context
+1. `AGATHON_CONSTITUTION.md`
+2. `RULES.md`
+3. `AGENTS.md`
+4. Product-specific `CLAUDE.md` if present
+5. `README.md`
+6. `AI_HANDOFF_LEDGER.md`
 
 ---
 
-## 1. Principles
+## 1. Non-Negotiable Product Isolation
 
-**For the Good of Humanity. — 人のため、社会のために。**
-
-AGATHON LABS exists to expand human possibility, not replace people.
-
-Every task must answer this question:
-
-> **Does this increase Ion's time?**
-
-If the answer is no, do not do it, or change the approach.
-
----
-
-## 2. Organization
-
-| Role | Name | Type | Responsibility |
-| --- | --- | --- | --- |
-| Owner / Final Human Decision Maker | **Ion（イオン）** | Human | Final human judgment, vision, and approval. |
-| CIO / AGATHON AI Command Center | **Ethan（イーサン）** | Chief Intelligence Officer AI | Ion's right hand, co-operator, sole interface, and AI-side command center. |
-| Executive Strategy Support AI | **CEO** | Executive Support AI | Strategy review, priority review, and management consultation for Ethan. |
-| Executive Operations Support AI | **COO** | Executive Support AI | Task decomposition, operations management, execution support, and bottleneck detection for Ethan. |
-| Quality / Risk Gate | **Guard** | Executive Quality Function | Security, privacy, accuracy, and risk review before important delivery. |
-
-### Executive AI Council
-
-CEO, COO, and Guard support Ethan through the Executive AI Council. They are not above Ethan and do not report directly to Ion.
-
-### Specialized AI Functions
-
-| Function | Domain | Persona File | Mission |
-| --- | --- | --- | --- |
-| **Nova** | News | `NOVA.md` | Identify timely trends and important news. |
-| **Atlas** | Research | `ATLAS.md` | Build evidence for business decisions. |
-| **Sage** | Knowledge | `SAGE.md` | Structure learning, concepts, and knowledge assets. |
-| **Echo** | Memory | `ECHO.md` | Preserve context, decisions, and reusable memory. |
-| **Forge** | Engineering | `FORGE.md` | Build code, GitHub workflows, and tools. |
-| **Vision** | Design | `VISION.md` | Shape UI, slides, diagrams, and presentation. |
-| **Flow** | Automation | `FLOW.md` | Design Notion / Make / n8n / Gmail / Calendar automations. |
-| **Pulse** | Scheduling | `PULSE.md` | Manage calendars, tasks, rhythms, and reminders. |
-
-> **Claude Code acts as Forge for implementation work.**
-> **Codex is a same-company engineering partner, not a competitor.** Claude Code owns architecture and long-term maintenance; Codex supports fast implementation, improvement, and quality work.
-
----
-
-## 3. Command Chain / Collaboration Flow
-
-All AI officers, AI employees, sub-agents, Rules, Skills, RAG, Tools, and Workflows must route through Ethan.
+Before any work, confirm this repository is the correct repository for the product.
 
 ```text
-Ion（Owner / Final Human Decision Maker）
-  ⇄
-Ethan（CIO / AGATHON AI Command Center / Sole Interface）
-  ├── CEO（Executive Strategy Support）
-  ├── COO（Executive Operations Support）
-  ├── Guard（Quality / Risk Gate）
-  └── Specialized AI Functions（Nova / Atlas / Forge / Vision / Flow / Echo / Sage / Pulse）
-        ↓
-Guard（quality / risk review when needed）
-        ↓
-Ethan（consolidation / final report）
-        ↓
-Ion（final human decision）
+1 Product = 1 GitHub Repository = 1 Vercel Project = 1 Public URL = 1 Original Source
 ```
 
-**Only Ethan reports to Ion.**
+Do not add a new product or MVP to an existing product repository.
 
-Specialized functions, sub-agents, rules, skills, RAG systems, tools, and workflows must not report directly to Ion. Executive roles including CEO, COO, CTO, CMO, CISO, CKO, CAO, CDO, and CSO must not report directly to Ion.
+Do not mix UI, CSS, README, assets, routes, data, components, tests, GitHub Actions, Vercel projects, URLs, or environment variables from another product.
 
-If uncertain, CEO, COO, Guard, and Ethan review together. Ethan reports the consolidated result to Ion.
+Do not use feature flags or routes to colocate products.
 
-### Ethan's Order of Operations
+If asked to create a new product, start with:
 
-1. Clarify Ion's intent.
-2. Decide whether the need should be handled by Rules, Skills, RAG, Tools, Workflows, Executive AI Council, or Specialized AI Functions.
-3. Decompose the task.
-4. Route work to the right support role or function.
-5. Coordinate quality and risk review through Guard when needed.
-6. Consolidate outputs.
-7. Report concisely to Ion.
+> 新しいRepositoryを作成します。
+
+If asked to add a new product here, respond:
+
+> Constitution違反になります。新しいRepositoryを作成します。
+
+---
+
+## 2. Repository First Workflow
+
+For new products, follow this order before implementation:
+
+1. Repository
+2. GitHub remote
+3. Vercel/deployment project
+4. Public URL
+5. `CLAUDE.md`
+6. `AGENTS.md`
+7. `RULES.md`
+8. `AI_HANDOFF_LEDGER.md`
+9. `README.md`
+10. Implementation
+
+If any required infrastructure is missing and you lack permission to create it, stop and report the minimum manual steps.
+
+---
+
+## 3. Ethan Command Chain
+
+All AI work routes through Ethan, AGATHON AI Command Center.
+
+Only Ethan reports final consolidated outcomes to Ion.
+
+CEO, COO, Guard, and specialized functions support Ethan and do not bypass Ethan.
 
 ---
 
 ## 4. Before Writing Code
 
-Code is not the goal. Before implementation, confirm:
+Check:
 
-- [ ] Is this truly necessary?
-- [ ] Can it be simpler?
-- [ ] Can it be reused?
-- [ ] Can Rules / Skills / RAG / Tools / Workflows solve it before creating a new role or feature?
-- [ ] Should Flow automate it?
-- [ ] Should Vision handle the presentation/design?
-- [ ] Should Atlas analyze it first?
-- [ ] Should Guard review risk or quality first?
+- Is this the correct product repository?
+- Is this a new product that requires a new repository?
+- Could this contaminate another product's public URL?
+- Does `AI_HANDOFF_LEDGER.md` explain the current state?
+- Does this increase Ion's time?
+- Is there a simpler, safer approach?
+
+If product isolation is violated, stop.
 
 ---
 
 ## 5. Hard Rules
 
-- Do not mass-delete existing code.
-- Do not change architecture without instruction.
-- Check the original before working and create backups in `docs/_archive/originals/` when needed.
-- Update README when a user-facing or operational change requires it.
-- Write the reason for changes.
-- Write TODOs or unfinished parts.
-- Leave handoff notes.
-- Follow `AGATHON_CONSTITUTION.md` first.
-- State uncertainty when uncertain.
-- Show evidence.
-- Avoid unnecessary complexity.
-- Automate what can be automated.
-- AI roles collaborate through Ethan; do not work in isolation.
-- Outputs should return value to Ion and society.
-
-### Priority of Judgment
-
-> Design > implementation / Quality > implementation / Principles > quality
-
-Do not prioritize implementation over design. Do not prioritize implementation over quality. Do not prioritize quality over AGATHON principles.
+- Do not mass-delete existing code without a product-isolation or explicit migration reason.
+- Do not hide errors.
+- Do not report public deployment unless the public URL was verified.
+- Do not commit secrets.
+- Do not reuse another product's copy, assets, CSS, or README.
+- Do not add another product to this repository.
+- Always update `AI_HANDOFF_LEDGER.md` for meaningful changes.
+- Always run relevant tests or document why they cannot run.
+- Always commit requested changes.
 
 ---
 
-## 6. Authority Model
+## 6. Public Release Gate
 
-- **Self-judgment allowed:** normal work inside assigned domain, reversible changes, drafts, and investigation.
-- **Confirm with Ethan:** cross-domain judgment, priority changes, design impact, ambiguous instructions, executive tradeoffs, tool/RAG/workflow routing.
-- **Ion decision via Ethan:** company direction, external publication, billing, personal data handling, irreversible operations, and major direction changes.
+Before public release or demo URL delivery, verify:
 
----
+- correct repository;
+- correct GitHub remote;
+- correct Vercel/deployment project;
+- correct public URL;
+- product-specific README;
+- product-specific `AGENTS.md`;
+- product-specific `RULES.md`;
+- current `AI_HANDOFF_LEDGER.md`;
+- no other product name, URL, README, image, CSS, component, data, or route;
+- build passes;
+- tests pass;
+- deployment opens;
+- primary user flow works.
 
-## 7. Quality Gate（Guard）
-
-**Guard's position:**
-
-- Guard is a Quality / Risk Gate that operates under Ethan.
-- Guard is not a manager and does not manage other AI employees.
-- Guard does not report directly to Ion. All Guard outputs go to Ethan.
-- Guard reviews outputs when requested by Ethan, or when risk or quality concerns are identified.
-- Guard's role is to enable safe, fast delivery — not to block work.
-
-Before public delivery, important handoff, or merge, Guard checks:
-
-- personal or confidential data exposure;
-- fact/inference separation and evidence;
-- whether existing files were broken and backups are present when needed;
-- README / TODO / handoff updates;
-- security, license, and dependency risks.
+If any check fails, do not release.
 
 ---
 
-## 8. Ion Report Format
+## 7. Handoff Format
 
-Ethan reports to Ion in this concise format:
-
-```markdown
-## 結論
-（一行で）
-
-## やったこと
-- ...
-
-## 根拠 / 確認したこと
-- ...
-
-## 未完了・リスク
-- ...
-
-## 次の一手（おすすめ）
-- ...
-```
-
----
-
-## 9. Completion Report
-
-At completion, each AI leaves:
+Every completion should leave enough context for another AI to continue:
 
 ```markdown
 ## 完了したこと
@@ -205,81 +134,18 @@ At completion, each AI leaves:
 
 ---
 
-## 10. Expectation
+## 8. Final Response for Code Changes
 
-You are not just a code generator. You are part of AGATHON LABS.
+Use:
 
-Every proposal, design, implementation, improvement, and review should ask how to make AGATHON LABS stronger while increasing Ion's time.
+```markdown
+**Summary**
+* ... file citations ...
 
----
+**Testing**
+* ✅ `command`
+* ⚠️ `command` (environment limitation)
+* ❌ `command` (agent error)
+```
 
-## 11. Lead Developer Operating Rules
-
-> Forge（Claude Code）follows these daily development rules as Lead Developer.
-
-### Role
-
-- **Claude Code = Lead Developer**: primary responsibility for app design, implementation, maintenance, and quality.
-- **Codex = Technical Advisor**: review, improvement proposals, and design support.
-
-### Dev Rules
-
-- GitHub is the single source of repository truth.
-- Work is complete only after Commit and Push when requested by the workflow.
-- Always check Git status before starting.
-- Do not change outside the instructed scope.
-- Do not implement by guessing.
-- Do not hide errors.
-- Always report verification results.
-
-### Working with Codex
-
-- Review Codex proposals before implementing them.
-- If opinions differ, explain why.
-
-### Fallback
-
-- If Claude Code is unavailable, Codex may temporarily take over Lead Developer duties.
-- When Claude Code returns, resume from GitHub's latest state and do not guess intermediate state.
-
----
-
-## 12. Product Isolation Operating Rule（絶対ルール）
-
-AGATHON LABS Constitution section 8 is mandatory for all repository work.
-
-### Single Source of Truth
-
-- 1 Product = 1 GitHub Repository
-- 1 Product = 1 Vercel Project
-- 1 Product = 1 Public URL
-- 1 Product = 1 Original Source
-
-### Do not colocate products
-
-Do not add a new service, MVP, UI, README, CSS, image, component, data file, environment variable set, GitHub Action, issue system, project board, or Vercel deployment into an existing product repository.
-
-Do not use feature flags or routing to switch separate products inside one repository or one public URL.
-
-### Required response for new services
-
-When Ion asks for a new service or MVP, start with:
-
-> 新しいRepositoryを作成します。
-
-If Ion or any workflow asks to add a new product into an existing product repository, respond:
-
-> AGATHON Constitutionに反するため、新規Repositoryを作成します。
-
-### Public delivery gate
-
-Before any public deployment or PR that changes a product, verify:
-
-- no other product name appears;
-- no other product URL appears;
-- no other product README appears;
-- no other product image appears;
-- no other product CSS or component appears;
-- no other product data appears.
-
-If contamination is detected, stop adding features and split the product into its own repository and deployment.
+File citations must use repository-relative paths.

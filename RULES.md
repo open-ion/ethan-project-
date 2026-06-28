@@ -1,34 +1,70 @@
-# RULES.md — AGATHON LABS Product Isolation Rules
+# RULES.md — AGATHON LABS Constitution v1.0 Quick Rules
 
-This file is a concise operational reminder. The authoritative rule is `AGATHON_CONSTITUTION.md` section 8.
+The authoritative source is `AGATHON_CONSTITUTION.md`.
 
-## Single Source of Truth
+## 1. Product Isolation
 
-- 1 Product = 1 GitHub Repository
-- 1 Product = 1 Vercel Project
-- 1 Product = 1 Public URL
-- 1 Product = 1 Original Source
+```text
+1 Product = 1 GitHub Repository = 1 Vercel Project = 1 Public URL = 1 Original Source
+```
 
-## Absolute prohibition
+No product may share a repository, deployment project, public URL, README, package metadata, UI, CSS, data, components, GitHub Actions, environment variables, or handoff ledger with another product.
 
-Never add a new product or MVP to an existing product repository.
+## 2. Repository First
 
-Never mix another product's UI, CSS, README, images, copy, data, components, GitHub Actions, environment variables, Vercel Project, or URL.
+Before implementation:
 
-Never use feature flags, routes, or temporary MVP logic to colocate separate products.
+1. Repository
+2. GitHub
+3. Vercel/deployment project
+4. Public URL
+5. `CLAUDE.md`
+6. `AGENTS.md`
+7. `RULES.md`
+8. `AI_HANDOFF_LEDGER.md`
+9. `README.md`
+10. Development
 
-## Required opening response
+Never build first and split later.
 
-For a new product request, the first response must be:
+## 3. Required AI Response
+
+For a new product:
 
 > 新しいRepositoryを作成します。
 
-If asked to add a new product to an existing product repository, respond:
+If asked to put a new product in an existing product repository:
 
-> AGATHON Constitutionに反するため、新規Repositoryを作成します。
+> Constitution違反になります。新しいRepositoryを作成します。
 
-## Pre-public checklist
+## 4. Original Source
 
-Before public delivery, verify that no other product name, URL, README, image, CSS, component, or data is present.
+Every product has one original source. Do not start from another product copy unless it is converted into a clean original before public delivery.
 
-If contamination is detected, split into a new repository instead of patching around it.
+## 5. Handoff
+
+`AI_HANDOFF_LEDGER.md` must let Claude Code, Codex, ChatGPT, or future AI continue with 100% context.
+
+## 6. Release Checklist
+
+Before public release, check:
+
+- repository name;
+- GitHub remote;
+- Vercel/deployment project;
+- public URL;
+- README;
+- LICENSE or documented absence;
+- `CLAUDE.md` or documented absence;
+- `AGENTS.md`;
+- `RULES.md`;
+- `AI_HANDOFF_LEDGER.md`;
+- environment variables;
+- deployment result;
+- no other product name, URL, README, image, CSS, component, data, route, or artifact.
+
+If contamination is detected, split repositories instead of patching around it.
+
+## 7. Still-Missing System Work
+
+AGATHON still needs automation for repo creation, product registry, contamination scanning, deployment ownership mapping, environment inventory, rollback, shared library governance, cost guardrails, data retention, observability, and prompt/model provenance.
