@@ -76,19 +76,30 @@ assert(appSource.includes('Product Prototype'), 'Voice reception demo route is m
 assert(voiceSource.includes('VOICE_RECEPTION_STORAGE_KEY'), 'Voice reception storage key is missing');
 assert(appSource.includes('SpeechRecognition'), 'Web Speech API microphone path is missing');
 assert(voiceSource.includes('extractReservation'), 'Reservation extraction logic is missing');
-assert(voiceSource.includes('営業・ご提案'), 'Sales-call handling copy is missing');
-assert(appSource.includes('AI電話受付 管理画面'), 'Voice admin screen is missing');
+assert(voiceSource.includes('営業のご提案はお電話ではお受けしておりません'), 'Sales-call handling copy is missing');
+assert(appSource.includes('電話受付 管理画面'), 'Voice admin screen is missing');
 
 assert(voiceSource.includes('VOICE_STORE_SETTINGS_KEY'), 'Store settings storage key is missing');
 assert(voiceSource.includes('buildVoiceReply'), 'Voice conversation flow is missing');
+assert(voiceSource.includes('receptionStyleProfiles'), 'Reception style profiles are missing');
+assert(voiceSource.includes('restaurant') && voiceSource.includes('izakaya'), 'Restaurant/izakaya style profiles are missing');
+assert(!voiceSource.includes('salon') && !voiceSource.includes('clinic') && !voiceSource.includes('hotel'), 'Non-restaurant style profiles should not be present in Phase 5');
+assert(voiceSource.includes('normalizeAmbiguousDateTime'), 'Ambiguous date/time normalization is missing');
+assert(voiceSource.includes('detectCustomerMood'), 'Customer mood detection is missing');
+assert(voiceSource.includes('createEmptyMemory') && voiceSource.includes('reservationToMemory'), 'Reception memory engine is missing');
+assert(voiceSource.includes('buildRecoveryReturnReply') && voiceSource.includes('replaceTimeInDateTime'), 'Conversation recovery engine is missing');
+assert(voiceSource.includes('detectReceptionPersonality') && voiceSource.includes('completionClosing'), 'Reception personality engine is missing');
+assert(voiceSource.includes('chooseAcknowledgement') && voiceSource.includes('humanTempoBridge'), 'Human conversation engine is missing');
+assert(appSource.includes('接客スタイル'), 'Reception style selector is missing');
+assert(appSource.includes('アレルギー') && appSource.includes('遅刻連絡') && appSource.includes('貸切相談'), 'Restaurant-specific settings are missing');
 assert(voiceSource.includes('needs_confirmation'), 'Reservation confirmation stage is missing');
-assert(voiceSource.includes('予約を受付しました'), 'Reservation completion message is missing');
+assert(voiceSource.includes('ご連絡先は') && voiceSource.includes('控えております'), 'Reservation completion message is missing');
 assert(appSource.includes('営業電話ログ'), 'Sales-call admin log is missing');
 assert(appSource.includes('人への転送ログ'), 'Human transfer admin log is missing');
 assert(appSource.includes('店舗設定'), 'Store settings admin UI is missing');
 assert(appSource.includes('data-confirm-record'), 'Admin confirmation action is missing');
 assert(appSource.includes('data-incoming-call'), 'Incoming call simulator is missing');
-assert(voiceSource.includes('3回聞き取れなかった'), 'Three-strike transfer handling is missing');
+assert(voiceSource.includes('お電話の内容を十分に確認できなかった'), 'Three-strike transfer handling is missing');
 assert(voiceSource.includes('席数'), 'Restaurant FAQ structure is missing seats');
 assert(voiceSource.includes('支払'), 'Restaurant FAQ structure is missing payment');
 
@@ -150,3 +161,5 @@ assert(handoffSource.includes('AI自動音声受付Web MVP'), 'Handoff ledger vo
 
 const roadmapSource = await readFile('docs/product/voice-reception-roadmap.md', 'utf8');
 assert(roadmapSource.includes('商品化ロードマップ'), 'Voice reception roadmap is missing');
+const phase5Source = await readFile('docs/product/phase5-restaurant-definition-of-done.md', 'utf8');
+assert(phase5Source.includes('Restaurant First Definition of Done'), 'Phase 5 restaurant DoD is missing');
