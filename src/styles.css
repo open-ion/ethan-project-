@@ -698,7 +698,8 @@ main {
   font-weight: 800;
 }
 
-.settings-form textarea {
+.settings-form textarea,
+.settings-form select {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 14px;
