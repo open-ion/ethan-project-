@@ -41,6 +41,7 @@ AGATHON_CONSTITUTION.md   ← 思想・権限の最高位（最優先）
 | [`quality-gate.md`](quality-gate.md) | 品質保証 | Guard の Quality Gate / Risk Gate 定義 |
 | [`git-workflow.md`](git-workflow.md) | Git 運用ルール | GitHub main を唯一の正本とする Git 作業フロー |
 | [`builder-handoff.md`](builder-handoff.md) | Temporary Builder ハンドオフ | Codex 等が一時作業した場合の成果物保存場所の必須明記ルール |
+| [`essential-thinking.md`](essential-thinking.md) | エッセンシャル思考：編集の原則 | より少なく、より良く。削除・凝縮・修正・抑制の4原則 |
 
 ---
 
@@ -67,6 +68,7 @@ command-chain.md           ← 最上位。全 Rule の前提となるチェー�
 | `quality-gate` | `review-policy`, `command-chain`, `reporting-policy` |
 | `role-creation-policy` | `command-chain`, `review-policy`, `quality-gate` |
 | `builder-handoff` | `git-workflow`, `reporting-policy`, `command-chain` |
+| `essential-thinking` | `reporting-policy`, `command-chain`（全 Rule の実行方針に影響） |
 
 ---
 
