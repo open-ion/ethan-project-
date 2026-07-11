@@ -40,6 +40,7 @@ AGATHON_CONSTITUTION.md   ← 思想・権限の最高位（最優先）
 | [`review-policy.md`](review-policy.md) | レビュー方針 | 通常レビューと拡張レビューの使い分け |
 | [`quality-gate.md`](quality-gate.md) | 品質保証 | Guard の Quality Gate / Risk Gate 定義 |
 | [`git-workflow.md`](git-workflow.md) | Git 運用ルール | GitHub main を唯一の正本とする Git 作業フロー |
+| [`design-decision-framework.md`](design-decision-framework.md) | デザイン意思決定 | 制作物の判断優先順位・感情設計・品質基準 |
 
 ---
 
