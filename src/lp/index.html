@@ -79,10 +79,12 @@
     align-items: center;
     justify-content: center;
     padding: clamp(4rem, 10vh, 8rem) clamp(1.5rem, 6vw, 5rem);
+    overflow: hidden; /* 視差・背景演出のはみ出しを封じる */
   }
   .panel-inner {
     width: min(46rem, 100%);
     text-align: center;
+    will-change: transform; /* スクロール視差用 */
   }
 
   /* 縦書きの章ラベル — 感情設計の「章」を進行として示す */
@@ -146,11 +148,47 @@
   .reveal:nth-child(2) { transition-delay: 0.15s; }
   .reveal:nth-child(3) { transition-delay: 0.3s; }
 
+  /* 文字がほどけるように現れる(参考動画の "Unfold" の思想) */
+  .char {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(0.35em);
+    filter: blur(10px);
+    transition:
+      opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+      filter 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: calc(var(--i) * 60ms);
+  }
+  .chars-in .char {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+
+  /* 見出し下に引かれる金の線(転機=夜明けの地平線) */
+  .dawn-line {
+    display: block;
+    width: min(16rem, 60%);
+    height: 1px;
+    margin: 2.2rem auto 0;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    transform: scaleX(0);
+    transition: transform 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.5s;
+  }
+  .is-in .dawn-line, .chars-in .dawn-line { transform: scaleX(1); }
+
   /* ============ hero ============ */
   .hero .panel-inner { width: min(52rem, 100%); }
   .hero h1 { font-size: clamp(2.2rem, 6.5vw, 4.2rem); }
   .hero .line2 { display: block; margin-top: 0.4em; }
   .phrase { display: inline-block; } /* 折り返しを文節単位に限定する */
+  .hero .eyebrow {
+    opacity: 0;
+    letter-spacing: 0.2em;
+    transition: opacity 1.6s ease, letter-spacing 2.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .hero.chars-in .eyebrow { opacity: 1; letter-spacing: 0.5em; }
   .scroll-cue {
     position: absolute;
     bottom: 2.5rem;
@@ -160,7 +198,10 @@
     font-size: 0.65rem;
     letter-spacing: 0.4em;
     color: var(--dim);
+    opacity: 0;
+    transition: opacity 1.4s ease 2.4s;
   }
+  .chars-in .scroll-cue { opacity: 1; }
   .scroll-cue::after {
     content: "";
     display: block;
@@ -174,6 +215,33 @@
   @keyframes cue {
     0%, 100% { transform: scaleY(0.3); opacity: 0.4; }
     50% { transform: scaleY(1); opacity: 1; }
+  }
+
+  /* ============ problem: 沈んでいく雑務 ============ */
+  .drift {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .drift span {
+    position: absolute;
+    top: -12%;
+    left: var(--x);
+    font-family: var(--gothic);
+    font-size: var(--fs);
+    letter-spacing: 0.3em;
+    color: var(--dim);
+    opacity: 0;
+    animation: sink var(--dur) linear infinite;
+    animation-delay: var(--delay);
+    will-change: transform, opacity;
+  }
+  @keyframes sink {
+    0%   { transform: translateY(0); opacity: 0; }
+    15%  { opacity: 0.14; }
+    75%  { opacity: 0.14; }
+    100% { transform: translateY(115vh); opacity: 0; }
   }
 
   /* ============ demo (会話例) ============ */
@@ -232,6 +300,43 @@
     letter-spacing: 0.2em;
     margin-top: 0.3rem;
   }
+  /* タイピングカーソルと入力中インジケータ */
+  .caret {
+    display: inline-block;
+    width: 1px;
+    height: 1em;
+    margin-left: 2px;
+    vertical-align: -0.15em;
+    background: var(--gold-bright);
+    animation: blink 0.9s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .typing-dots { display: inline-flex; gap: 6px; padding: 0.3em 0; }
+  .typing-dots i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: dot 1.2s ease-in-out infinite;
+  }
+  .typing-dots i:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots i:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes dot {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+    30% { transform: translateY(-4px); opacity: 1; }
+  }
+  /* 送信完了の光のスタンプ */
+  .msg-system::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 1px;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    transform: scaleX(0);
+    transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .msg-system.is-in::before { transform: scaleX(1); }
 
   /* ============ benefits ============ */
   .works {
@@ -242,13 +347,34 @@
     border-top: 1px solid var(--line);
   }
   .work {
+    position: relative;
     display: grid;
     grid-template-columns: auto 1fr;
     align-items: baseline;
     gap: 1.5rem;
     padding: 1.8rem 0.3rem;
-    border-bottom: 1px solid var(--line);
+    opacity: 0;
+    transform: translateY(1.4rem);
+    transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), background 0.4s ease;
+    transition-delay: var(--d, 0s);
   }
+  .works.is-in .work { opacity: 1; transform: none; }
+  .work:hover { background: rgba(201, 161, 92, 0.04); }
+  /* 罫線は左から引かれる */
+  .work::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--line);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: calc(var(--d, 0s) + 0.25s);
+  }
+  .works.is-in .work::after { transform: scaleX(1); }
   .work .time {
     font-family: var(--gothic);
     font-variant-numeric: tabular-nums;
@@ -274,13 +400,16 @@
   .cta-mission {
     font-family: var(--gothic);
     font-size: 0.75rem;
-    letter-spacing: 0.45em;
+    letter-spacing: 0.15em;
     text-indent: 0.45em;
     color: var(--dim);
     margin-top: 3rem;
     text-transform: uppercase;
+    transition: letter-spacing 2.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
+  .is-in .cta-mission { letter-spacing: 0.45em; }
   .cta-btn {
+    position: relative;
     display: inline-block;
     margin-top: 2.8rem;
     padding: 1.15rem 3.6rem;
@@ -293,6 +422,19 @@
     text-decoration: none;
     border-radius: 2px;
     transition: background 0.4s ease, transform 0.4s ease;
+  }
+  .cta-btn::after {
+    content: "";
+    position: absolute;
+    inset: -14px;
+    border-radius: 6px;
+    background: radial-gradient(closest-side, rgba(201, 161, 92, 0.35), transparent);
+    z-index: -1;
+    animation: halo 3.4s ease-in-out infinite;
+  }
+  @keyframes halo {
+    0%, 100% { opacity: 0.35; transform: scale(0.96); }
+    50% { opacity: 0.85; transform: scale(1.04); }
   }
   .cta-btn:hover { background: var(--gold-bright); transform: translateY(-2px); }
 
@@ -314,8 +456,13 @@
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .reveal, .msg { opacity: 1; transform: none; transition: none; }
-    .scroll-cue::after { animation: none; }
+    .reveal, .msg, .work, .works.is-in .work { opacity: 1; transform: none; transition: none; }
+    .char { opacity: 1; transform: none; filter: none; transition: none; }
+    .hero .eyebrow, .scroll-cue, .cta-mission { opacity: 1; letter-spacing: inherit; transition: none; }
+    .dawn-line, .work::after, .msg-system::before { transform: none; transition: none; }
+    .scroll-cue::after, .cta-btn::after, .drift span, .typing-dots i { animation: none; }
+    .drift { display: none; }
+    .panel-inner { will-change: auto; }
   }
 </style>
 </head>
@@ -324,18 +471,28 @@
 <canvas id="glow" aria-hidden="true"></canvas>
 
 <!-- Hero:「なんだこの会社？」 -->
-<section class="panel hero" aria-label="ヒーロー">
-  <div class="panel-inner">
-    <p class="eyebrow reveal">AGATHON LABS</p>
-    <h1 class="reveal"><span class="phrase">AIは、</span><span class="phrase">目立たない。</span><em class="line2"><span class="phrase">人の仕事が、</span><span class="phrase">輝く。</span></em></h1>
+<section class="panel hero" aria-label="ヒーロー" id="hero">
+  <div class="panel-inner" data-parallax>
+    <p class="eyebrow">AGATHON LABS</p>
+    <h1 data-chars><span class="phrase">AIは、</span><span class="phrase">目立たない。</span><em class="line2"><span class="phrase">人の仕事が、</span><span class="phrase">輝く。</span></em></h1>
   </div>
   <p class="scroll-cue" aria-hidden="true">SCROLL</p>
 </section>
 
 <!-- Problem:「まさにこれで困ってる」 -->
 <section class="panel" aria-label="課題">
+  <div class="drift" aria-hidden="true">
+    <span style="--x:8%;  --fs:0.85rem; --dur:26s; --delay:0s;">メール</span>
+    <span style="--x:24%; --fs:0.7rem;  --dur:32s; --delay:-9s;">日報</span>
+    <span style="--x:38%; --fs:0.9rem;  --dur:24s; --delay:-18s;">電話対応</span>
+    <span style="--x:58%; --fs:0.75rem; --dur:30s; --delay:-4s;">集計</span>
+    <span style="--x:72%; --fs:0.85rem; --dur:27s; --delay:-14s;">請求書</span>
+    <span style="--x:86%; --fs:0.7rem;  --dur:34s; --delay:-22s;">定型連絡</span>
+    <span style="--x:15%; --fs:0.7rem;  --dur:29s; --delay:-25s;">シフト調整</span>
+    <span style="--x:65%; --fs:0.8rem;  --dur:31s; --delay:-27s;">議事録</span>
+  </div>
   <span class="chapter" aria-hidden="true">壱 — 課題</span>
-  <div class="panel-inner">
+  <div class="panel-inner" data-parallax>
     <h2 class="reveal">時間が、消えていく。</h2>
     <p class="sub reveal">メール、電話、日報、集計。<br />本当の仕事は、いつも夜に始まる。</p>
   </div>
@@ -344,8 +501,8 @@
 <!-- Story:「なるほど」 -->
 <section class="panel" aria-label="転機">
   <span class="chapter" aria-hidden="true">弐 — 転機</span>
-  <div class="panel-inner">
-    <h2 class="reveal">任せる、という選択。</h2>
+  <div class="panel-inner" data-parallax>
+    <h2 class="reveal">任せる、という選択。<span class="dawn-line" aria-hidden="true"></span></h2>
     <p class="sub reveal">あなたが眠っている間も、会社は回る。<br />AIは裏側で、静かに働く。</p>
   </div>
 </section>
@@ -353,11 +510,11 @@
 <!-- Demo:「すごい」 -->
 <section class="panel" aria-label="証明">
   <span class="chapter" aria-hidden="true">参 — 証明</span>
-  <div class="panel-inner">
+  <div class="panel-inner" data-parallax>
     <h2 class="reveal">証明しよう。</h2>
     <div class="chat" id="chat">
-      <p class="msg msg-ion"><span class="who">Ion — 23:47</span>明日の朝までに、今週の数字まとめておいて。</p>
-      <p class="msg msg-ethan"><span class="who">Ethan — 23:47</span>了解。朝6時、日次レポートと合わせて出しておく。おやすみ。</p>
+      <p class="msg msg-ion"><span class="who">Ion — 23:47</span><span class="body">明日の朝までに、今週の数字まとめておいて。</span></p>
+      <p class="msg msg-ethan"><span class="who">Ethan — 23:47</span><span class="body">了解。朝6時、日次レポートと合わせて出しておく。おやすみ。</span></p>
       <p class="msg msg-system">06:00 — レポート送信済み<small>あなたが眠っている間に。</small></p>
     </div>
   </div>
@@ -366,24 +523,24 @@
 <!-- Benefits:「導入したい」 -->
 <section class="panel" aria-label="恩恵">
   <span class="chapter" aria-hidden="true">肆 — 恩恵</span>
-  <div class="panel-inner">
+  <div class="panel-inner" data-parallax>
     <h2 class="reveal">朝5分で、今日が決まる。</h2>
     <div class="works reveal">
-      <div class="work">
+      <div class="work" style="--d:0.1s">
         <span class="time">06:00</span>
         <div>
           <h3>AI朝ダッシュボード</h3>
           <p>世界のニュースを、あなた向けに要約。読むのは5分、決めるのはあなた。</p>
         </div>
       </div>
-      <div class="work">
+      <div class="work" style="--d:0.35s">
         <span class="time">24H</span>
         <div>
           <h3>AI音声受付</h3>
           <p>営業時間外の電話も、AIが受けて要点だけ報告。機会損失をゼロに。</p>
         </div>
       </div>
-      <div class="work">
+      <div class="work" style="--d:0.6s">
         <span class="time">自動</span>
         <div>
           <h3>業務の仕組み化</h3>
@@ -397,8 +554,8 @@
 <!-- CTA:「相談してみよう」 -->
 <section class="panel" aria-label="お問い合わせ">
   <span class="chapter" aria-hidden="true">終 — 対話</span>
-  <div class="panel-inner">
-    <h2 class="reveal">まず、話そう。</h2>
+  <div class="panel-inner" data-parallax>
+    <h2 data-chars>まず、話そう。</h2>
     <p class="sub reveal">導入の相談は無料。<br />あなたの仕事のどこに光を当てるか、一緒に決める。</p>
     <div class="reveal">
       <a class="cta-btn" href="mailto:onchan20010102@gmail.com?subject=%E5%B0%8E%E5%85%A5%E7%9B%B8%E8%AB%87">相談する</a>
@@ -410,9 +567,45 @@
 <footer>© AGATHON LABS — For the Good of Humanity.</footer>
 
 <script>
-  // ---- スクロール連動の出現(意味: 章ごとに1メッセージずつ提示する感情設計) ----
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // ---- 文字がほどける見出し(意味: 香りがほどけるように、主張が立ち上がる) ----
+  function splitChars(el) {
+    const walk = (node) => {
+      if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+        const frag = document.createDocumentFragment();
+        for (const ch of Array.from(node.textContent)) {
+          const s = document.createElement('span');
+          s.className = 'char';
+          s.textContent = ch;
+          frag.appendChild(s);
+        }
+        node.replaceWith(frag);
+      } else if (node.nodeType === Node.ELEMENT_NODE && !node.classList.contains('dawn-line')) {
+        Array.from(node.childNodes).forEach(walk);
+      }
+    };
+    walk(el);
+    el.querySelectorAll('.char').forEach((c, i) => c.style.setProperty('--i', i));
+  }
+
+  document.querySelectorAll('[data-chars]').forEach((el) => {
+    if (reduced) return; // 分割せず即表示
+    splitChars(el);
+    const host = el.closest('.panel');
+    if (host.id === 'hero') {
+      // ページの幕開けはロード直後に演じる
+      requestAnimationFrame(() => setTimeout(() => host.classList.add('chars-in'), 250));
+    } else {
+      const io = new IntersectionObserver((es) => {
+        if (es[0].isIntersecting) { host.classList.add('chars-in'); io.disconnect(); }
+      }, { threshold: 0.5 });
+      io.observe(el);
+    }
+  });
+  if (reduced) document.querySelectorAll('.panel').forEach((p) => p.classList.add('chars-in'));
+
+  // ---- スクロール連動の出現(意味: 章ごとに1メッセージずつ提示する感情設計) ----
   const io = new IntersectionObserver((entries) => {
     for (const e of entries) {
       if (e.isIntersecting) {
@@ -423,19 +616,81 @@
   }, { threshold: 0.25 });
   document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
 
-  // 会話デモは1通ずつ順に届く(Show, don't tell)
+  // ---- 会話デモ(Show, don't tell): 打鍵 → 入力中 → 返信 → 朝の送信スタンプ ----
   const chat = document.getElementById('chat');
-  const chatIo = new IntersectionObserver((entries) => {
+  const msgIon = chat.querySelector('.msg-ion');
+  const msgEthan = chat.querySelector('.msg-ethan');
+  const msgSystem = chat.querySelector('.msg-system');
+
+  function typeInto(msg, speed) {
+    return new Promise((done) => {
+      const body = msg.querySelector('.body');
+      const text = body.textContent;
+      body.textContent = '';
+      const caret = document.createElement('span');
+      caret.className = 'caret';
+      body.after(caret);
+      msg.classList.add('is-in');
+      let i = 0;
+      const chars = Array.from(text);
+      (function tick() {
+        body.textContent += chars[i++];
+        if (i < chars.length) { setTimeout(tick, speed); }
+        else { setTimeout(() => { caret.remove(); done(); }, 350); }
+      })();
+    });
+  }
+
+  function showTypingDots(msg) {
+    const dots = document.createElement('span');
+    dots.className = 'typing-dots';
+    dots.innerHTML = '<i></i><i></i><i></i>';
+    const body = msg.querySelector('.body');
+    body.style.display = 'none';
+    body.before(dots);
+    msg.classList.add('is-in');
+    return () => { dots.remove(); body.style.display = ''; };
+  }
+
+  const chatIo = new IntersectionObserver(async (entries) => {
     if (!entries[0].isIntersecting) return;
     chatIo.disconnect();
-    const msgs = chat.querySelectorAll('.msg');
-    msgs.forEach((m, i) => {
-      setTimeout(() => m.classList.add('is-in'), reduced ? 0 : 600 + i * 900);
-    });
+    if (reduced) {
+      chat.querySelectorAll('.msg').forEach((m) => m.classList.add('is-in'));
+      return;
+    }
+    await new Promise((r) => setTimeout(r, 500));
+    await typeInto(msgIon, 65);                    // Ion が打つ
+    await new Promise((r) => setTimeout(r, 500));
+    const hideDots = showTypingDots(msgEthan);     // Ethan 入力中…
+    await new Promise((r) => setTimeout(r, 1500));
+    msgEthan.classList.remove('is-in');
+    hideDots();
+    void msgEthan.offsetWidth; // 再表示をトランジションさせる
+    await typeInto(msgEthan, 45);                  // Ethan が返す
+    await new Promise((r) => setTimeout(r, 900));
+    msgSystem.classList.add('is-in');              // 06:00 の光
   }, { threshold: 0.4 });
   chatIo.observe(chat);
 
-  // ---- 環境光キャンバス(意味: 暗闇=雑務の海の中で、人の仕事だけが金色に呼吸する) ----
+  // ---- スクロール視差(意味: 章がめくれる奥行き。transform のみで 60fps) ----
+  const parallaxEls = Array.from(document.querySelectorAll('[data-parallax]'));
+  if (!reduced) {
+    let raf = null;
+    const applyParallax = () => {
+      raf = null;
+      const vh = innerHeight;
+      for (const el of parallaxEls) {
+        const r = el.getBoundingClientRect();
+        const offCenter = (r.top + r.height / 2 - vh / 2) / vh; // -1〜1
+        el.style.transform = `translateY(${(-offCenter * 46).toFixed(1)}px)`;
+      }
+    };
+    addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(applyParallax); }, { passive: true });
+    applyParallax();
+  }
+
+  // ---- 環境光キャンバス(意味: 感情曲線と同期して夜が明ける。課題=闇、CTA=朝) ----
   const canvas = document.getElementById('glow');
   const ctx = canvas.getContext('2d');
   const DPR = Math.min(devicePixelRatio || 1, 1.5);
@@ -453,8 +708,16 @@
   resize();
   addEventListener('resize', resize);
 
+  function scrollProgress() {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    return max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+  }
+
   function frame(t) {
     ctx.clearRect(0, 0, W, H);
+    const p = scrollProgress();
+    // 夜 → 朝: 進むほど光が強くなる(0.7x → 1.5x)
+    const brightness = 0.7 + p * 0.8;
     for (const o of orbs) {
       const dx = Math.sin(t * o.sp + o.ph) * 0.06;
       const dy = Math.cos(t * o.sp * 0.8 + o.ph) * 0.05;
@@ -463,7 +726,16 @@
       const cy = (o.y + dy) * H;
       const r = o.r * Math.max(W, H) * breathe;
       const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-      g.addColorStop(0, `rgba(${o.hue[0]},${o.hue[1]},${o.hue[2]},${o.a})`);
+      g.addColorStop(0, `rgba(${o.hue[0]},${o.hue[1]},${o.hue[2]},${(o.a * brightness).toFixed(4)})`);
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    }
+    // 終章で地平線から朝日が昇る
+    if (p > 0.72) {
+      const sun = (p - 0.72) / 0.28;
+      const g = ctx.createRadialGradient(W / 2, H * 1.15, 0, W / 2, H * 1.15, H * 0.9);
+      g.addColorStop(0, `rgba(226, 193, 133, ${(sun * 0.16).toFixed(4)})`);
       g.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, W, H);
