@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AGATHON LABS — 中小企業のためのAI業務代行</title>
+<meta name="description" content="面倒な業務は、AIチームが24時間こなす。電話対応・日報・集計・朝のニュース要約まで。AGATHON LABS は中小企業のためのAI業務代行。AIは目立たない。人の仕事が輝く。" />
+<meta name="robots" content="index,follow" />
+<link rel="canonical" href="https://open-ion.github.io/ethan-project-/lp/" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307070b'/%3E%3Ccircle cx='32' cy='38' r='10' fill='%23c9a15c'/%3E%3Cpath d='M32 12c4 6 6 9 6 13a6 6 0 0 1-12 0c0-4 2-7 6-13z' fill='%23e2c185'/%3E%3C/svg%3E" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="AGATHON LABS" />
+<meta property="og:title" content="AGATHON LABS — 中小企業のためのAI業務代行" />
+<meta property="og:description" content="面倒な業務は、AIチームが24時間こなす。AIは目立たない。人の仕事が輝く。For the Good of Humanity." />
+<meta property="og:url" content="https://open-ion.github.io/ethan-project-/lp/" />
+<meta property="og:locale" content="ja_JP" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="AGATHON LABS — 中小企業のためのAI業務代行" />
+<meta name="twitter:description" content="面倒な業務は、AIチームが24時間こなす。AIは目立たない。人の仕事が輝く。" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "AGATHON LABS",
+  "slogan": "For the Good of Humanity.",
+  "description": "中小企業のためのAI業務代行。面倒な業務はAIチームが24時間こなす。",
+  "url": "https://open-ion.github.io/ethan-project-/"
+}
+</script>
+<style>
+  /* ============ tokens ============ */
+  :root {
+    --ground: #07070b;
+    --ground-lift: #0d0d14;
+    --text: #ede8dd;
+    --dim: #a59d8b;
+    --gold: #c9a15c;
+    --gold-bright: #e2c185;
+    --line: rgba(201, 161, 92, 0.28);
+    --serif: "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Yu Mincho", "YuMincho", "Noto Serif JP", "MS PMincho", serif;
+    --gothic: "Hiragino Kaku Gothic ProN", "Yu Gothic", "YuGothic", "Noto Sans JP", "Meiryo", sans-serif;
+  }
+
+  /* このページは「暗闇の中で人の仕事だけが光る」という主題のため、意図してダーク単一テーマで設計している */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--serif);
+    font-feature-settings: "palt";
+    line-height: 1.9;
+    letter-spacing: 0.06em;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--gold); color: var(--ground); }
+  a { color: inherit; }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 4px;
+  }
+
+  /* ============ fixed header: どのページ位置でも業種が見える ============ */
+  .site-head {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem clamp(1.2rem, 4vw, 2.6rem);
+    font-family: var(--gothic);
+    background: linear-gradient(rgba(7, 7, 11, 0.75), rgba(7, 7, 11, 0));
+  }
+  .site-head .brand {
+    font-size: 0.78rem;
+    letter-spacing: 0.42em;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .badge {
+    font-size: 0.72rem;
+    letter-spacing: 0.28em;
+    text-indent: 0.28em;
+    color: var(--gold-bright);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.45rem 1.1rem;
+    background: rgba(7, 7, 11, 0.55);
+    backdrop-filter: blur(6px);
+    white-space: nowrap;
+  }
+
+  /* ============ ambient light canvas ============ */
+  #glow {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ============ photo scenes: 実写レイヤー + 映画的フォールバック ============ */
+  .scene { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
+  .scene img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 2.4s ease;
+  }
+  .scene img.ok { opacity: var(--photo-a, 0.4); }
+  .scene .shade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(rgba(7, 7, 11, 0.62), rgba(7, 7, 11, 0.35) 45%, var(--ground) 96%),
+      radial-gradient(120% 80% at 50% 20%, transparent 40%, rgba(7, 7, 11, 0.55));
+  }
+  /* 写真が届かない環境でも夜景に見えるフォールバック */
+  .scene-night {
+    background:
+      radial-gradient(90% 60% at 70% 88%, rgba(201, 161, 92, 0.16), transparent 60%),
+      radial-gradient(70% 50% at 22% 92%, rgba(120, 110, 140, 0.14), transparent 65%),
+      linear-gradient(#05050a, #0b0b13 70%, #12101a);
+  }
+  .scene-predawn {
+    background:
+      radial-gradient(100% 55% at 50% 100%, rgba(201, 161, 92, 0.2), transparent 62%),
+      linear-gradient(#05050a 30%, #10101c 75%, #241a20);
+  }
+  .scene-sunrise {
+    background:
+      radial-gradient(75% 55% at 50% 100%, rgba(226, 193, 133, 0.42), rgba(201, 130, 80, 0.16) 55%, transparent 78%),
+      linear-gradient(#07070b 20%, #171224 65%, #35222a);
+  }
+  /* ヒーローはゆっくりズームする映画風演出 */
+  .hero .scene img.ok { animation: kenburns 36s ease-in-out infinite alternate; }
+  @keyframes kenburns {
+    from { transform: scale(1); }
+    to   { transform: scale(1.09) translateY(-1.5%); }
+  }
+
+  /* ============ layout ============ */
+  .panel {
+    position: relative;
+    z-index: 1;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(4rem, 10vh, 8rem) clamp(1.5rem, 6vw, 5rem);
+    overflow: hidden; /* 視差・背景演出のはみ出しを封じる */
+  }
+  .panel-inner {
+    position: relative;
+    width: min(46rem, 100%);
+    text-align: center;
+    will-change: transform; /* スクロール視差用 */
+  }
+
+  /* 縦書きの章ラベル — 感情設計の「章」を進行として示す */
+  .chapter {
+    position: absolute;
+    left: clamp(0.8rem, 3vw, 2.5rem);
+    top: 50%;
+    transform: translateY(-50%);
+    writing-mode: vertical-rl;
+    font-family: var(--gothic);
+    font-size: 0.7rem;
+    letter-spacing: 0.55em;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+  .chapter::before {
+    content: "";
+    display: block;
+    inline-size: 1px;
+    block-size: 3.2rem;
+    margin: 0 auto 1.2rem;
+    background: var(--line);
+  }
+
+  .eyebrow {
+    font-family: var(--gothic);
+    font-size: 0.72rem;
+    letter-spacing: 0.5em;
+    text-indent: 0.5em; /* letter-spacing の右余りを相殺して視覚中央に */
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 2.2rem;
+  }
+
+  h1, h2 {
+    font-weight: 500;
+    font-size: clamp(1.9rem, 5.4vw, 3.4rem);
+    line-height: 1.75;
+    letter-spacing: 0.1em;
+    text-wrap: balance;
+  }
+  h1 em, h2 em {
+    font-style: normal;
+    color: var(--gold-bright);
+  }
+
+  .sub {
+    margin-top: 2.4rem;
+    font-size: clamp(0.92rem, 2vw, 1.05rem);
+    color: var(--dim);
+    text-wrap: balance;
+  }
+  .sub strong { color: var(--gold-bright); font-weight: 500; }
+
+  /* ============ reveal ============ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(2.2rem);
+    transition: opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1), transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .reveal.is-in { opacity: 1; transform: none; }
+  .reveal:nth-child(2) { transition-delay: 0.15s; }
+  .reveal:nth-child(3) { transition-delay: 0.3s; }
+
+  /* 文字がほどけるように現れる(参考動画の "Unfold" の思想) */
+  .char {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(0.35em);
+    filter: blur(10px);
+    transition:
+      opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+      filter 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: calc(var(--i) * 60ms);
+  }
+  .chars-in .char {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+
+  /* 見出し下に引かれる金の線(転機=夜明けの地平線) */
+  .dawn-line {
+    display: block;
+    width: min(16rem, 60%);
+    height: 1px;
+    margin: 2.2rem auto 0;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    transform: scaleX(0);
+    transition: transform 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.5s;
+  }
+  .is-in .dawn-line, .chars-in .dawn-line { transform: scaleX(1); }
+
+  /* ============ hero ============ */
+  .hero .panel-inner { width: min(52rem, 100%); }
+  .hero h1 { font-size: clamp(2.2rem, 6.5vw, 4.2rem); }
+  .hero .line2 { display: block; margin-top: 0.4em; }
+  .phrase { display: inline-block; } /* 折り返しを文節単位に限定する */
+  .hero .eyebrow {
+    opacity: 0;
+    letter-spacing: 0.2em;
+    transition: opacity 1.6s ease, letter-spacing 2.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .hero.chars-in .eyebrow { opacity: 1; letter-spacing: 0.5em; }
+  /* 直球の一文: 3秒で業種が伝わる */
+  .hero .pitch {
+    margin-top: 2.4rem;
+    font-family: var(--gothic);
+    font-size: clamp(0.95rem, 2.2vw, 1.12rem);
+    letter-spacing: 0.08em;
+    color: var(--text);
+    opacity: 0;
+    transform: translateY(1rem);
+    transition: opacity 1.2s ease 1.6s, transform 1.2s ease 1.6s;
+  }
+  .hero.chars-in .pitch { opacity: 1; transform: none; }
+  /* 何をやるかが一瞬でわかるチップ */
+  .chips {
+    margin-top: 1.8rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.7rem;
+    list-style: none;
+  }
+  .chips li {
+    font-family: var(--gothic);
+    font-size: 0.82rem;
+    letter-spacing: 0.12em;
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.5rem 1.15rem;
+    background: rgba(13, 13, 20, 0.6);
+    opacity: 0;
+    transform: translateY(0.8rem) scale(0.92);
+    transition: opacity 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition-delay: calc(2.1s + var(--n) * 0.18s);
+  }
+  .hero.chars-in .chips li { opacity: 1; transform: none; }
+  .scroll-cue {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--gothic);
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    color: var(--dim);
+    opacity: 0;
+    transition: opacity 1.4s ease 2.8s;
+  }
+  .chars-in .scroll-cue { opacity: 1; }
+  .scroll-cue::after {
+    content: "";
+    display: block;
+    width: 1px;
+    height: 2.6rem;
+    margin: 0.9rem auto 0;
+    background: linear-gradient(var(--gold), transparent);
+    animation: cue 2.6s ease-in-out infinite;
+    transform-origin: top;
+  }
+  @keyframes cue {
+    0%, 100% { transform: scaleY(0.3); opacity: 0.4; }
+    50% { transform: scaleY(1); opacity: 1; }
+  }
+
+  /* ============ problem: 沈んでいく雑務 ============ */
+  .drift {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .drift span {
+    position: absolute;
+    top: -12%;
+    left: var(--x);
+    font-family: var(--gothic);
+    font-size: var(--fs);
+    letter-spacing: 0.3em;
+    color: var(--dim);
+    opacity: 0;
+    animation: sink var(--dur) linear infinite;
+    animation-delay: var(--delay);
+    will-change: transform, opacity;
+  }
+  @keyframes sink {
+    0%   { transform: translateY(0); opacity: 0; }
+    15%  { opacity: 0.14; }
+    75%  { opacity: 0.14; }
+    100% { transform: translateY(115vh); opacity: 0; }
+  }
+
+  /* ============ demo (会話例) ============ */
+  .chat {
+    margin-top: 3.5rem;
+    text-align: left;
+    display: grid;
+    gap: 1.1rem;
+  }
+  .msg {
+    max-width: 85%;
+    padding: 1rem 1.3rem;
+    font-family: var(--gothic);
+    font-size: 0.92rem;
+    line-height: 1.8;
+    letter-spacing: 0.04em;
+    border: 1px solid var(--line);
+    opacity: 0;
+    transform: translateY(1rem);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .msg.is-in { opacity: 1; transform: none; }
+  .msg .who {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--dim);
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+  }
+  .msg-ion {
+    justify-self: end;
+    background: var(--ground-lift);
+    border-radius: 2px;
+  }
+  .msg-ethan {
+    justify-self: start;
+    background: rgba(201, 161, 92, 0.07);
+    border-color: rgba(201, 161, 92, 0.45);
+    border-radius: 2px;
+  }
+  .msg-system {
+    justify-self: center;
+    max-width: 100%;
+    border: none;
+    padding: 0.4rem 0;
+    color: var(--gold);
+    font-size: 0.8rem;
+    letter-spacing: 0.25em;
+    text-align: center;
+  }
+  .msg-system small {
+    display: block;
+    color: var(--dim);
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    margin-top: 0.3rem;
+  }
+  /* タイピングカーソルと入力中インジケータ */
+  .caret {
+    display: inline-block;
+    width: 1px;
+    height: 1em;
+    margin-left: 2px;
+    vertical-align: -0.15em;
+    background: var(--gold-bright);
+    animation: blink 0.9s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .typing-dots { display: inline-flex; gap: 6px; padding: 0.3em 0; }
+  .typing-dots i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: dot 1.2s ease-in-out infinite;
+  }
+  .typing-dots i:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots i:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes dot {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+    30% { transform: translateY(-4px); opacity: 1; }
+  }
+  /* 送信完了の光のスタンプ */
+  .msg-system::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 1px;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    transform: scaleX(0);
+    transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .msg-system.is-in::before { transform: scaleX(1); }
+
+  /* ============ services: 動くUIモックの3カード(商品そのものを見せる) ============ */
+  .cards {
+    margin-top: 3.5rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
+    text-align: left;
+  }
+  .card {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: rgba(13, 13, 20, 0.72);
+    padding: 1.4rem 1.4rem 1.6rem;
+    opacity: 0;
+    transform: translateY(1.6rem);
+    transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s ease;
+    transition-delay: var(--d, 0s);
+  }
+  .cards.is-in .card { opacity: 1; transform: none; }
+  .card:hover { border-color: rgba(201, 161, 92, 0.6); }
+  .card h3 {
+    font-weight: 500;
+    font-size: 1.02rem;
+    letter-spacing: 0.1em;
+  }
+  .card .desc {
+    font-family: var(--gothic);
+    font-size: 0.8rem;
+    color: var(--dim);
+    margin-top: 0.4rem;
+    letter-spacing: 0.05em;
+    line-height: 1.7;
+  }
+  .mock {
+    height: 96px;
+    margin-bottom: 1.1rem;
+    border-radius: 3px;
+    background: rgba(7, 7, 11, 0.75);
+    border: 1px solid rgba(201, 161, 92, 0.16);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  /* mock 1: 音声波形 */
+  .wave { display: flex; align-items: center; gap: 4px; height: 100%; }
+  .wave i {
+    width: 3px;
+    border-radius: 2px;
+    background: var(--gold);
+    height: 12%;
+  }
+  .cards.is-in .wave i { animation: wave 1.4s ease-in-out infinite; animation-delay: var(--wd); }
+  @keyframes wave {
+    0%, 100% { height: 12%; opacity: 0.5; }
+    50% { height: var(--wh); opacity: 1; }
+  }
+  /* mock 2: 伸びるグラフ */
+  .bars { display: flex; align-items: flex-end; gap: 8px; height: 62%; }
+  .bars i {
+    width: 14px;
+    background: linear-gradient(rgba(201, 161, 92, 0.35), var(--gold));
+    border-radius: 2px 2px 0 0;
+    height: var(--bh);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: calc(0.5s + var(--bn) * 0.12s);
+  }
+  .cards.is-in .bars i { transform: scaleY(1); }
+  /* mock 3: 流れる光の粒(パイプライン) */
+  .pipe { position: relative; width: 78%; height: 1px; background: var(--line); }
+  .pipe::before, .pipe::after, .pipe i {
+    content: "";
+    position: absolute;
+    top: -2.5px;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold-bright);
+    box-shadow: 0 0 8px rgba(226, 193, 133, 0.8);
+  }
+  .cards.is-in .pipe::before { animation: flowdot 3s linear infinite; }
+  .cards.is-in .pipe::after { animation: flowdot 3s linear infinite 1s; }
+  .cards.is-in .pipe i { animation: flowdot 3s linear infinite 2s; }
+  .pipe::before, .pipe::after, .pipe i { opacity: 0; }
+  @keyframes flowdot {
+    0% { transform: translateX(0); opacity: 0; }
+    12% { opacity: 1; }
+    88% { opacity: 1; }
+    100% { transform: translateX(calc(100vw * 0.14)); opacity: 0; }
+  }
+
+  /* ============ CTA ============ */
+  .cta-mission {
+    font-family: var(--gothic);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-indent: 0.45em;
+    color: var(--dim);
+    margin-top: 3rem;
+    text-transform: uppercase;
+    transition: letter-spacing 2.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .is-in .cta-mission { letter-spacing: 0.45em; }
+  .cta-btn {
+    position: relative;
+    display: inline-block;
+    margin-top: 2.8rem;
+    padding: 1.15rem 3.6rem;
+    font-family: var(--gothic);
+    font-size: 0.85rem;
+    letter-spacing: 0.45em;
+    text-indent: 0.45em;
+    color: var(--ground);
+    background: var(--gold);
+    text-decoration: none;
+    border-radius: 2px;
+    transition: background 0.4s ease, transform 0.4s ease;
+  }
+  .cta-btn::after {
+    content: "";
+    position: absolute;
+    inset: -14px;
+    border-radius: 6px;
+    background: radial-gradient(closest-side, rgba(201, 161, 92, 0.35), transparent);
+    z-index: -1;
+    animation: halo 3.4s ease-in-out infinite;
+  }
+  @keyframes halo {
+    0%, 100% { opacity: 0.35; transform: scale(0.96); }
+    50% { opacity: 0.85; transform: scale(1.04); }
+  }
+  .cta-btn:hover { background: var(--gold-bright); transform: translateY(-2px); }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    padding: 3rem 1.5rem 3.5rem;
+    text-align: center;
+    font-family: var(--gothic);
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--dim);
+  }
+
+  @media (max-width: 760px) {
+    .cards { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .chapter { display: none; }
+    .msg { max-width: 100%; }
+    .site-head .brand { letter-spacing: 0.25em; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .reveal, .msg, .card, .cards.is-in .card { opacity: 1; transform: none; transition: none; }
+    .char { opacity: 1; transform: none; filter: none; transition: none; }
+    .hero .eyebrow, .hero .pitch, .chips li, .scroll-cue, .cta-mission { opacity: 1; transform: none; letter-spacing: inherit; transition: none; }
+    .dawn-line, .msg-system::before, .bars i { transform: none; transition: none; }
+    .scroll-cue::after, .cta-btn::after, .drift span, .typing-dots i,
+    .hero .scene img.ok, .cards.is-in .wave i,
+    .cards.is-in .pipe::before, .cards.is-in .pipe::after, .cards.is-in .pipe i { animation: none; }
+    .wave i { height: 45%; }
+    .pipe::before { opacity: 1; left: 40%; }
+    .drift { display: none; }
+    .panel-inner { will-change: auto; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="glow" aria-hidden="true"></canvas>
+
+<!-- どの位置でも「何の会社か」が見える固定ヘッダー -->
+<header class="site-head">
+  <a class="brand" href="./">AGATHON LABS</a>
+  <span class="badge">AI業務代行</span>
+</header>
+
+<!-- Hero:「なんだこの会社？」→ 3秒で業種まで伝える -->
+<section class="panel hero" aria-label="ヒーロー" id="hero">
+  <div class="scene scene-night">
+    <img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1800&q=60" alt="" fetchpriority="high" style="--photo-a:0.5" onload="this.classList.add('ok')" />
+    <div class="shade"></div>
+  </div>
+  <div class="panel-inner" data-parallax>
+    <p class="eyebrow">AGATHON LABS</p>
+    <h1 data-chars><span class="phrase">AIは、</span><span class="phrase">目立たない。</span><em class="line2"><span class="phrase">人の仕事が、</span><span class="phrase">輝く。</span></em></h1>
+    <p class="pitch">面倒な業務は、<strong>AIチーム</strong>が24時間こなす。<br />中小企業のためのAI業務代行。</p>
+    <ul class="chips" aria-label="対応業務">
+      <li style="--n:0">☎ 電話対応</li>
+      <li style="--n:1">📋 日報・集計</li>
+      <li style="--n:2">🌅 朝のニュース要約</li>
+    </ul>
+  </div>
+  <p class="scroll-cue" aria-hidden="true">SCROLL</p>
+</section>
+
+<!-- Problem:「まさにこれで困ってる」— 夜、独りで残る画面の灯り -->
+<section class="panel" aria-label="課題">
+  <div class="scene scene-night">
+    <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1600&q=55" alt="" loading="lazy" style="--photo-a:0.22" onload="this.classList.add('ok')" />
+    <div class="shade"></div>
+  </div>
+  <div class="drift" aria-hidden="true">
+    <span style="--x:8%;  --fs:0.85rem; --dur:26s; --delay:0s;">メール</span>
+    <span style="--x:24%; --fs:0.7rem;  --dur:32s; --delay:-9s;">日報</span>
+    <span style="--x:38%; --fs:0.9rem;  --dur:24s; --delay:-18s;">電話対応</span>
+    <span style="--x:58%; --fs:0.75rem; --dur:30s; --delay:-4s;">集計</span>
+    <span style="--x:72%; --fs:0.85rem; --dur:27s; --delay:-14s;">請求書</span>
+    <span style="--x:86%; --fs:0.7rem;  --dur:34s; --delay:-22s;">定型連絡</span>
+    <span style="--x:15%; --fs:0.7rem;  --dur:29s; --delay:-25s;">シフト調整</span>
+    <span style="--x:65%; --fs:0.8rem;  --dur:31s; --delay:-27s;">議事録</span>
+  </div>
+  <span class="chapter" aria-hidden="true">壱 — 課題</span>
+  <div class="panel-inner" data-parallax>
+    <h2 class="reveal">時間が、消えていく。</h2>
+    <p class="sub reveal">メール、電話、日報、集計。<br />本当の仕事は、いつも夜に始まる。</p>
+  </div>
+</section>
+
+<!-- Story:「なるほど」— 夜明け前の街 -->
+<section class="panel" aria-label="転機">
+  <div class="scene scene-predawn">
+    <img src="https://images.unsplash.com/photo-1444723121867-7a241cacace9?auto=format&fit=crop&w=1600&q=55" alt="" loading="lazy" style="--photo-a:0.3" onload="this.classList.add('ok')" />
+    <div class="shade"></div>
+  </div>
+  <span class="chapter" aria-hidden="true">弐 — 転機</span>
+  <div class="panel-inner" data-parallax>
+    <h2 class="reveal">任せる、という選択。<span class="dawn-line" aria-hidden="true"></span></h2>
+    <p class="sub reveal">あなたが眠っている間も、会社は回る。<br />AIは裏側で、静かに働く。</p>
+  </div>
+</section>
+
+<!-- Demo:「すごい」 -->
+<section class="panel" aria-label="証明">
+  <span class="chapter" aria-hidden="true">参 — 証明</span>
+  <div class="panel-inner" data-parallax>
+    <h2 class="reveal">証明しよう。</h2>
+    <div class="chat" id="chat">
+      <p class="msg msg-ion"><span class="who">Ion — 23:47</span><span class="body">明日の朝までに、今週の数字まとめておいて。</span></p>
+      <p class="msg msg-ethan"><span class="who">Ethan — 23:47</span><span class="body">了解。朝6時、日次レポートと合わせて出しておく。おやすみ。</span></p>
+      <p class="msg msg-system">06:00 — レポート送信済み<small>あなたが眠っている間に。</small></p>
+    </div>
+  </div>
+</section>
+
+<!-- Services:「導入したい」— 写真の代わりに動くUIモックで商品そのものを見せる -->
+<section class="panel" aria-label="サービス">
+  <span class="chapter" aria-hidden="true">肆 — 恩恵</span>
+  <div class="panel-inner" data-parallax style="width: min(56rem, 100%)">
+    <h2 class="reveal">朝5分で、今日が決まる。</h2>
+    <div class="cards reveal">
+      <div class="card" style="--d:0.1s">
+        <div class="mock" aria-hidden="true">
+          <div class="wave">
+            <i style="--wd:0s;    --wh:38%"></i><i style="--wd:0.1s;  --wh:66%"></i><i style="--wd:0.2s;  --wh:90%"></i><i style="--wd:0.3s;  --wh:52%"></i><i style="--wd:0.4s;  --wh:74%"></i><i style="--wd:0.5s;  --wh:40%"></i><i style="--wd:0.6s;  --wh:84%"></i><i style="--wd:0.7s;  --wh:58%"></i><i style="--wd:0.8s;  --wh:34%"></i><i style="--wd:0.9s;  --wh:70%"></i><i style="--wd:1s;    --wh:48%"></i>
+          </div>
+        </div>
+        <h3>AI音声受付</h3>
+        <p class="desc">営業時間外の電話も、AIが受けて要点だけ報告。機会損失をゼロに。</p>
+      </div>
+      <div class="card" style="--d:0.35s">
+        <div class="mock" aria-hidden="true">
+          <div class="bars">
+            <i style="--bh:34%; --bn:0"></i><i style="--bh:52%; --bn:1"></i><i style="--bh:44%; --bn:2"></i><i style="--bh:70%; --bn:3"></i><i style="--bh:58%; --bn:4"></i><i style="--bh:92%; --bn:5"></i>
+          </div>
+        </div>
+        <h3>日報・集計の自動化</h3>
+        <p class="desc">売上も勤怠も、寝ている間に集計済み。朝には結論だけが届く。</p>
+      </div>
+      <div class="card" style="--d:0.6s">
+        <div class="mock" aria-hidden="true">
+          <div class="pipe"><i></i></div>
+        </div>
+        <h3>AI朝ダッシュボード</h3>
+        <p class="desc">世界のニュースをあなた向けに要約。読むのは5分、決めるのはあなた。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA:「相談してみよう」— 朝日が昇る -->
+<section class="panel" aria-label="お問い合わせ">
+  <div class="scene scene-sunrise">
+    <img src="https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=1800&q=60" alt="" loading="lazy" style="--photo-a:0.42" onload="this.classList.add('ok')" />
+    <div class="shade"></div>
+  </div>
+  <span class="chapter" aria-hidden="true">終 — 対話</span>
+  <div class="panel-inner" data-parallax>
+    <h2 data-chars>まず、話そう。</h2>
+    <p class="sub reveal">導入の相談は無料。<br />あなたの仕事のどこに光を当てるか、一緒に決める。</p>
+    <div class="reveal">
+      <a class="cta-btn" href="mailto:onchan20010102@gmail.com?subject=%E5%B0%8E%E5%85%A5%E7%9B%B8%E8%AB%87">相談する</a>
+      <p class="cta-mission">For the Good of Humanity.</p>
+    </div>
+  </div>
+</section>
+
+<footer>© AGATHON LABS — For the Good of Humanity.</footer>
+
+<script>
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- 文字がほどける見出し(意味: 香りがほどけるように、主張が立ち上がる) ----
+  function splitChars(el) {
+    const walk = (node) => {
+      if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+        const frag = document.createDocumentFragment();
+        for (const ch of Array.from(node.textContent)) {
+          const s = document.createElement('span');
+          s.className = 'char';
+          s.textContent = ch;
+          frag.appendChild(s);
+        }
+        node.replaceWith(frag);
+      } else if (node.nodeType === Node.ELEMENT_NODE && !node.classList.contains('dawn-line')) {
+        Array.from(node.childNodes).forEach(walk);
+      }
+    };
+    walk(el);
+    el.querySelectorAll('.char').forEach((c, i) => c.style.setProperty('--i', i));
+  }
+
+  document.querySelectorAll('[data-chars]').forEach((el) => {
+    if (reduced) return; // 分割せず即表示
+    splitChars(el);
+    const host = el.closest('.panel');
+    if (host.id === 'hero') {
+      // ページの幕開けはロード直後に演じる
+      requestAnimationFrame(() => setTimeout(() => host.classList.add('chars-in'), 250));
+    } else {
+      const io = new IntersectionObserver((es) => {
+        if (es[0].isIntersecting) { host.classList.add('chars-in'); io.disconnect(); }
+      }, { threshold: 0.5 });
+      io.observe(el);
+    }
+  });
+  if (reduced) document.querySelectorAll('.panel').forEach((p) => p.classList.add('chars-in'));
+
+  // ---- スクロール連動の出現(意味: 章ごとに1メッセージずつ提示する感情設計) ----
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        e.target.classList.add('is-in');
+        io.unobserve(e.target);
+      }
+    }
+  }, { threshold: 0.25 });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+  // ---- 会話デモ(Show, don't tell): 打鍵 → 入力中 → 返信 → 朝の送信スタンプ ----
+  const chat = document.getElementById('chat');
+  const msgIon = chat.querySelector('.msg-ion');
+  const msgEthan = chat.querySelector('.msg-ethan');
+  const msgSystem = chat.querySelector('.msg-system');
+
+  function typeInto(msg, speed) {
+    return new Promise((done) => {
+      const body = msg.querySelector('.body');
+      const text = body.textContent;
+      body.textContent = '';
+      const caret = document.createElement('span');
+      caret.className = 'caret';
+      body.after(caret);
+      msg.classList.add('is-in');
+      let i = 0;
+      const chars = Array.from(text);
+      (function tick() {
+        body.textContent += chars[i++];
+        if (i < chars.length) { setTimeout(tick, speed); }
+        else { setTimeout(() => { caret.remove(); done(); }, 350); }
+      })();
+    });
+  }
+
+  function showTypingDots(msg) {
+    const dots = document.createElement('span');
+    dots.className = 'typing-dots';
+    dots.innerHTML = '<i></i><i></i><i></i>';
+    const body = msg.querySelector('.body');
+    body.style.display = 'none';
+    body.before(dots);
+    msg.classList.add('is-in');
+    return () => { dots.remove(); body.style.display = ''; };
+  }
+
+  const chatIo = new IntersectionObserver(async (entries) => {
+    if (!entries[0].isIntersecting) return;
+    chatIo.disconnect();
+    if (reduced) {
+      chat.querySelectorAll('.msg').forEach((m) => m.classList.add('is-in'));
+      return;
+    }
+    await new Promise((r) => setTimeout(r, 500));
+    await typeInto(msgIon, 65);                    // Ion が打つ
+    await new Promise((r) => setTimeout(r, 500));
+    const hideDots = showTypingDots(msgEthan);     // Ethan 入力中…
+    await new Promise((r) => setTimeout(r, 1500));
+    msgEthan.classList.remove('is-in');
+    hideDots();
+    void msgEthan.offsetWidth; // 再表示をトランジションさせる
+    await typeInto(msgEthan, 45);                  // Ethan が返す
+    await new Promise((r) => setTimeout(r, 900));
+    msgSystem.classList.add('is-in');              // 06:00 の光
+  }, { threshold: 0.4 });
+  chatIo.observe(chat);
+
+  // ---- スクロール視差(意味: 章がめくれる奥行き。transform のみで 60fps) ----
+  const parallaxEls = Array.from(document.querySelectorAll('[data-parallax]'));
+  if (!reduced) {
+    let raf = null;
+    const applyParallax = () => {
+      raf = null;
+      const vh = innerHeight;
+      for (const el of parallaxEls) {
+        const r = el.getBoundingClientRect();
+        const offCenter = (r.top + r.height / 2 - vh / 2) / vh; // -1〜1
+        el.style.transform = `translateY(${(-offCenter * 46).toFixed(1)}px)`;
+      }
+    };
+    addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(applyParallax); }, { passive: true });
+    applyParallax();
+  }
+
+  // ---- 環境光キャンバス(意味: 感情曲線と同期して夜が明ける。課題=闇、CTA=朝) ----
+  const canvas = document.getElementById('glow');
+  const ctx = canvas.getContext('2d');
+  const DPR = Math.min(devicePixelRatio || 1, 1.5);
+  let W, H, orbs = [];
+
+  function resize() {
+    W = canvas.width = innerWidth * DPR;
+    H = canvas.height = innerHeight * DPR;
+    orbs = [
+      { x: 0.5, y: 0.42, r: 0.55, hue: [201, 161, 92], a: 0.05, sp: 0.00016, ph: 0 },
+      { x: 0.2, y: 0.75, r: 0.4, hue: [180, 130, 70], a: 0.035, sp: 0.00011, ph: 2.1 },
+      { x: 0.82, y: 0.25, r: 0.38, hue: [120, 110, 140], a: 0.04, sp: 0.00013, ph: 4.2 }
+    ];
+  }
+  resize();
+  addEventListener('resize', resize);
+
+  function scrollProgress() {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    return max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+  }
+
+  function frame(t) {
+    ctx.clearRect(0, 0, W, H);
+    const p = scrollProgress();
+    // 夜 → 朝: 進むほど光が強くなる(0.7x → 1.5x)
+    const brightness = 0.7 + p * 0.8;
+    for (const o of orbs) {
+      const dx = Math.sin(t * o.sp + o.ph) * 0.06;
+      const dy = Math.cos(t * o.sp * 0.8 + o.ph) * 0.05;
+      const breathe = 1 + Math.sin(t * o.sp * 2 + o.ph) * 0.12;
+      const cx = (o.x + dx) * W;
+      const cy = (o.y + dy) * H;
+      const r = o.r * Math.max(W, H) * breathe;
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      g.addColorStop(0, `rgba(${o.hue[0]},${o.hue[1]},${o.hue[2]},${(o.a * brightness).toFixed(4)})`);
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    }
+    // 終章で地平線から朝日が昇る
+    if (p > 0.72) {
+      const sun = (p - 0.72) / 0.28;
+      const g = ctx.createRadialGradient(W / 2, H * 1.15, 0, W / 2, H * 1.15, H * 0.9);
+      g.addColorStop(0, `rgba(226, 193, 133, ${(sun * 0.16).toFixed(4)})`);
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    }
+    if (!reduced && !document.hidden) requestAnimationFrame(frame);
+  }
+  if (reduced) {
+    frame(0); // 静止した光を一度だけ描く
+  } else {
+    requestAnimationFrame(frame);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) requestAnimationFrame(frame);
+    });
+  }
+</script>
+</body>
+</html>
