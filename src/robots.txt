@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://open-ion.github.io/ethan-project-/sitemap.xml
