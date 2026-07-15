@@ -47,6 +47,10 @@ jobs:
         run: npm run summarize
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          # OpenAI互換の無料プロバイダ(Groq/Gemini/OpenRouter等)へ切り替える場合は
+          # リポジトリの vars.AI_BASE_URL / vars.AI_MODEL と secrets.AI_API_KEY を設定する。
+          AI_BASE_URL: ${{ vars.AI_BASE_URL || '' }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY || '' }}
           AI_MODEL: ${{ vars.AI_MODEL || 'gpt-4.1-mini' }}
           AI_SUMMARY_LIMIT: ${{ vars.AI_SUMMARY_LIMIT || '20' }}
 

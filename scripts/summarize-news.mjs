@@ -5,8 +5,16 @@ const outputPath = process.argv.find((arg) => arg.startsWith('--out='))?.slice('
 const model = process.env.AI_MODEL || 'gpt-4.1-mini';
 const summaryLimit = Number(process.env.AI_SUMMARY_LIMIT || 20);
 
+// OpenAI互換プロバイダ対応: AI_BASE_URL と AI_API_KEY を差し替えるだけで
+// Groq / Gemini(OpenAI互換) / OpenRouter / Cerebras / Mistral / DeepSeek 等の無料枠が使える。
+// 既定は従来どおり OpenAI(Responses API)。互換プロバイダは chat/completions を使う。
+const aiBaseUrl = (process.env.AI_BASE_URL || 'https://api.openai.com/v1').replace(/\/+$/, '');
+const aiApiKey = process.env.AI_API_KEY || process.env.OPENAI_API_KEY || '';
+const usesResponsesApi = aiBaseUrl === 'https://api.openai.com/v1';
+const providerLabel = usesResponsesApi ? 'openai' : new URL(aiBaseUrl).hostname.replace(/^api\./, '');
+
 const payload = JSON.parse(await readFile(inputPath, 'utf8'));
-const hasOpenAiKey = Boolean(process.env.OPENAI_API_KEY);
+const hasAiKey = Boolean(aiApiKey);
 
 const SIGNAL_RULES = [
   { label: '災害・安全', score: 98, confidence: 0.88, pattern: /地震|津波|噴火|台風|豪雨|大雨|洪水|避難|災害|火災|事故|警報|停電|断水|不明者|死者|負傷|救助/ },
@@ -69,7 +77,7 @@ function extractKeywords(item, topic) {
 }
 
 function buildConfidenceReason({ item, confidence, provider, signal }) {
-  if (provider === 'openai') {
+  if (provider === providerLabel) {
     if (confidence < 0.55) return 'RSS本文が短い、または要約根拠が限られるため低めに表示しています。';
     return 'RSSのタイトル・説明文に基づいて要約できています。';
   }
@@ -165,24 +173,27 @@ Category: ${item.categoryId}
 URL: ${item.url}
 Description: ${item.rawDescription || item.summary || ''}`;
 
-  const response = await fetch('https://api.openai.com/v1/responses', {
+  const url = usesResponsesApi ? `${aiBaseUrl}/responses` : `${aiBaseUrl}/chat/completions`;
+  const body = usesResponsesApi
+    ? { model, input: prompt, temperature: 0.1, text: { format: { type: 'json_object' } } }
+    : { model, messages: [{ role: 'user', content: prompt }], temperature: 0.1, response_format: { type: 'json_object' } };
+
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
-      authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      authorization: `Bearer ${aiApiKey}`,
       'content-type': 'application/json'
     },
-    body: JSON.stringify({
-      model,
-      input: prompt,
-      temperature: 0.1,
-      text: { format: { type: 'json_object' } }
-    })
+    body: JSON.stringify(body)
   });
 
-  if (!response.ok) throw new Error(`OpenAI API HTTP ${response.status}: ${await response.text()}`);
+  if (!response.ok) throw new Error(`${providerLabel} API HTTP ${response.status}: ${await response.text()}`);
 
   const responseJson = await response.json();
-  return parseSummaryJson(extractResponseText(responseJson));
+  const text = usesResponsesApi
+    ? extractResponseText(responseJson)
+    : responseJson.choices?.[0]?.message?.content || '';
+  return parseSummaryJson(text);
 }
 
 function mergeSummary(item, summary, provider) {
@@ -205,12 +216,12 @@ function mergeSummary(item, summary, provider) {
 }
 
 async function summarizeItem(item, index) {
-  if (!hasOpenAiKey || index >= summaryLimit) {
-    return mergeSummary(item, fallbackSummary(item), hasOpenAiKey && index >= summaryLimit ? 'template-fallback-limit' : 'template-fallback');
+  if (!hasAiKey || index >= summaryLimit) {
+    return mergeSummary(item, fallbackSummary(item), hasAiKey && index >= summaryLimit ? 'template-fallback-limit' : 'template-fallback');
   }
 
   try {
-    return mergeSummary(item, await summarizeWithOpenAI(item), 'openai');
+    return mergeSummary(item, await summarizeWithOpenAI(item), providerLabel);
   } catch (error) {
     console.warn(`OpenAI summary failed for ${item.id}: ${error instanceof Error ? error.message : String(error)}`);
     return {
@@ -234,8 +245,8 @@ summarizedItems.sort((a, b) => {
 const summarized = {
   ...payload,
   summarizedAt: new Date().toISOString(),
-  summaryMode: hasOpenAiKey ? 'openai-with-fallback' : 'template-fallback',
-  summaryModel: hasOpenAiKey ? model : null,
+  summaryMode: hasAiKey ? `${providerLabel}-with-fallback` : 'template-fallback',
+  summaryModel: hasAiKey ? model : null,
   rankingPolicy: 'importanceScore desc, publishedAt desc; disaster/safety, global, Japan-critical, finance, AI, medical signals boosted',
   items: summarizedItems
 };
