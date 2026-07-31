@@ -272,6 +272,26 @@ report is written to the job summary.
 
 Architecture and extension points: [`docs/orchestrator/architecture.md`](docs/orchestrator/architecture.md).
 
+
+## Skills
+
+AGATHON LABS の Skills は、Ethan が状況に応じて選択する再利用可能な専門能力です。Role（役職）ではなく、Rules / Workflows / RAG / Tools と連携して Ion の時間を増やすための能力として扱います。
+
+Skills 全体の索引: [`docs/skills/README.md`](docs/skills/README.md)
+
+| Skill | 概要 |
+| --- | --- |
+| [`grant-consulting`](docs/skills/grant-consulting.md) | 補助金・助成金リサーチ、IT導入補助金、AI導入支援、申請資料作成 |
+| [`business-development`](docs/skills/business-development.md) | 新規事業設計、MVP設計、顧客課題、収益モデル整理 |
+| [`decision-making`](docs/skills/decision-making.md) | 目的明確化、優先順位付け、トレードオフ・ROI・リスク分析、推奨案整理 |
+| [`marketing`](docs/skills/marketing.md) | 集客導線、LP・広告・投稿文、ターゲット・訴求整理 |
+| [`agent-design`](docs/skills/agent-design.md) | AI社員・サブエージェント設計、責任範囲、連携ルール定義 |
+| [`rag-engineering`](docs/skills/rag-engineering.md) | ナレッジベース、RAG、情報源管理、回答根拠整理 |
+| [`knowledge-management`](docs/skills/knowledge-management.md) | NotebookLM / Notion / Drive / GitHub / RAG / Markdown などの知識資産整理・維持 |
+| [`mobile-development`](docs/skills/mobile-development.md) | iOS・モバイルアプリ開発、ニュースアプリ改善、パーソナライズ |
+| [`uiux-design`](docs/skills/uiux-design.md) | 画面設計、UX、カスタマイズ導線、意思決定支援デザイン |
+| [`medical-knowledge`](docs/skills/medical-knowledge.md) | 看護・医療知識整理、医療コンテンツ作成、人間専門家確認の徹底 |
+
 ## Rules
 
 AGATHON LABS の全 AI が必ず守る最高位の運用ルール。思想・権限は `AGATHON_CONSTITUTION.md`（最優先）、組織・連携は `AGENTS.md` に従う。
