@@ -68,13 +68,19 @@ command-chain.md           ← 最上位。全 Rule の前提となるチェー�
 
 ---
 
+
+### Skills との関係
+
+Skills は Rules の下位にある再利用可能な専門能力であり、Role ではない。  
+Ethan は `docs/skills/README.md` を索引として、必要な Skill を選択し、Rules / Workflows / RAG / Tools と矛盾しない範囲で組み合わせる。
+
 ## 能力拡張の優先順位
 
 AGATHON LABS は役職（AI）を増やすのではなく、以下の順序で能力を拡張する：
 
 ```
 1. Rules      ← このディレクトリ（完成）
-2. Skills     ← docs/skills/（未作成）
+2. Skills     ← docs/skills/（Domain-Specific Skills 初期セット）
 3. Workflows  ← docs/workflows/（未作成）
 4. RAG        ← docs/rag/（未作成）
 5. Tools      ← docs/tools/（未作成）
